@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express'
+import express, { Express, NextFunction, Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
@@ -23,11 +23,8 @@ let users: User[] = [
     { username: "bob", password: "bob" }
 ]
 
-app.get('/', (req: Request, res: Response) => {
-	res.status(200).send({
-		text: "hi",
-		id: 1
-	})
+app.get('/', authenticateToken, (req: Request, res: Response) => {
+	res.status(200).send(`Welcome, ${req.body.user}`)
 })
 
 app.post('/login', async (req: Request, res: Response) => {
@@ -53,13 +50,19 @@ app.post('/login', async (req: Request, res: Response) => {
             } 
 
             if (result) {
-                res.send('Login Successful')
+                const secretKey = process.env.ACCESS_TOKEN_SECRET
+
+                if (!secretKey) {
+                    return res.status(500).json({ error: 'JWT secret key is not defined' });
+                }
+        
+                const accessToken = jwt.sign(username, secretKey)
+                res.json({ accessToken: accessToken })
             } else {
                 res.status(401).send('Invalid password')
+                return
             }
         })
-
-        // const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
 
     } catch (error) {
         console.error('Error during login')
@@ -107,4 +110,28 @@ function getUserByUsername(username: string): User | undefined {
             return users[i]
         }
     } return undefined
+}
+
+
+function authenticateToken(req: Request, res: Response, next: NextFunction) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.sendStatus(401);
+    }
+
+    const secretKey = process.env.ACCESS_TOKEN_SECRET;
+
+    if (!secretKey) {
+        return res.status(500).json({ error: 'JWT secret key is not defined' });
+    }
+
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) return res.sendStatus(403);
+
+        // Attach the user information to the request object
+        req.body.user = user;
+        next();
+    });
 }
