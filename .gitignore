@@ -9,3 +9,6 @@ dist/
 
 # Ignore coverage directory
 coverage/
+
+# Ignore transpiled test files
+auth.test.js

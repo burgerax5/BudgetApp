@@ -4,6 +4,13 @@ import { User } from '../../src/models/User';
 
 jest.mock('bcrypt');
 
+async function jestRegister(username: string, password: string, userService: UserService): Promise<void> {
+    // Mocking bcrypt.genSalt and bcrypt.hash
+    jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('mockedSalt' as never);
+    jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword123' as never);
+    await userService.registerUser(username, password)
+}
+
 describe('Get user by username', () => {
     let userService: UserService
 
@@ -11,9 +18,17 @@ describe('Get user by username', () => {
         userService = new UserService()
     })
 
-    it('it should return bob from the list of users', () => {
+    it('should return undefined since user bob doesn\'t exist', () => {
         const user = userService.getUserByUsername('bob')
-        expect(user).toBe(userService.getAllUsers()[0])
+        expect(user).toBe(undefined)
+    })
+
+    it('should register "alice" then search and return the user "alice"', async () => {
+        await jestRegister('alice', 'password123', userService)
+ 
+        const newUser = userService.getUserByUsername('alice')
+        expect(newUser).not.toBeUndefined()
+        expect(newUser?.username).toBe('alice')
     })
 })
 
@@ -25,17 +40,14 @@ describe('registerUser', () => {
     })
 
     it('should register alice as a new user', async () => {
-        const username = 'alice'
-        const password = 'password123'
-
-        // Mocking bcrypt.genSalt and bcrypt.hash
-        jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('mockedSalt' as never);
-        jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword123' as never);
-
-        await userService.registerUser(username, password)
+        await jestRegister('alice', 'password123', userService)
+        
         const newUser = userService.getUserByUsername('alice')
-        expect(userService.getAllUsers().length).toBe(2)
-        expect(newUser).toEqual({ username, password: 'hashedPassword123' })
+        expect(userService.getAllUsers().length).toBe(1)
+        expect(newUser).toEqual({ username: 'alice', password: 'hashedPassword123' })
+
+        expect(bcrypt.genSalt).toHaveBeenCalledWith(10)
+        expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
     })
 })
 
@@ -46,11 +58,13 @@ describe('getAllUsers', () => {
         userService = new UserService()
     })
 
-    it('should return 1 user', () => {
-        expect(userService.getAllUsers().length).toBe(1)
+    it('should return 0 users', () => {
+        expect(userService.getAllUsers().length).toBe(0)
     })
 
-    it('should return bob as the user', () => {
-        expect(userService.getAllUsers()[0]).toEqual({ username: "bob", password: "hashedBobPassword" })
+    it('should return bob as the user', async () => {
+        await jestRegister('bob', 'password123', userService)
+        const user = userService.getAllUsers()[0]
+        expect(user).toEqual({ username: "bob", password: "hashedPassword123" })
     })
 })

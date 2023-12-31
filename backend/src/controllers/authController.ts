@@ -8,11 +8,17 @@ import { UserService } from '../services/userService';
 const compareAsync = promisify(bcrypt.compare);
 
 export class AuthController {
+    private userService: UserService
+
+    constructor(userService: UserService) {
+        this.userService = userService
+    }
+
     public static home(req: Request, res: Response) {
         res.status(200).send(`Welcome, ${req.body.user.username}`)
     }
 
-    public static async login(req: Request, res: Response): Promise<void> {
+    public async login(req: Request, res: Response): Promise<void> {
         try {
             const { username, password } = req.body;
 
@@ -21,7 +27,7 @@ export class AuthController {
                 return;
             }
 
-            const user = UserService.getUserByUsername(username);
+            const user = this.userService.getUserByUsername(username);
             if (!user) {
                 res.status(401).send('User not found');
                 return;
@@ -48,7 +54,7 @@ export class AuthController {
         }
     }
 
-    public static async register(req: Request, res: Response): Promise<void> {
+    public async register(req: Request, res: Response): Promise<void> {
         try {
             const { username, password } = req.body;
 
@@ -57,13 +63,13 @@ export class AuthController {
                 return;
             }
 
-            const userExists = UserService.getUserByUsername(username);
+            const userExists = this.userService.getUserByUsername(username);
             if (userExists) {
                 res.status(400).send(`The user ${username} already exists.`);
                 return;
             }
 
-            await UserService.registerUser(username, password);
+            await this.userService.registerUser(username, password);
             res.send(`Registered the user ${username}`);
         } catch (error) {
             console.error('Error during registration:', error);

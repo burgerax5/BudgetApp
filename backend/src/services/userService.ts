@@ -3,7 +3,11 @@ import bcrypt from 'bcrypt';
 import { User } from '../models/User';
 
 export class UserService {
-    private users: User[] = [{ username: 'bob', password: 'hashedBobPassword' }];
+    private users: User[];
+
+    constructor() {
+        this.users = []
+    }
 
     public getUserByUsername(username: string): User | undefined {
         return this.users.find(user => user.username === username);
