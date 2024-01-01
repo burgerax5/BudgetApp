@@ -44,7 +44,7 @@ describe('registerUser', () => {
         
         const newUser = userService.getUserByUsername('alice')
         expect(userService.getAllUsers().length).toBe(1)
-        expect(newUser).toEqual({ username: 'alice', password: 'hashedPassword123' })
+        expect(newUser).toEqual({ user_id: 0, username: 'alice', password: 'hashedPassword123' })
 
         expect(bcrypt.genSalt).toHaveBeenCalledWith(10)
         expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
@@ -65,6 +65,6 @@ describe('getAllUsers', () => {
     it('should return bob as the user', async () => {
         await jestRegister('bob', 'password123', userService)
         const user = userService.getAllUsers()[0]
-        expect(user).toEqual({ username: "bob", password: "hashedPassword123" })
+        expect(user).toEqual({ user_id: 0, username: "bob", password: "hashedPassword123" })
     })
 })

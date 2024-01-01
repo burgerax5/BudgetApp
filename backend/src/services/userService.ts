@@ -16,7 +16,7 @@ export class UserService {
     public async registerUser(username: string, password: string): Promise<void> {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        this.users.push({ username, password: hashedPassword });
+        this.users.push({ user_id: this.users.length , username, password: hashedPassword });
     }
 
     public getAllUsers(): User[] {
