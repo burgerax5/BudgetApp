@@ -1,6 +1,7 @@
 import { Currency } from "../models/Currency";
 import { Expense } from "../models/Expense";
 import { User } from "../models/User";
+import { Category } from "../models/Category";
 
 export class ExpenseServices {
     private expenses: Expense[]
@@ -15,7 +16,7 @@ export class ExpenseServices {
         return this.expenses
     }
 
-    public addExpense(user_id: number, currency: Currency, amount: number, name: string, date: Date, category_id: number | undefined): boolean {
+    public addExpense(user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category): boolean {
         const expense: Expense = { 
             expense_id: this.next_id++,
             user_id: user_id,
@@ -23,7 +24,7 @@ export class ExpenseServices {
             amount,
             name,
             date,
-            category_id
+            category
         }
 
         const expenseExists: boolean = this.expenses.includes(expense)
@@ -34,18 +35,43 @@ export class ExpenseServices {
         } return false
     }
 
-    public editExpense(original: Expense, newExpense: Expense): void {
-        original.amount = newExpense.amount
-        original.date = newExpense.date
-        original.name = newExpense.name
-        original.currency = newExpense.currency
+    public editExpense(original: Expense, 
+        new_expense_details: {
+            new_amount?: number, 
+            new_date?: Date, 
+            new_name?: string, 
+            new_currency?: Currency,
+            new_category?: Category
+        }): void {
+
+        const { new_amount, new_date, new_name, new_currency, new_category } = new_expense_details
+
+        if (new_amount) {
+            original.amount = new_amount
+        }
+
+        if (new_date) {
+            original.date = new_date
+        }
+
+        if (new_name) {
+            original.name = new_name
+        }
+
+        if (new_currency) {
+            original.currency = new_currency
+        }
+
+        if (new_category) {
+            original.category = new_category
+        }
     }
 
     public deleteExpense(expense: Expense): boolean {
         const index = this.expenses.findIndex(exp => exp.expense_id === expense.expense_id)
 
         if (index > -1) {
-            this.expenses = this.expenses.filter(exp => exp.category_id !== expense.expense_id)
+            this.expenses = this.expenses.filter(exp => exp.expense_id !== expense.expense_id)
             return true
         }
         return false
@@ -55,29 +81,3 @@ export class ExpenseServices {
         return this.expenses.filter(expense => expense.user_id === user.user_id)
     }
 }
-
-// import { Category } from "../models/Category";
-
-// export class CategoryServices {
-//     private categories: Category[]
-
-//     constructor() {
-//         this.categories = [
-//             {category_id: 0, name: "Food & Drink", colour: "#f5b642"},
-//             {category_id: 1, name: "Entertainment", colour: "#f54e42"},
-//             {category_id: 2, name: "Transportation", colour: "#dd42f5"},
-//             {category_id: 3, name: "Health", colour: "#54f542"},
-//             {category_id: 4, name: "Groceries", colour: "#ba4111"},
-//             {category_id: 5, name: "Education", colour: "#11bab2"},
-//             {category_id: 6, name: "Housing", colour: "#ba115a"}
-//         ]
-//     }
-
-//     public getAllCategories(): Category[] {
-//         return this.categories
-//     }
-
-//     public getCategoryByName(category_name: string): Category | undefined {
-//         return this.categories.find(category => category.name === category_name)
-//     }
-// }
