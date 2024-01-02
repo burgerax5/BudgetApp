@@ -13,4 +13,7 @@ coverage/
 # Ignore transpiled test files
 auth.test.js
 category.test.js
+expense.test.js
+
+# Ignore transpiled helper functions
 registerUser.js

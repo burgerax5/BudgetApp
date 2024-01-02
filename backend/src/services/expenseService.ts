@@ -80,4 +80,29 @@ export class ExpenseServices {
     getExpenseByUser(user: User): Expense[] {
         return this.expenses.filter(expense => expense.user_id === user.user_id)
     }
+
+    getUserExpenseByMonth(user: User, month: number, year: number): Expense[] {
+        if (this.getExpenseByUser(user)) {
+            const monthlyExpenses = this.expenses.filter(expense => {
+                if (expense.date.getMonth() + 1 === month && 
+                    expense.date.getFullYear() === year &&
+                    expense.user_id === user.user_id) {
+                    return expense
+                }
+            })
+            return monthlyExpenses
+        } return []
+    }
+
+    getUserExpenseByYear(user: User, year: number): Expense[] {
+        if (this.getExpenseByUser(user)) {
+            const yearlyExpenses = this.expenses.filter(expense => {
+                if (expense.date.getFullYear() === year &&
+                    expense.user_id === user.user_id) {
+                    return expense
+                }
+            }) 
+            return yearlyExpenses
+        } return []
+    }
 }
