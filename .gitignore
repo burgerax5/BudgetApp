@@ -12,3 +12,5 @@ coverage/
 
 # Ignore transpiled test files
 auth.test.js
+category.test.js
+registerUser.js

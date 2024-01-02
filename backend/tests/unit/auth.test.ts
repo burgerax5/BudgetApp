@@ -1,15 +1,9 @@
 import bcrypt from 'bcrypt';
 import { UserService } from '../../src/services/userService';
 import { User } from '../../src/models/User';
+import { jestRegister } from '../registerUser.js';
 
 jest.mock('bcrypt');
-
-async function jestRegister(username: string, password: string, userService: UserService): Promise<void> {
-    // Mocking bcrypt.genSalt and bcrypt.hash
-    jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('mockedSalt' as never);
-    jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword123' as never);
-    await userService.registerUser(username, password)
-}
 
 describe('Get user by username', () => {
     let userService: UserService

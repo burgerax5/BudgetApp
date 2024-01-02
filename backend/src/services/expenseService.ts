@@ -1,23 +1,54 @@
+import { Currency } from "../models/Currency";
 import { Expense } from "../models/Expense";
 import { User } from "../models/User";
 
 export class ExpenseServices {
     private expenses: Expense[]
+    private next_id: number
 
     constructor() {
         this.expenses = []
+        this.next_id = 0
     }
 
     getAllExpenses(): Expense[] {
         return this.expenses
     }
 
-    public addExpense(expense: Expense): void {
+    public addExpense(user_id: number, currency: Currency, amount: number, name: string, date: Date, category_id: number | undefined): boolean {
+        const expense: Expense = { 
+            expense_id: this.next_id++,
+            user_id: user_id,
+            currency,
+            amount,
+            name,
+            date,
+            category_id
+        }
+
         const expenseExists: boolean = this.expenses.includes(expense)
 
         if (!expenseExists) {
             this.expenses.push(expense)
+            return true
+        } return false
+    }
+
+    public editExpense(original: Expense, newExpense: Expense): void {
+        original.amount = newExpense.amount
+        original.date = newExpense.date
+        original.name = newExpense.name
+        original.currency = newExpense.currency
+    }
+
+    public deleteExpense(expense: Expense): boolean {
+        const index = this.expenses.findIndex(exp => exp.expense_id === expense.expense_id)
+
+        if (index > -1) {
+            this.expenses = this.expenses.filter(exp => exp.category_id !== expense.expense_id)
+            return true
         }
+        return false
     }
 
     getExpenseByUser(user: User): Expense[] {
