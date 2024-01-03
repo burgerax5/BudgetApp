@@ -14,6 +14,8 @@ coverage/
 auth.test.js
 category.test.js
 expense.test.js
+budget.test.js
 
 # Ignore transpiled helper functions
 registerUser.js
+addExpense.js

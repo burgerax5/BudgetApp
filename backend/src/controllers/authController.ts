@@ -76,4 +76,8 @@ export class AuthController {
             res.status(500).send('Internal Server Error');
         }
     }
+
+    public getUsers(req: Request, res: Response): void {
+        res.status(200).send(this.userService.getAllUsers())
+    }
 }

@@ -18,4 +18,8 @@ router.post('/register', async (req: Request, res: Response) => {
     await authController.register(req, res);
 });
 
+router.get('/users', (req: Request, res: Response) => {
+    authController.getUsers(req, res)
+})
+
 export default router;

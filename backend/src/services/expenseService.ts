@@ -16,15 +16,17 @@ export class ExpenseServices {
         return this.expenses
     }
 
-    public addExpense(user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category): boolean {
+    public addExpense(expense_details: {
+        user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category
+    }): boolean {
         const expense: Expense = { 
             expense_id: this.next_id++,
-            user_id: user_id,
-            currency,
-            amount,
-            name,
-            date,
-            category
+            user_id: expense_details.user_id,
+            currency: expense_details.currency,
+            amount: expense_details.amount,
+            name: expense_details.name,
+            date: expense_details.date,
+            category: expense_details.category
         }
 
         const expenseExists: boolean = this.expenses.includes(expense)
