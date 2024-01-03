@@ -3,8 +3,9 @@ import { Expense } from "../../src/models/Expense";
 import { UserService } from "../../src/services/userService";
 import { CategoryServices } from "../../src/services/categoryService";
 import { jestRegister } from "../registerUser";
-import { addMockExpense } from "../addExpense";
+import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../addExpense";
 import { User } from "../../src/models/User";
+import { Category } from "../../src/models/Category";
 
 describe('Test initialization and adding', () => {
     let expenseService: ExpenseServices
@@ -102,21 +103,12 @@ describe('Get expenses by month and year', () => {
     it("should return alice's expenses by month", () => {
         const user: User = userService.getAllUsers()[0]
 
-        addMockExpense(userService, categoryService, expenseService) // Aug 2023
-        addMockExpense(userService, categoryService, expenseService) // Oct 2023
-        addMockExpense(userService, categoryService, expenseService) // Dec 2023
-        addMockExpense(userService, categoryService, expenseService) // Dec 2023
+        datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023'))
+        datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
+        datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
+        datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023')) // Dec 2023
 
         const all_expenses: Expense[] = expenseService.getAllExpenses()
-        const expense1: Expense = all_expenses[0]
-        const expense2: Expense = all_expenses[1]
-        const expense3: Expense = all_expenses[2]
-        const expense4: Expense = all_expenses[3]
-
-        expense1.date = new Date('August, 31, 2023')
-        expense2.date = new Date('October, 10, 2023')
-        expense3.date = new Date('December, 13, 2023')
-        expense4.date = new Date('December, 26, 2023')
 
         const august: Expense[] = expenseService.getUserExpenseByMonth(user, 8, 2023)
         const october: Expense[] = expenseService.getUserExpenseByMonth(user, 10, 2023)
@@ -128,34 +120,69 @@ describe('Get expenses by month and year', () => {
         expect(december.length).toBe(2)
 
         // Confirm the validity of entries
-        expect(august[0]).toBe(expense1)
-        expect(october[0]).toBe(expense2)
-        expect(december[0]).toBe(expense3)
-        expect(december[1]).toBe(expense4)
+        expect(august[0]).toBe(all_expenses[0])
+        expect(october[0]).toBe(all_expenses[1])
+        expect(december[0]).toBe(all_expenses[2])
+        expect(december[1]).toBe(all_expenses[3])
     })
 
     it("should return all expenses from 2023", () => {
         const user: User = userService.getAllUsers()[0]
 
-        addMockExpense(userService, categoryService, expenseService) // Aug 2021
-        addMockExpense(userService, categoryService, expenseService) // Oct 2022
-        addMockExpense(userService, categoryService, expenseService) // Dec 2023
-        addMockExpense(userService, categoryService, expenseService) // Dec 2023
+        datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2021'))
+        datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2022'))
+        datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023'))
+        datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023'))
 
         const all_expenses: Expense[] = expenseService.getAllExpenses()
-        const expense1: Expense = all_expenses[0]
-        const expense2: Expense = all_expenses[1]
-        const expense3: Expense = all_expenses[2]
-        const expense4: Expense = all_expenses[3]
 
-        expense1.date = new Date('August, 31, 2021')
-        expense2.date = new Date('October, 10, 2022')
-        expense3.date = new Date('December, 13, 2023')
-        expense4.date = new Date('December, 26, 2023')
+        const expenses_in_2021: Expense[] = expenseService.getUserExpenseByYear(user, 2021)
+        expect(expenses_in_2021.length).toBe(1)
+        expect(expenses_in_2021[0]).toBe(all_expenses[0])
+
+        const expenses_in_2022: Expense[] = expenseService.getUserExpenseByYear(user, 2022)
+        expect(expenses_in_2022.length).toBe(1)
+        expect(expenses_in_2022[0]).toBe(all_expenses[1])
 
         const expenses_in_2023: Expense[] = expenseService.getUserExpenseByYear(user, 2023)
         expect(expenses_in_2023.length).toBe(2)
-        expect(expenses_in_2023[0]).toBe(expense3)
-        expect(expenses_in_2023[1]).toBe(expense4)
+        expect(expenses_in_2023[0]).toBe(all_expenses[2])
+        expect(expenses_in_2023[1]).toBe(all_expenses[3])
+    })
+})
+
+describe('Get expenses by category', () => {
+    let expenseService: ExpenseServices
+    let userService: UserService
+    let categoryService: CategoryServices
+
+    beforeEach(async () => {
+        expenseService = new ExpenseServices()
+        userService = new UserService()
+        categoryService = new CategoryServices()
+        await jestRegister('bob', 'password123', userService)
+    })
+    
+    it("should return all of bob's expenses that are under entertainment", () => {
+        const user: User = userService.getAllUsers()[0]
+        const entertainment = categoryService.getCategoryByName('Entertainment')
+        const foodndrink = categoryService.getCategoryByName('Food & Drink')
+
+        expect(entertainment).not.toBeUndefined()
+        expect(foodndrink).not.toBeUndefined()
+
+        if (entertainment && foodndrink) {
+            categorizedMockExpense(userService, categoryService, expenseService, entertainment)
+            categorizedMockExpense(userService, categoryService, expenseService, entertainment)
+            categorizedMockExpense(userService, categoryService, expenseService, foodndrink)
+
+            const all_expenses = expenseService.getAllExpenses()
+
+            const entertainment_expenses = expenseService.getUserExpenseByCategory(user, entertainment)
+            const foodndrink_expenses = expenseService.getUserExpenseByCategory(user, foodndrink)
+
+            expect(entertainment_expenses.length).toBe(2)
+            expect(foodndrink_expenses.length).toBe(1)
+        }
     })
 })

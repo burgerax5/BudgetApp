@@ -105,4 +105,16 @@ export class ExpenseServices {
             return yearlyExpenses
         } return []
     }
+
+    getUserExpenseByCategory(user: User, category: Category): Expense[] {
+        if (this.getExpenseByUser(user)) {
+            const categoryExpenses = this.expenses.filter(expense => {
+                if (expense.category === category &&
+                    expense.user_id === user.user_id) {
+                    return expense
+                }
+            }) 
+            return categoryExpenses
+        } return []
+    }
 }
