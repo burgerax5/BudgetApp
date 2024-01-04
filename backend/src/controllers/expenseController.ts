@@ -36,6 +36,12 @@ export class ExpenseController {
         } return currency
     }
 
+    private getUserFromParam(req: Request): User | undefined {
+        const userId = parseInt(req.params.userId)
+        const user = this.userService.getUserById(userId)
+        return user
+    }
+
     public addExpense(req: Request, res: Response) {
         try {
             // Validate input
@@ -49,7 +55,7 @@ export class ExpenseController {
             const user = this.getUserFromRequest(req)
 
             if (!user) {
-                throw new Error('Invalid user')
+                throw new Error('User does not exist')
             }
 
             // Validate currency
@@ -75,8 +81,8 @@ export class ExpenseController {
             expense.date = new Date(expense.date)
 
             // Ensure the date is a Date object
-            if (!expense.date || !(expense.date instanceof Date)) {
-                throw new Error(`Expense date must be a Date object: ${expense.date}`)
+            if (!expense.date || expense.date.toString() === 'Invalid Date') {
+                throw new Error(`Invalid Date`)
             }
 
             if (expense.category) {
@@ -105,24 +111,37 @@ export class ExpenseController {
 
     editExpense(req: Request, res: Response) {
         try {
-            const { expense: old_expense, new_expense_details } = req.body
+            const { new_expense_details } = req.body
             const expense_id = parseInt(req.params.expenseId)
+            let expense = this.expenseService.getExpenseById(expense_id)
 
             const user = this.userService.getUserByUsername(req.body.user.username)
-            
+
             if (!user) {
-                throw new Error(`No user with the details ${JSON.stringify(req.body.user)}`);
+                throw new Error('User does not exist')
             }
 
-            if (old_expense.user_id !== user.user_id) {
-                throw new Error(`Owner of expense has id ${old_expense.user_id}, not ${user.user_id}`)
+            if (!expense) {
+                throw new Error('Expense does not exist')
             }
 
-            if (!this.expenseService.getExpenseById(expense_id)) {
-                throw new Error(`No expense with the id ${expense_id}`)
+            if (expense.user_id !== user.user_id) {
+                throw new Error(`User id of expense does not match the user requesting`)
             }
 
-            let expense = this.expenseService.getExpenseById(expense_id)
+            // Validate currency
+            if (!new_expense_details.currency) {
+                throw new Error('Expense currency is required')
+            }
+
+            const currency = this.getCurrency(new_expense_details.currency)
+
+            if (!currency) {
+                console.error(`Received ${currency} as currency`)
+                throw new Error(`Invalid currency: ${new_expense_details.currency}`)
+            }
+
+            expense.currency = currency
 
             if (expense) {
                 this.expenseService.editExpense(expense, new_expense_details)
@@ -164,14 +183,48 @@ export class ExpenseController {
         }
     }
 
-    getExpenseByUser(req: Request, res: Response) {
-        const userId = parseInt(req.params.userId)
-        const user = this.userService.getUserById(userId)
+    getExpenseByUser(req: Request, res: Response): void {
+        const user = this.getUserFromParam(req)
         
         if (user) {
-            res.send({ message: this.expenseService.getExpenseByUser(user) })
+            res.status(200).send(this.expenseService.getExpenseByUser(user))
         } else {
-            res.status(401).send(`No user with the id ${userId}`)
+            res.status(401).send(`No user with the id ${req.params.userId}`)
+        }
+    }
+
+    getUserExpenseByMonth(req: Request, res: Response): void {
+        const user = this.getUserFromParam(req)
+        const { month, year } = req.body
+
+        if (user) {
+            res.status(200).send(this.expenseService.getUserExpenseByMonth(user, month, year))
+        } else {
+            res.status(401).send(`No user with the id ${req.params.userId}`)
+        }
+    }
+
+    getUserExpenseByYear(req: Request, res: Response): void {
+        const user = this.getUserFromParam(req)
+        const { year } = req.body
+
+        if (user) {
+            res.status(200).send(this.expenseService.getUserExpenseByYear(user, year))
+        } else {
+            res.status(401).send(`No user with the id ${req.params.userId}`)
+        }
+    }
+
+    getUserExpenseByCategory(req: Request, res: Response): void {
+        const user = this.getUserFromParam(req)
+        const { category: category_name } = req.body
+
+        const category = this.categoryService.getCategoryByName(category_name)
+
+        if (user && category) {
+            res.status(200).send(this.expenseService.getUserExpenseByCategory(user, category))
+        } else {
+            res.status(401).send(`No user with the id ${req.params.userId}`)
         }
     }
 }

@@ -23,4 +23,18 @@ router.delete('/delete/:expenseId', authenticateToken, (req: Request, res: Respo
     expenseController.deleteExpense(req, res)
 })
 
+router.get('/month/:userId', authenticateToken, (req: Request, res: Response) => {
+    // expecting: { month: number, year: number }
+    expenseController.getUserExpenseByMonth(req, res)
+})
+
+router.get('/year/:userId', authenticateToken, (req: Request, res: Response) => {
+    // expecting: { year: number }
+    expenseController.getUserExpenseByYear(req, res)
+})
+
+router.get('/category/:userId', authenticateToken, (req: Request, res: Response) => {
+    expenseController.getUserExpenseByCategory(req, res)
+})
+
 export default router;
