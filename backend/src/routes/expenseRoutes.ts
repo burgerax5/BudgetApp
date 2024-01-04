@@ -11,6 +11,10 @@ router.get('/user/:userId', (req: Request, res: Response) => {
     expenseController.getExpenseByUser(req, res)
 })
 
+router.get('/:expenseId', (req: Request, res: Response) => {
+    expenseController.getExpenseById(req, res);
+});
+
 router.post('/add', authenticateToken, (req: Request, res: Response) => {
     expenseController.addExpense(req, res);
 });
@@ -34,6 +38,7 @@ router.get('/year/:userId', authenticateToken, (req: Request, res: Response) => 
 })
 
 router.get('/category/:userId', authenticateToken, (req: Request, res: Response) => {
+    // expecting: { category: string }
     expenseController.getUserExpenseByCategory(req, res)
 })
 

@@ -42,6 +42,12 @@ export class ExpenseController {
         return user
     }
 
+    getExpenseById(req: Request, res: Response) {
+        const expense_id = parseInt(req.params.expenseId)
+        const expense = this.expenseService.getExpenseById(expense_id)
+        res.json({expense})
+    }
+
     public addExpense(req: Request, res: Response) {
         try {
             // Validate input
