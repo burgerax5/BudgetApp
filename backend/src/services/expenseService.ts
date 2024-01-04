@@ -16,6 +16,10 @@ export class ExpenseServices {
         return this.expenses
     }
 
+    getExpenseById(expense_id: number): Expense | undefined {
+        return this.expenses.find(expense => expense.expense_id === expense_id)
+    }
+
     public addExpense(expense_details: {
         user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category
     }) {

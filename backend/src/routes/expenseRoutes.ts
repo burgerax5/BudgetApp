@@ -7,8 +7,16 @@ import { expenseService, userService } from '../services/service_init';
 const router: Router = express.Router();
 const expenseController: ExpenseController = new ExpenseController(expenseService, userService)
 
-router.post('/add', authenticateToken, async (req: Request, res: Response) => {
-    await expenseController.addExpense(req, res);
+router.get('/user/:userId', (req: Request, res: Response) => {
+    expenseController.getExpenseByUser(req, res)
+})
+
+router.post('/add', authenticateToken, (req: Request, res: Response) => {
+    expenseController.addExpense(req, res);
 });
+
+router.post('/edit/:expenseId', authenticateToken, (req: Request, res: Response) => {
+    expenseController.editExpense(req, res)
+})
 
 export default router;

@@ -190,3 +190,30 @@ describe('Get expenses by category', () => {
         }
     })
 })
+
+describe('Get expense by id', () => {
+    let expenseService: ExpenseServices
+    let userService: UserService
+    let categoryService: CategoryServices
+
+    beforeEach(async () => {
+        expenseService = new ExpenseServices()
+        userService = new UserService()
+        categoryService = new CategoryServices()
+        await jestRegister('bob', 'password123', userService)
+    })
+
+    it('should return undefined since there is no expense with id 0', () => {
+        const expense = expenseService.getExpenseById(0)
+        expect(expense).toBeUndefined()
+    })
+
+    it('should return the expense with id 0', () => {
+        addMockExpense(userService, categoryService, expenseService)
+
+        const expense = expenseService.getExpenseById(0)
+        expect(expense).not.toBeUndefined()
+        expect(expense?.expense_id).toBe(0)
+        expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
+    })
+})
