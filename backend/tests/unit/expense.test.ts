@@ -25,8 +25,12 @@ describe('Test initialization and adding', () => {
     })
 
     it('should add a new expense', async () => {
-        const isAdded: boolean = addMockExpense(userService, categoryService, expenseService)
-        expect(isAdded).toBeTruthy()
+        const old_expenses = expenseService.getAllExpenses()
+        expect(old_expenses.length).toBe(0)
+
+        addMockExpense(userService, categoryService, expenseService)
+        const new_expenses = expenseService.getAllExpenses()
+        expect(new_expenses.length).toBe(1)
     })
 
     it('should increment the expense_id after each expense added', async () => {

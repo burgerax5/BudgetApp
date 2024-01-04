@@ -18,30 +18,30 @@ const get_expense_details = (userService: UserService, categoryService: Category
     }
 }
 
-export function addMockExpense(userService: UserService, categoryService: CategoryServices, expenseService: ExpenseServices): boolean {
+export function addMockExpense(userService: UserService, categoryService: CategoryServices, expenseService: ExpenseServices): void {
     const expense_details = get_expense_details(userService, categoryService, expenseService)
 
     if (expense_details.user_id !== undefined && expense_details.category) {
-        return expenseService.addExpense(expense_details)
-    } return false
+        expenseService.addExpense(expense_details)
+    }
 }
 
 export function datedMockExpense(userService: UserService, categoryService: CategoryServices, 
-    expenseService: ExpenseServices, date: Date) {
+    expenseService: ExpenseServices, date: Date): void {
     let expense_details = get_expense_details(userService, categoryService, expenseService)
     expense_details.date = date
 
     if (expense_details.user_id !== undefined && expense_details.category) {
-        return expenseService.addExpense(expense_details)
-    } return false
+        expenseService.addExpense(expense_details)
+    }
 }
 
 export function categorizedMockExpense(userService: UserService, categoryService: CategoryServices, 
-    expenseService: ExpenseServices, category: Category) {
+    expenseService: ExpenseServices, category: Category): void {
     let expense_details = get_expense_details(userService, categoryService, expenseService)
     expense_details.category = category
 
     if (expense_details.user_id !== undefined && category) {
-        return expenseService.addExpense(expense_details)
-    } return false
+        expenseService.addExpense(expense_details)
+    }
 }

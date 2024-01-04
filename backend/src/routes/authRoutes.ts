@@ -2,10 +2,9 @@ import express, { Router, Response, Request } from 'express';
 
 import { AuthController } from '../controllers/authController';
 import { authenticateToken } from '../middlewares/authenticationMiddleware';
-import { UserService } from '../services/userService';
+import { userService } from '../services/service_init';
 
 const router: Router = express.Router();
-const userService: UserService = new UserService()
 const authController: AuthController = new AuthController(userService)
 
 router.get('/', authenticateToken, AuthController.home);

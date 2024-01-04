@@ -18,7 +18,7 @@ export class ExpenseServices {
 
     public addExpense(expense_details: {
         user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category
-    }): boolean {
+    }) {
         const expense: Expense = { 
             expense_id: this.next_id++,
             user_id: expense_details.user_id,
@@ -29,12 +29,7 @@ export class ExpenseServices {
             category: expense_details.category
         }
 
-        const expenseExists: boolean = this.expenses.includes(expense)
-
-        if (!expenseExists) {
-            this.expenses.push(expense)
-            return true
-        } return false
+        this.expenses.push(expense)
     }
 
     public editExpense(original: Expense, 

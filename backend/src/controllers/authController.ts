@@ -43,7 +43,10 @@ export class AuthController {
                     return;
                 }
 
-                const accessToken = jwt.sign({ username }, secretKey);
+                const accessToken = jwt.sign({ 
+                    user_id: user.user_id, 
+                    username
+                }, secretKey);
                 res.json({ accessToken });
             } else {
                 res.status(401).send('Invalid password');

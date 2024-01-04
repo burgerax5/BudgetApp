@@ -5,7 +5,7 @@ import { jestRegister } from '../registerUser.js';
 
 jest.mock('bcrypt');
 
-describe('Get user by username', () => {
+describe('Get user by username or id', () => {
     let userService: UserService
 
     beforeEach(() => {
@@ -23,6 +23,19 @@ describe('Get user by username', () => {
         const newUser = userService.getUserByUsername('alice')
         expect(newUser).not.toBeUndefined()
         expect(newUser?.username).toBe('alice')
+    })
+
+    it('should return undefined since there is no user with id 0', () => {
+        const user = userService.getUserById(0)
+        expect(user).toBe(undefined)
+    })
+
+    it('should return "alice" when looking for user with id of 0', async () => {
+        await jestRegister('alice', 'password123', userService)
+        const user = userService.getUserById(0)
+
+        expect(user).not.toBeUndefined()
+        expect(user?.username).toBe("alice")
     })
 })
 
