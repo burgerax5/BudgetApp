@@ -4,10 +4,12 @@ import { User } from '../models/User';
 
 export class UserService {
     private users: User[];
+    refreshTokens: string[]
     private next_user_id: number
 
     constructor() {
         this.users = []
+        this.refreshTokens = []
         this.next_user_id = 0
     }
 

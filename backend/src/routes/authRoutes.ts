@@ -17,6 +17,14 @@ router.post('/register', async (req: Request, res: Response) => {
     await authController.register(req, res);
 });
 
+router.post('/logout', (req: Request, res: Response) => {
+    authController.logout(req, res);
+})
+
+router.post('/refresh-token', (req: Request, res: Response) => {
+    authController.token(req, res);
+})
+
 router.get('/users', (req: Request, res: Response) => {
     authController.getUsers(req, res)
 })
