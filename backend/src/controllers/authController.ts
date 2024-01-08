@@ -50,7 +50,7 @@ export class AuthController {
                     throw new Error('JWT refresh token secret is not defined')
 
                 const accessToken = this.generateAccessToken(secretKey, user)
-                const refreshToken = jwt.sign({ user_id: user.user_id, username: user.username }, secretKey)
+                const refreshToken = jwt.sign({ user_id: user.user_id, username: user.username }, refreshSecretKey)
                 this.userService.refreshTokens.push(refreshToken)
 
                 res.json({ accessToken, refreshToken });
@@ -105,9 +105,10 @@ export class AuthController {
     public token(req: Request, res: Response) {
         try {
             const refreshToken = req.body.refreshToken
-            if (refreshToken == null) return res.sendStatus(401)
-            if (this.userService.refreshTokens.includes(refreshToken))
-                return res.sendStatus(403)
+            if (!refreshToken) return res.status(401).send('Missing refresh token')
+
+            if (!this.userService.refreshTokens.includes(refreshToken))
+                return res.status(401).send('Invalid refresh token')
 
             const refreshSecret = process.env.REFRESH_TOKEN_SECRET
             const accessSecret = process.env.ACCESS_TOKEN_SECRET
@@ -119,7 +120,7 @@ export class AuthController {
                 throw new Error('JWT access token secret is not defined')
 
             jwt.verify(refreshToken, refreshSecret, (err, user) => {
-                if (err) return res.status(403).send('bruh')
+                if (err) return res.status(401).send('Invalid refresh token')
                 if (!user) return res.sendStatus(403)
 
                 const accessToken = this.generateAccessToken(accessSecret, user)
