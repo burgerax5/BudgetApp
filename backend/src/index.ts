@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/authRoutes';
 import expenseRoutes from './routes/expenseRoutes'
+import budgetRoutes from './routes/budgetRoutes'
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use((req, res, next) => {
 
 app.use('/auth', authRoutes);
 app.use('/expense', expenseRoutes)
+app.use('/budget', budgetRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

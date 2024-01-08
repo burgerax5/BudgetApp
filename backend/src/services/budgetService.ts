@@ -79,4 +79,17 @@ export class BudgetServices {
             return { success: true }
         } return { success: false, error: `No budget with the id ${budget_id}` }
     }
+
+    getBudgetsByMonth(month: number, year: number): Budget[] {
+        return this.budgets.filter(budget => budget.budget_month === month &&
+            budget.budget_year === year)
+    }
+
+    getBudgetsByYear(year: number): Budget[] {
+        return this.budgets.filter(budget => budget.budget_year === year)
+    }
+
+    getBudgetsByCategory(category: Category): Budget[] {
+        return this.budgets.filter(budget => budget.category === category)
+    }
 }
