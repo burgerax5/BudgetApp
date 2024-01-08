@@ -34,7 +34,7 @@ export class BudgetController {
             const monthly_budgets = this.budgetService.getBudgetsByMonth(month, year)
             
             return monthly_budgets.some(budget => !budget.category && budget.budget_month === month &&
-                budget.budget_year === year && budget.user.user_id === user.user_id)
+                budget.budget_year === year && budget.user === user)
         }
 
         // Total budget for the year
@@ -42,7 +42,7 @@ export class BudgetController {
             const yearly_budgets = this.budgetService.getBudgetsByYear(year)
 
             return yearly_budgets.some(budget => budget.budget_year === year &&
-                !budget.budget_month && !budget.category && budget.user.user_id === user.user_id)
+                !budget.budget_month && !budget.category && budget.user === user)
         }
 
         // Categorical budget for the month
@@ -51,7 +51,7 @@ export class BudgetController {
 
             return monthly_budgets.some(budget => budget.category === category &&
                 budget.budget_month === month &&
-                budget.budget_year === year && budget.user.user_id === user.user_id)
+                budget.budget_year === year && budget.user === user)
         }
 
         // Categorical budget for the year
@@ -59,7 +59,7 @@ export class BudgetController {
             const yearly_budgets = this.budgetService.getBudgetsByYear(year)
 
             return yearly_budgets.some(budget => budget.category === category &&
-                !budget.budget_month && budget.budget_year === year && budget.user.user_id === user.user_id)
+                !budget.budget_month && budget.budget_year === year && budget.user === user)
         }
 
         return false
@@ -108,7 +108,8 @@ export class BudgetController {
 
     addBudget(req: Request, res: Response) {
         try {
-            const user = req.body.user
+            const username = req.body.user.username
+            const user = this.userService.getUserByUsername(username)
             const { category_name, amount, month, year } = req.body
 
             const category = this.categoryService.getCategoryByName(category_name)
@@ -147,6 +148,60 @@ export class BudgetController {
 
         } catch (error) {
             console.error(`An error occurred while adding a budget: `, error)
+            res.status(500).send('Internal Server Error')
+        }
+    }
+
+    editBudget(req: Request, res: Response) {
+        try {
+            const username = req.body.user.username
+            const user = this.userService.getUserByUsername(username)
+
+            if (!user)
+                throw new Error('User does not exist.')
+
+            const budget_id = parseInt(req.params.budgetId)
+            const budget = this.budgetService.getBudgetById(budget_id)
+
+            if (!budget)
+                throw new Error('Budget does not exist.')
+
+            if (user !== budget.user)
+                throw new Error('User id does not match owner of budget id')
+
+            const budget_amount = parseInt(req.body.amount)
+
+            if (!budget_amount)
+                throw new Error('Must supply a budget amount as a number')
+
+            this.budgetService.editBudget(budget_id, budget_amount)
+            res.status(200).send('Succesfully edited budget.')
+
+        } catch (error) {
+            console.error('Error occured while editing budget', error)
+            res.status(500).send('Internal Server Error')
+        }
+    }
+
+    deleteBudget(req: Request, res: Response) {
+        try {
+            const username = req.body.user.username
+            const user = this.userService.getUserByUsername(username)
+
+            if (!user)
+                throw new Error('User does not exist') 
+
+            const budget_id = parseInt(req.params.budgetId)
+            const budget = this.budgetService.getBudgetById(budget_id)
+
+            if (!budget)
+                throw new Error('Budget does not exist')
+
+            this.budgetService.deleteBudget(budget_id)
+            res.status(200).send('Successfully deleted a budget.')
+
+        } catch (error) {
+            console.error('An error occurred while deleting a budget', error)
             res.status(500).send('Internal Server Error')
         }
     }

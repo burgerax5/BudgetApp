@@ -15,4 +15,12 @@ router.post('/add', authenticateToken, (req: Request, res: Response) => {
     budgetController.addBudget(req, res)
 })
 
+router.put('/edit/:budgetId', authenticateToken, (req: Request, res: Response) => {
+    budgetController.editBudget(req, res)
+})
+
+router.delete('/delete/:budgetId', authenticateToken, (req: Request, res: Response) => {
+    budgetController.deleteBudget(req, res)
+})
+
 export default router
