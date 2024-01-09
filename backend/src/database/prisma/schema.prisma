@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expenses  Expense[]
+  budgets   Budget[]
+}
+
+model Category {
+  id      Int       @id @default(autoincrement())
+  name    String
+  colour  String
+  Expense Expense[]
+  Budget  Budget[]
+}
+
+model Currency {
+  id      Int       @id @default(autoincrement())
+  cc      String    @unique
+  symbol  String
+  name    String
+  Expense Expense[]
+  Budget  Budget[]
+}
+
+model Expense {
+  id         Int      @id @default(autoincrement())
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  User       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
+  createdAt  DateTime @default(now())
+  amount     Int
+}
+
+model Budget {
+  id           Int      @id @default(autoincrement())
+  currency     Currency @relation(fields: [currencyId], references: [id])
+  currencyId   Int
+  category     Category @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  User         User?    @relation(fields: [userId], references: [id])
+  userId       Int?
+  createdAt    DateTime @default(now())
+  budget_month Int?
+  budget_year  Int
+  amount       Int
+}
