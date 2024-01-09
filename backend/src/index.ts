@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser'
 
 import authRoutes from './routes/authRoutes';
 import expenseRoutes from './routes/expenseRoutes'
@@ -10,6 +11,7 @@ dotenv.config();
 const app: Express = express();
 const PORT: number = 8080;
 
+app.use(cookieParser())
 app.use(express.json());
 app.use((req, res, next) => {
     console.log('Request Body: ', req.body);

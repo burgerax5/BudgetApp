@@ -20,7 +20,11 @@ export class AuthController {
 
     private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {
         return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '15m' });
-    };
+    }
+
+    private createSession() {
+
+    }
 
     public async login(req: Request, res: Response): Promise<void> {
         try {
@@ -52,6 +56,15 @@ export class AuthController {
                 const accessToken = this.generateAccessToken(secretKey, user)
                 const refreshToken = jwt.sign({ user_id: user.user_id, username: user.username }, refreshSecretKey)
                 this.userService.refreshTokens.push(refreshToken)
+
+                res.cookie("access-token", accessToken, {
+                    maxAge: 2.592e+9, // 1 month
+                    httpOnly: true
+                })
+
+                res.cookie("refresh-token", refreshToken, {
+                    httpOnly: true
+                })
 
                 res.json({ accessToken, refreshToken });
             } else {
@@ -87,16 +100,23 @@ export class AuthController {
     }
 
     public logout(req: Request, res: Response) {
-        const token = req.header('Authorization')?.split(' ')[1];
+        const token = req.cookies['refresh-token']
 
         if (!token)
             return res.status(400).send('Expected refresh token in header')
 
-        console.log(token)
-        console.log(this.userService.refreshTokens)
-
         if (!this.userService.refreshTokens.includes(token))
             return res.status(401).send('Invalid token')
+
+        res.cookie("access-token", "", {
+            maxAge: 0,
+            httpOnly: true
+        })
+
+        res.cookie("refresh-token", "", {
+            maxAge: 0,
+            httpOnly: true
+        })
 
         this.userService.refreshTokens = this.userService.refreshTokens.filter(t => t !== token)
         res.status(200).send('Successful logout.')
