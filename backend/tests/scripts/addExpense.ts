@@ -1,38 +1,46 @@
-// import { UserService } from "../../src/services/userService"
-// import { CategoryService } from "../../src/services/categoryService"
-// import { ExpenseService } from "../../src/services/expenseService"
+import { UserService } from "../../src/services/userService"
+import { CategoryService } from "../../src/services/categoryService"
+import { ExpenseService } from "../../src/services/expenseService"
+import { currencies } from "src/constants/currencies"
 
-// import { Category as PrismaCategory,
-// Currency as PrismaCurrency,
-//  } from '@prisma/client'
+import {
+    Category as PrismaCategory,
+    Currency as PrismaCurrency,
+} from '@prisma/client'
 
-// interface Category extends PrismaCategory {}
-// interface Currency extends PrismaCurrency {}
+interface Category extends PrismaCategory { }
+interface Currency extends PrismaCurrency { }
 
-// const mockCurrency: Currency = {cc:"NZD",symbol:"NZ$",name:"New Zealand dollar"}
+const get_expense_details = () => {
+    return {
+        // Parameters for expense
+        user_id: 1,
+        currency_id: 105,
+        amount: 49.99,
+        name: "Cyberpunk 2077: Phantom Liberty",
+        date: new Date(),
+        category_id: 2
+    }
+}
 
-// const get_expense_details = async (userService: UserService, categoryService: CategoryService, expenseService: ExpenseService) => {
+export async function addMockExpense(userService: UserService, categoryService: CategoryService, expenseService: ExpenseService): void {
+    try {
+        const expense_details = get_expense_details()
 
-//     const currency_i
+        const userExists = await userService.getUserById(1)
+        if (!userExists)
+            throw new Error('User does not exist')
 
-//     return {
-//         // Parameters for expense
-//         user_id: 0,
-//         currency: mockCurrency,
-//         amount: 49.99,
-//         name: "Cyberpunk 2077: Phantom Liberty",
-//         date: new Date(),
-//         categoryId: await categoryService.getCategoryByName("Entertainment")
-//     }
-// }
+        const categoryExists = await categoryService.getCategoryById(2)
+        if (!categoryExists)
+            throw new Error('Category does not exist')
 
-// export function addMockExpense(userService: UserService, categoryService: CategoryService, expenseService: ExpenseService): void {
-//     const expense_details = get_expense_details(userService, categoryService, expenseService)
+        await expenseService.addExpense(expense_details)
 
-//     if (expense_details.user_id !== undefined && expense_details.category) {
-//         expenseService.addExpense(expense_details)
-//     }
-// }
+    } catch (error) {
+        console.error('Error occurred while adding mock expense:', error)
+    }
+}
 
 // export function datedMockExpense(userService: UserService, categoryService: CategoryService,
 //     expenseService: ExpenseService, date: Date): void {

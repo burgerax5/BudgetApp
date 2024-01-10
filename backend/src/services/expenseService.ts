@@ -31,16 +31,16 @@ export class ExpenseService {
     }
 
     public async addExpense(expense_details: {
-        user_id: number, currency: Currency, amount: number, name: string, date: Date, category: Category
+        user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
     }) {
         await this.prisma.expense.create({
             data: {
                 userId: expense_details.user_id,
-                currencyId: expense_details.currency.id,
+                currencyId: expense_details.currency_id,
                 amount: expense_details.amount,
                 name: expense_details.name,
                 date: expense_details.date,
-                categoryId: expense_details.category.id,
+                categoryId: expense_details.category_id,
             }
         })
     }

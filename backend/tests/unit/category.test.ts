@@ -22,7 +22,7 @@ describe('Test we initialize categories properly', () => {
     })
 })
 
-describe('Test we can get the category object by the name', () => {
+describe('Test we can get the category object by the name and id', () => {
     let prisma: PrismaClient
     let categoryService: CategoryService
 
@@ -38,8 +38,12 @@ describe('Test we can get the category object by the name', () => {
 
     it('should return the category object of "Entertainment"', async () => {
         const entertainment = await categoryService.getCategoryByName('Entertainment')
-        expect(entertainment).not.toBeNull()
         expect(entertainment?.name).toBe("Entertainment")
         expect(entertainment?.colour).toBe("#f54e42")
+    })
+
+    it('should return the Food & Drink category', async () => {
+        const category = await categoryService.getCategoryById(1)
+        expect(category?.name).toBe("Food & Drink")
     })
 })
