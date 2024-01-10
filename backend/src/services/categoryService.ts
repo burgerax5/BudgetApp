@@ -12,7 +12,7 @@ export class CategoryService {
     }
 
     async populate_categories() {
-        if (!await this.prisma.category.count())
+        if (await this.prisma.category.count() === 0)
             await this.prisma.category.createMany({
                 data: categories
             })

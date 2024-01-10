@@ -59,7 +59,7 @@ describe('Test initialization and adding', () => {
         expect(all_expenses[1].id).toBe(2)
     })
 
-    afterAll(async () => cleanUp)
+    afterEach(async () => cleanUp(prisma))
 })
 
 describe('Test if there are ids provided for rows that do not exist', () => {
@@ -96,7 +96,7 @@ describe('Test if there are ids provided for rows that do not exist', () => {
             expect(error.message).toBe('Category does not exist')
     })
 
-    afterAll(async () => await cleanUp(prisma))
+    afterEach(async () => await cleanUp(prisma))
 })
 
 // describe('Test modifying existing expenses', () => {
@@ -279,5 +279,5 @@ describe('Get expense by id', () => {
         expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
     })
 
-    afterAll(async () => await cleanUp(prisma))
+    afterEach(async () => await cleanUp(prisma))
 })
