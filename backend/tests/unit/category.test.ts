@@ -1,21 +1,35 @@
-// import { CategoryServices } from "../../src/services/categoryService";
-// import { Category } from "../../src/models/Category";
+import { PrismaClient } from "@prisma/client";
+import { CategoryServices } from "../../src/services/categoryService";
 
-// describe('Test we initialize categories properly', () => {
-//     const categoryServices: CategoryServices = new CategoryServices()
+describe('Test we initialize categories properly', () => {
+    let prisma: PrismaClient
+    let categoryServices: CategoryServices
 
-//     it('should have 7 default categories', () => {
-//         const numCategories = categoryServices.getAllCategories().length
-//         expect(numCategories).toBe(7)
-//     })
-// })
+    beforeAll(async () => {
+        prisma = new PrismaClient()
+        categoryServices = new CategoryServices(prisma)
+    })
 
-// describe('Test we can get the category object by the name', () => {
-//     const categoryServices: CategoryServices = new CategoryServices()
+    it('should have 7 default categories', async () => {
+        const allCategories = await categoryServices.getAllCategories()
+        const numCategories = allCategories.length
+        expect(numCategories).toBe(7)
+    })
+})
 
-//     it('should return the category object of "Entertainment"', () => {
-//         const entertainment = categoryServices.getCategoryByName('Entertainment')
-//         expect(entertainment).not.toBeUndefined
-//         expect(entertainment).toEqual({category_id: 1, name: "Entertainment", colour: "#f54e42"})
-//     })
-// })
+describe('Test we can get the category object by the name', () => {
+    let prisma: PrismaClient
+    let categoryServices: CategoryServices
+
+    beforeAll(async () => {
+        prisma = new PrismaClient()
+        categoryServices = new CategoryServices(prisma)
+    })
+
+    it('should return the category object of "Entertainment"', async () => {
+        const entertainment = await categoryServices.getCategoryByName('Entertainment')
+        expect(entertainment).not.toBeNull()
+        expect(entertainment?.name).toBe("Entertainment")
+        expect(entertainment?.colour).toBe("#f54e42")
+    })
+})

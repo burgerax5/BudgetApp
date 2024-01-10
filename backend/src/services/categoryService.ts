@@ -1,25 +1,41 @@
-// import { Category } from "../models/Category";
+import { PrismaClient, Category as PrismaCategory } from '@prisma/client'
 
-// export class CategoryServices {
-//     private categories: Category[]
+interface Category extends PrismaCategory { }
 
-//     constructor() {
-//         this.categories = [
-//             {category_id: 0, name: "Food & Drink", colour: "#f5b642"},
-//             {category_id: 1, name: "Entertainment", colour: "#f54e42"},
-//             {category_id: 2, name: "Transportation", colour: "#dd42f5"},
-//             {category_id: 3, name: "Health", colour: "#54f542"},
-//             {category_id: 4, name: "Groceries", colour: "#ba4111"},
-//             {category_id: 5, name: "Education", colour: "#11bab2"},
-//             {category_id: 6, name: "Housing", colour: "#ba115a"}
-//         ]
-//     }
+export class CategoryServices {
+    private prisma: PrismaClient
 
-//     public getAllCategories(): Category[] {
-//         return this.categories
-//     }
+    private async populate_categories() {
+        const categories = [
+            { name: "Food & Drink", colour: "#f5b642" },
+            { name: "Entertainment", colour: "#f54e42" },
+            { name: "Transportation", colour: "#dd42f5" },
+            { name: "Health", colour: "#54f542" },
+            { name: "Groceries", colour: "#ba4111" },
+            { name: "Education", colour: "#11bab2" },
+            { name: "Housing", colour: "#ba115a" }
+        ]
 
-//     public getCategoryByName(category_name: string): Category | undefined {
-//         return this.categories.find(category => category.name === category_name)
-//     }
-// }
+        if (!await this.prisma.category.count())
+            await this.prisma.category.createMany({
+                data: categories
+            })
+    }
+
+    constructor(prisma: PrismaClient) {
+        this.prisma = prisma
+        this.populate_categories()
+    }
+
+    public async getAllCategories(): Promise<Category[]> {
+        return await this.prisma.category.findMany()
+    }
+
+    public async getCategoryByName(category_name: string): Promise<Category | null> {
+        return await this.prisma.category.findFirst({
+            where: {
+                name: category_name
+            }
+        })
+    }
+}
