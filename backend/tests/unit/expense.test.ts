@@ -99,52 +99,63 @@ describe('Test if there are ids provided for rows that do not exist', () => {
     afterEach(async () => await cleanUp(prisma))
 })
 
-// describe('Test modifying existing expenses', () => {
-//     let expenseService: ExpenseService
-//     let userService: UserService
-//     let categoryService: CategoryService
+describe('Test updating and deleting existing expenses', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let categoryService: CategoryService
+    let currencyService: CurrencyService
+    let prisma: PrismaClient
 
-//     beforeEach(async () => {
-//         expenseService = new ExpenseService()
-//         userService = new UserService()
-//         categoryService = new CategoryService()
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it('should remove an expense from the list', () => {
-//         addMockExpense(userService, categoryService, expenseService)
+        await resetTables(prisma)
 
-//         let all_expenses = expenseService.getAllExpenses()
-//         expect(all_expenses.length).toBe(1)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+        await jestRegister('bob', 'password123', userService)
+    })
 
-//         let isDeleted: boolean = expenseService.deleteExpense(all_expenses[0])
-//         expect(isDeleted).toBeTruthy()
+    // it('should remove an expense from the list', () => {
+    //     addMockExpense(userService, categoryService, expenseService)
 
-//         all_expenses = expenseService.getAllExpenses()
-//         expect(all_expenses.length).toBe(0)
-//     })
+    //     let all_expenses = expenseService.getAllExpenses()
+    //     expect(all_expenses.length).toBe(1)
 
-//     it('should modify the details of an expense', () => {
-//         addMockExpense(userService, categoryService, expenseService)
-//         const expenseToEdit: Expense = expenseService.getAllExpenses()[0]
+    //     let isDeleted: boolean = expenseService.deleteExpense(all_expenses[0])
+    //     expect(isDeleted).toBeTruthy()
 
-//         const new_amount = 109.00
-//         const new_name = "Final Fantasy VII Rebirth"
-//         const new_date = new Date()
-//         const new_expense_details = {
-//             new_amount, new_date, new_name
-//         }
+    //     all_expenses = expenseService.getAllExpenses()
+    //     expect(all_expenses.length).toBe(0)
+    // })
 
-//         expenseService.editExpense(expenseToEdit, new_expense_details)
-//         const editedExpense: Expense = expenseService.getAllExpenses()[0]
+    it('should modify the details of an expense', async () => {
+        await addMockExpense(userService, categoryService, expenseService)
 
-//         expect(editedExpense.currency).toEqual({"cc":"NZD","symbol":"NZ$","name":"New Zealand dollar"}) // Stays the same
-//         expect(editedExpense.amount).toBe(109.00)
-//         expect(editedExpense.name).toBe("Final Fantasy VII Rebirth")
-//         expect(editedExpense.date).toBe(new_date)
-//         expect(editedExpense.category.name).toBe("Entertainment") // Stays the same
-//     })
-// })
+        const new_amount = 109.00
+        const new_name = "Final Fantasy VII Rebirth"
+        const new_date = new Date()
+        const new_currency_id = 106
+        const new_category_id = 2
+
+        const new_details = { new_amount, new_date, new_name, new_currency_id, new_category_id }
+
+        await expenseService.editExpense(1, new_details) // expenseId = 1
+        const editedExpense = await expenseService.getExpenseById(1)
+
+        expect(editedExpense?.currencyId).toBe(106)
+        expect(editedExpense?.amount).toBe(109.00)
+        expect(editedExpense?.name).toBe("Final Fantasy VII Rebirth")
+        expect(editedExpense?.date.toISOString()).toBe(new_date.toISOString())
+        expect(editedExpense?.categoryId).toBe(2)
+    })
+
+    afterEach(async () => await cleanUp(prisma))
+})
 
 // describe('Get expenses by month and year', () => {
 //     let expenseService: ExpenseService

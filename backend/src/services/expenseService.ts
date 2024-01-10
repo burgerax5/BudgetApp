@@ -30,21 +30,6 @@ export class ExpenseService {
         })
     }
 
-    // public async addExpense(expense_details: {
-    //     user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
-    // }): Promise<void> {
-    //     await this.prisma.expense.create({
-    //         data: {
-    //             userId: expense_details.user_id,
-    //             currencyId: expense_details.currency_id,
-    //             amount: expense_details.amount,
-    //             name: expense_details.name,
-    //             date: expense_details.date,
-    //             categoryId: expense_details.category_id
-    //         }
-    //     })
-    // }
-
     public async addExpense(expense_details: {
         user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
     }): Promise<Expense> {
@@ -66,37 +51,30 @@ export class ExpenseService {
         });
     }
 
-    // public editExpense(original: Expense,
-    //     new_expense_details: {
-    //         new_amount?: number,
-    //         new_date?: Date,
-    //         new_name?: string,
-    //         new_currency?: Currency,
-    //         new_category?: Category
-    //     }): void {
+    public async editExpense(expense_id: number,
+        new_expense_details: {
+            new_amount?: number,
+            new_date?: Date,
+            new_name?: string,
+            new_currency_id?: number,
+            new_category_id?: number
+        }): Promise<void> {
 
-    //     const { new_amount, new_date, new_name, new_currency, new_category } = new_expense_details
+        const { new_amount, new_date, new_name, new_currency_id, new_category_id } = new_expense_details
 
-    //     if (new_amount) {
-    //         original.amount = new_amount
-    //     }
-
-    //     if (new_date) {
-    //         original.date = new_date
-    //     }
-
-    //     if (new_name) {
-    //         original.name = new_name
-    //     }
-
-    //     if (new_currency) {
-    //         original.currency = new_currency
-    //     }
-
-    //     if (new_category) {
-    //         original.category = new_category
-    //     }
-    // }
+        await this.prisma.expense.update({
+            data: {
+                amount: new_amount,
+                date: new_date,
+                name: new_name,
+                currencyId: new_currency_id,
+                categoryId: new_category_id
+            },
+            where: {
+                id: expense_id
+            }
+        })
+    }
 
     // public deleteExpense(expense: Expense): boolean {
     //     const index = this.expenses.findIndex(exp => exp.expense_id === expense.expense_id)
