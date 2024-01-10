@@ -1,4 +1,4 @@
-import { UserService } from "../src/services/userService";
+import { UserService } from "../../src/services/userService";
 import bcrypt from 'bcrypt'
 
 export async function jestRegister(username: string, password: string, userService: UserService): Promise<void> {

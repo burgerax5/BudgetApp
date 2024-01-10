@@ -1,19 +1,26 @@
 import bcrypt from 'bcrypt';
 import { UserService } from '../../src/services/userService';
-import { User } from '../../src/models/User';
-import { jestRegister } from '../registerUser.js';
+import { jestRegister } from '../scripts/registerUser';
+import { PrismaClient } from '@prisma/client';
 
 jest.mock('bcrypt');
 
 describe('Get user by username or id', () => {
     let userService: UserService
+    let prisma: PrismaClient
 
-    beforeEach(() => {
-        userService = new UserService()
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        userService = new UserService(prisma)
+
+        // Reset table and id after each test
+        await prisma.user.deleteMany()
+        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
     })
 
-    it('should return undefined since user bob does not exist', async () => {
+    it('should return null since user bob does not exist', async () => {
         const user = await userService.getUserByUsername('bob')
+        console.log(user)
         expect(user).toBeNull()
     })
 
@@ -25,32 +32,43 @@ describe('Get user by username or id', () => {
         expect(newUser?.username).toBe('alice')
     })
 
-    it('should return undefined since there is no user with id 0', async () => {
-        const user = await userService.getUserById(0)
+    it('should return null since there is no user with id 1', async () => {
+        const user = await userService.getUserById(1)
         expect(user).toBeNull()
     })
 
-    it('should return "alice" when looking for user with id of 0', async () => {
+    it('should return "alice" when looking for user with id of 1', async () => {
         await jestRegister('alice', 'password123', userService)
-        const user = await userService.getUserById(0)
+        const user = await userService.getUserById(1)
 
-        expect(user).not.toBeUndefined()
+        expect(user).not.toBeNull()
         expect(user?.username).toBe("alice")
+    })
+
+    afterAll(async () => {
+        await prisma.$disconnect()
     })
 })
 
 describe('registerUser', () => {
     let userService: UserService
+    let prisma: PrismaClient
 
-    beforeEach(() => {
-        userService = new UserService()
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        userService = new UserService(prisma)
+
+        // Reset table and id after each test
+        await prisma.user.deleteMany()
+        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
     })
 
     it('should register alice as a new user', async () => {
         await jestRegister('alice', 'password123', userService)
 
         const newUser = await userService.getUserByUsername('alice')
-        expect(newUser).toEqual({ user_id: 0, username: 'alice', password: 'hashedPassword123' })
+        expect(newUser?.id).toBe(1)
+        expect(newUser?.username).toBe('alice')
 
         const allUsers = await userService.getAllUsers()
         expect(allUsers.length).toBe(1)
@@ -60,11 +78,17 @@ describe('registerUser', () => {
     })
 })
 
-describe('getAllUsers', async () => {
+describe('getAllUsers', () => {
     let userService: UserService
+    let prisma: PrismaClient
 
-    beforeEach(() => {
-        userService = new UserService()
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        userService = new UserService(prisma)
+
+        // Reset table and id after each test
+        await prisma.user.deleteMany()
+        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
     })
 
     it('should return 0 users', async () => {
@@ -72,11 +96,14 @@ describe('getAllUsers', async () => {
         expect(allUsers.length).toBe(0)
     })
 
-    it('should return bob as the user', async () => {
+    it('should return alice and bob in the list of users', async () => {
+        await jestRegister('alice', 'password123', userService)
         await jestRegister('bob', 'password123', userService)
-        const allUsers = await userService.getAllUsers()
-        const user = allUsers[0]
 
-        expect(user).toEqual({ user_id: 0, username: "bob", password: "hashedPassword123" })
+        const allUsers = await userService.getAllUsers()
+        expect(allUsers.length).toBe(2)
+
+        expect(allUsers[0]?.username).toBe('alice')
+        expect(allUsers[1]?.username).toBe('bob')
     })
 })

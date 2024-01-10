@@ -1,18 +1,19 @@
 import bcrypt from 'bcrypt';
-import { User as PrismaUser } from '@prisma/client'
+import { PrismaClient, User as PrismaUser } from '@prisma/client'
 
 interface User extends PrismaUser { }
-import { prisma } from './service_init';
 
 export class UserService {
     refreshTokens: string[]
+    private prisma: PrismaClient
 
-    constructor() {
+    constructor(prisma: PrismaClient) {
+        this.prisma = prisma
         this.refreshTokens = []
     }
 
     public async getUserByUsername(username: string): Promise<User | null> {
-        return await prisma.user.findUnique({
+        return await this.prisma.user.findUnique({
             where: {
                 username: username,
             }
@@ -20,7 +21,7 @@ export class UserService {
     }
 
     public async getUserById(user_id: number): Promise<User | null> {
-        return await prisma.user.findUnique({
+        return await this.prisma.user.findUnique({
             where: {
                 id: user_id,
             }
@@ -31,7 +32,7 @@ export class UserService {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        return prisma.user.create({
+        return this.prisma.user.create({
             data: {
                 username,
                 password: hashedPassword
@@ -40,6 +41,6 @@ export class UserService {
     }
 
     public async getAllUsers(): Promise<User[]> {
-        return prisma.user.findMany()
+        return this.prisma.user.findMany()
     }
 }
