@@ -15,7 +15,7 @@ const get_expense_details = () => {
     return {
         // Parameters for expense
         user_id: 1,
-        currency_id: 105,
+        currency_id: 106,
         amount: 49.99,
         name: "Cyberpunk 2077: Phantom Liberty",
         date: new Date(),
@@ -23,7 +23,9 @@ const get_expense_details = () => {
     }
 }
 
-export async function addMockExpense(userService: UserService, categoryService: CategoryService, expenseService: ExpenseService): void {
+export async function addMockExpense(userService: UserService, categoryService: CategoryService, expenseService: ExpenseService): Promise<{
+    success: boolean, error: unknown
+}> {
     try {
         const expense_details = get_expense_details()
 
@@ -36,9 +38,11 @@ export async function addMockExpense(userService: UserService, categoryService: 
             throw new Error('Category does not exist')
 
         await expenseService.addExpense(expense_details)
+        return { success: true, error: null }
 
     } catch (error) {
         console.error('Error occurred while adding mock expense:', error)
+        return { success: false, error: error }
     }
 }
 

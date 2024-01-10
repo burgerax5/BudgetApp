@@ -8,7 +8,6 @@ export class CurrencyService {
 
     constructor(prisma: PrismaClient) {
         this.prisma = prisma
-        this.populate_currencies()
     }
 
     async populate_currencies() {

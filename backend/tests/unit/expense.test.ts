@@ -1,49 +1,109 @@
-// import { ExpenseService } from "../../src/services/expenseService";
-// import { UserService } from "../../src/services/userService";
-// import { CategoryService } from "../../src/services/categoryService";
-// import { jestRegister } from "../scripts/registerUser";
-// import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
-// import { PrismaClient } from "@prisma/client";
+import { ExpenseService } from "../../src/services/expenseService";
+import { UserService } from "../../src/services/userService";
+import { CategoryService } from "../../src/services/categoryService";
+import { jestRegister } from "../scripts/registerUser";
+import { addMockExpense } from "../scripts/addExpense";
+import { PrismaClient } from "@prisma/client";
+import { CurrencyService } from "../../src/services/currencyService";
+import { resetTables } from "../scripts/resetTables";
 
-// describe('Test initialization and adding', () => {
-//     let expenseService: ExpenseService
-//     let userService: UserService
-//     let categoryService: CategoryService
-//     let prisma: PrismaClient
+describe('Test initialization and adding', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let categoryService: CategoryService
+    let currencyService: CurrencyService
+    let prisma: PrismaClient
 
-//     beforeEach(async () => {
-//         prisma = new PrismaClient()
-//         expenseService = new ExpenseService(prisma)
-//         userService = new UserService(prisma)
-//         categoryService = new CategoryService(prisma)
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it('should initially be an empty list', () => {
-//         const all_expenses = expenseService.getAllExpenses()
-//         expect(all_expenses).toEqual([])
-//     })
+        await resetTables(prisma)
 
-//     it('should add a new expense', async () => {
-//         const old_expenses = expenseService.getAllExpenses()
-//         expect(old_expenses.length).toBe(0)
+        // Initialize user and currencies
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
 
-//         addMockExpense(userService, categoryService, expenseService)
-//         const new_expenses = expenseService.getAllExpenses()
-//         expect(new_expenses.length).toBe(1)
-//     })
+    it('should initially be an empty list', async () => {
+        const all_expenses = await expenseService.getAllExpenses()
+        expect(all_expenses.length).toBe(0)
+    })
 
-//     it('should increment the expense_id after each expense added', async () => {
-//         addMockExpense(userService, categoryService, expenseService)
-//         addMockExpense(userService, categoryService, expenseService)
+    it('should add a new expense', async () => {
+        const expenses1 = await expenseService.getAllExpenses()
+        expect(expenses1.length).toBe(0)
 
-//         const all_expenses: Expense[] = expenseService.getAllExpenses()
-//         expect(all_expenses.length).toBe(2)
+        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+        expect(success).toBeTruthy()
+        expect(error).toBeNull()
 
-//         expect(all_expenses[0].expense_id).toBe(0)
-//         expect(all_expenses[1].expense_id).toBe(1)
-//     })
-// })
+        const expenses2 = await expenseService.getAllExpenses()
+        expect(expenses2.length).toBe(1)
+    })
+
+    it('should increment the expense_id after each expense added', async () => {
+        const { success: s1, error: err1 } = await addMockExpense(userService, categoryService, expenseService)
+        expect(s1).toBeTruthy()
+
+        const { success: s2, error: err2 } = await addMockExpense(userService, categoryService, expenseService)
+        expect(s2).toBeTruthy()
+
+        const all_expenses = await expenseService.getAllExpenses()
+        expect(all_expenses.length).toBe(2)
+        expect(all_expenses[0].id).toBe(1)
+        expect(all_expenses[1].id).toBe(2)
+    })
+
+    afterAll(async () => {
+        await resetTables(prisma)
+        await prisma.$disconnect()
+    })
+})
+
+describe('Test if there are ids provided for rows that do not exist', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let categoryService: CategoryService
+    let currencyService: CurrencyService
+    let prisma: PrismaClient
+
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
+
+        await resetTables(prisma)
+    })
+
+    it('should return an error saying user does not exist', async () => {
+        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+        expect(success).toBeFalsy()
+
+        if (error instanceof Error)
+            expect(error.message).toBe('User does not exist')
+    })
+
+    it('should return an error saying category does not exist', async () => {
+        await jestRegister('xiao', 'password', userService)
+        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+        expect(success).toBeFalsy()
+
+        if (error instanceof Error)
+            expect(error.message).toBe('Category does not exist')
+    })
+
+    afterAll(async () => {
+        await resetTables(prisma)
+        await prisma.$disconnect()
+    })
+})
 
 // describe('Test modifying existing expenses', () => {
 //     let expenseService: ExpenseService
@@ -60,16 +120,16 @@
 //     it('should remove an expense from the list', () => {
 //         addMockExpense(userService, categoryService, expenseService)
 
-//         let all_expenses = expenseService.getAllExpenses()    
+//         let all_expenses = expenseService.getAllExpenses()
 //         expect(all_expenses.length).toBe(1)
 
 //         let isDeleted: boolean = expenseService.deleteExpense(all_expenses[0])
 //         expect(isDeleted).toBeTruthy()
-        
+
 //         all_expenses = expenseService.getAllExpenses()
 //         expect(all_expenses.length).toBe(0)
 //     })
-    
+
 //     it('should modify the details of an expense', () => {
 //         addMockExpense(userService, categoryService, expenseService)
 //         const expenseToEdit: Expense = expenseService.getAllExpenses()[0]
@@ -83,7 +143,7 @@
 
 //         expenseService.editExpense(expenseToEdit, new_expense_details)
 //         const editedExpense: Expense = expenseService.getAllExpenses()[0]
-        
+
 //         expect(editedExpense.currency).toEqual({"cc":"NZD","symbol":"NZ$","name":"New Zealand dollar"}) // Stays the same
 //         expect(editedExpense.amount).toBe(109.00)
 //         expect(editedExpense.name).toBe("Final Fantasy VII Rebirth")
@@ -166,7 +226,7 @@
 //         categoryService = new CategoryService()
 //         await jestRegister('bob', 'password123', userService)
 //     })
-    
+
 //     it("should return all of bob's expenses that are under entertainment", () => {
 //         const user: User = userService.getAllUsers()[0]
 //         const entertainment = categoryService.getCategoryByName('Entertainment')
@@ -195,25 +255,31 @@
 //     let expenseService: ExpenseService
 //     let userService: UserService
 //     let categoryService: CategoryService
+//     let prisma: PrismaClient
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseService()
-//         userService = new UserService()
-//         categoryService = new CategoryService()
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
 //         await jestRegister('bob', 'password123', userService)
 //     })
 
-//     it('should return undefined since there is no expense with id 0', () => {
-//         const expense = expenseService.getExpenseById(0)
-//         expect(expense).toBeUndefined()
+//     it('should return undefined since there is no expense with id 1', async () => {
+//         const expense = await expenseService.getExpenseById(1)
+//         expect(expense).toBeNull()
 //     })
 
-//     it('should return the expense with id 0', () => {
-//         addMockExpense(userService, categoryService, expenseService)
+//     it('should return the expense with id 1', async () => {
+//         await addMockExpense(userService, categoryService, expenseService)
 
-//         const expense = expenseService.getExpenseById(0)
-//         expect(expense).not.toBeUndefined()
-//         expect(expense?.expense_id).toBe(0)
+//         const expense = await expenseService.getExpenseById(1)
+//         expect(expense).not.toBeNull()
+//         expect(expense?.id).toBe(0)
 //         expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
+//     })
+
+//     afterAll(async () => {
+//         await resetTables(prisma)
+//         await prisma.$disconnect()
 //     })
 // })

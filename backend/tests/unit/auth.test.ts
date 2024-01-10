@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { UserService } from '../../src/services/userService';
 import { jestRegister } from '../scripts/registerUser';
 import { PrismaClient } from '@prisma/client';
+import { resetTables } from '../scripts/resetTables';
 
 jest.mock('bcrypt');
 
@@ -13,14 +14,11 @@ describe('Get user by username or id', () => {
         prisma = new PrismaClient()
         userService = new UserService(prisma)
 
-        // Reset table and id after each test
-        await prisma.user.deleteMany()
-        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
+        await resetTables(prisma)
     })
 
     it('should return null since user bob does not exist', async () => {
         const user = await userService.getUserByUsername('bob')
-        console.log(user)
         expect(user).toBeNull()
     })
 
@@ -46,6 +44,7 @@ describe('Get user by username or id', () => {
     })
 
     afterAll(async () => {
+        await resetTables(prisma)
         await prisma.$disconnect()
     })
 })
@@ -58,9 +57,7 @@ describe('registerUser', () => {
         prisma = new PrismaClient()
         userService = new UserService(prisma)
 
-        // Reset table and id after each test
-        await prisma.user.deleteMany()
-        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
+        await resetTables(prisma)
     })
 
     it('should register alice as a new user', async () => {
@@ -76,6 +73,11 @@ describe('registerUser', () => {
         expect(bcrypt.genSalt).toHaveBeenCalledWith(10)
         expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
     })
+
+    afterAll(async () => {
+        await resetTables(prisma)
+        await prisma.$disconnect()
+    })
 })
 
 describe('getAllUsers', () => {
@@ -86,9 +88,7 @@ describe('getAllUsers', () => {
         prisma = new PrismaClient()
         userService = new UserService(prisma)
 
-        // Reset table and id after each test
-        await prisma.user.deleteMany()
-        await prisma.$executeRaw`SELECT setval('"User_id_seq"', 1, false);`
+        await resetTables(prisma)
     })
 
     it('should return 0 users', async () => {
@@ -105,5 +105,10 @@ describe('getAllUsers', () => {
 
         expect(allUsers[0]?.username).toBe('alice')
         expect(allUsers[1]?.username).toBe('bob')
+    })
+
+    afterAll(async () => {
+        await resetTables(prisma)
+        await prisma.$disconnect()
     })
 })

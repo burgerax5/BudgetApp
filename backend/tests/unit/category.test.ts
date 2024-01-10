@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { resetTables } from "../scripts/resetTables";
 import { CategoryService } from "../../src/services/categoryService";
 
 describe('Test we initialize categories properly', () => {
@@ -9,10 +10,8 @@ describe('Test we initialize categories properly', () => {
         prisma = new PrismaClient()
         categoryService = new CategoryService(prisma)
 
-        // Reset table and id after each test
-        await prisma.category.deleteMany()
+        await resetTables(prisma)
         await categoryService.populate_categories()
-        await prisma.$executeRaw`SELECT setval('"Category_id_seq"', 1, false);`
     })
 
     it('should have 7 default categories', async () => {
@@ -30,10 +29,8 @@ describe('Test we can get the category object by the name and id', () => {
         prisma = new PrismaClient()
         categoryService = new CategoryService(prisma)
 
-        // Reset table and id after each test
-        await prisma.category.deleteMany()
+        await resetTables(prisma)
         await categoryService.populate_categories()
-        await prisma.$executeRaw`SELECT setval('"Category_id_seq"', 1, false);`
     })
 
     it('should return the category object of "Entertainment"', async () => {

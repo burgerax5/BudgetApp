@@ -30,19 +30,40 @@ export class ExpenseService {
         })
     }
 
+    // public async addExpense(expense_details: {
+    //     user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
+    // }): Promise<void> {
+    //     await this.prisma.expense.create({
+    //         data: {
+    //             userId: expense_details.user_id,
+    //             currencyId: expense_details.currency_id,
+    //             amount: expense_details.amount,
+    //             name: expense_details.name,
+    //             date: expense_details.date,
+    //             categoryId: expense_details.category_id
+    //         }
+    //     })
+    // }
+
     public async addExpense(expense_details: {
         user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
-    }) {
-        await this.prisma.expense.create({
+    }): Promise<Expense> {
+        return await this.prisma.expense.create({
             data: {
-                userId: expense_details.user_id,
-                currencyId: expense_details.currency_id,
+                user: {
+                    connect: { id: expense_details.user_id }
+                },
+                currency: {
+                    connect: { id: expense_details.currency_id }
+                },
                 amount: expense_details.amount,
                 name: expense_details.name,
                 date: expense_details.date,
-                categoryId: expense_details.category_id,
+                category: {
+                    connect: { id: expense_details.category_id }
+                }
             }
-        })
+        });
     }
 
     // public editExpense(original: Expense,
