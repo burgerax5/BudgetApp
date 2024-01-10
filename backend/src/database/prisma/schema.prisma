@@ -49,6 +49,9 @@ model Expense {
   categoryId Int
   User       User     @relation(fields: [userId], references: [id])
   userId     Int
+  amount     Int
+  name       String
+  date       DateTime
 }
 
 // Define the Budget model

@@ -1,11 +1,11 @@
 import { UserService } from './userService';
-// import { ExpenseServices } from "./expenseService";
-// import { BudgetServices } from "./budgetService";
-// import { CategoryServices } from "./categoryService";
+import { ExpenseService } from "./expenseService";
+// import { BudgetService } from "./budgetService";
+import { CategoryService } from "./categoryService";
 import { PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient()
 export const userService: UserService = new UserService(prisma)
-// export const expenseService: ExpenseServices = new ExpenseServices()
-// export const categoryService: CategoryServices = new CategoryServices()
+export const expenseService: ExpenseService = new ExpenseService(prisma)
+export const categoryService: CategoryService = new CategoryService(prisma)
 // export const budgetService: BudgetServices = new BudgetServices()

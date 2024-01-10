@@ -1,12 +1,20 @@
 // import { UserService } from "../../src/services/userService"
-// import { CategoryServices } from "../../src/services/categoryService"
-// import { ExpenseServices } from "../../src/services/expenseService"
-// import { Currency } from "../src/models/Currency"
-// import { Category } from "../src/models/Category"
+// import { CategoryService } from "../../src/services/categoryService"
+// import { ExpenseService } from "../../src/services/expenseService"
 
-// const mockCurrency: Currency = {"cc":"NZD","symbol":"NZ$","name":"New Zealand dollar"}
+// import { Category as PrismaCategory,
+// Currency as PrismaCurrency,
+//  } from '@prisma/client'
 
-// const get_expense_details = (userService: UserService, categoryService: CategoryServices, expenseService: ExpenseServices) => {
+// interface Category extends PrismaCategory {}
+// interface Currency extends PrismaCurrency {}
+
+// const mockCurrency: Currency = {cc:"NZD",symbol:"NZ$",name:"New Zealand dollar"}
+
+// const get_expense_details = async (userService: UserService, categoryService: CategoryService, expenseService: ExpenseService) => {
+
+//     const currency_i
+
 //     return {
 //         // Parameters for expense
 //         user_id: 0,
@@ -14,11 +22,11 @@
 //         amount: 49.99,
 //         name: "Cyberpunk 2077: Phantom Liberty",
 //         date: new Date(),
-//         category: categoryService.getAllCategories()[1]
+//         categoryId: await categoryService.getCategoryByName("Entertainment")
 //     }
 // }
 
-// export function addMockExpense(userService: UserService, categoryService: CategoryServices, expenseService: ExpenseServices): void {
+// export function addMockExpense(userService: UserService, categoryService: CategoryService, expenseService: ExpenseService): void {
 //     const expense_details = get_expense_details(userService, categoryService, expenseService)
 
 //     if (expense_details.user_id !== undefined && expense_details.category) {
@@ -26,8 +34,8 @@
 //     }
 // }
 
-// export function datedMockExpense(userService: UserService, categoryService: CategoryServices,
-//     expenseService: ExpenseServices, date: Date): void {
+// export function datedMockExpense(userService: UserService, categoryService: CategoryService,
+//     expenseService: ExpenseService, date: Date): void {
 //     let expense_details = get_expense_details(userService, categoryService, expenseService)
 //     expense_details.date = date
 
@@ -36,8 +44,8 @@
 //     }
 // }
 
-// export function categorizedMockExpense(userService: UserService, categoryService: CategoryServices,
-//     expenseService: ExpenseServices, category: Category): void {
+// export function categorizedMockExpense(userService: UserService, categoryService: CategoryService,
+//     expenseService: ExpenseService, category: Category): void {
 //     let expense_details = get_expense_details(userService, categoryService, expenseService)
 //     expense_details.category = category
 

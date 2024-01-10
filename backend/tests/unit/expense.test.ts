@@ -1,21 +1,21 @@
-// import { ExpenseServices } from "../../src/services/expenseService";
-// import { Expense } from "../../src/models/Expense";
+// import { ExpenseService } from "../../src/services/expenseService";
 // import { UserService } from "../../src/services/userService";
-// import { CategoryServices } from "../../src/services/categoryService";
-// import { jestRegister } from "../registerUser";
-// import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../addExpense";
-// import { User } from "../../src/models/User";
-// import { Category } from "../../src/models/Category";
+// import { CategoryService } from "../../src/services/categoryService";
+// import { jestRegister } from "../scripts/registerUser";
+// import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
+// import { PrismaClient } from "@prisma/client";
 
 // describe('Test initialization and adding', () => {
-//     let expenseService: ExpenseServices
+//     let expenseService: ExpenseService
 //     let userService: UserService
-//     let categoryService: CategoryServices
+//     let categoryService: CategoryService
+//     let prisma: PrismaClient
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseServices()
-//         userService = new UserService()
-//         categoryService = new CategoryServices()
+//         prisma = new PrismaClient()
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
 //         await jestRegister('bob', 'password123', userService)
 //     })
 
@@ -46,14 +46,14 @@
 // })
 
 // describe('Test modifying existing expenses', () => {
-//     let expenseService: ExpenseServices
+//     let expenseService: ExpenseService
 //     let userService: UserService
-//     let categoryService: CategoryServices
+//     let categoryService: CategoryService
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseServices()
+//         expenseService = new ExpenseService()
 //         userService = new UserService()
-//         categoryService = new CategoryServices()
+//         categoryService = new CategoryService()
 //         await jestRegister('bob', 'password123', userService)
 //     })
 
@@ -93,14 +93,14 @@
 // })
 
 // describe('Get expenses by month and year', () => {
-//     let expenseService: ExpenseServices
+//     let expenseService: ExpenseService
 //     let userService: UserService
-//     let categoryService: CategoryServices
+//     let categoryService: CategoryService
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseServices()
+//         expenseService = new ExpenseService()
 //         userService = new UserService()
-//         categoryService = new CategoryServices()
+//         categoryService = new CategoryService()
 //         await jestRegister('bob', 'password123', userService)
 //     })
 
@@ -156,14 +156,14 @@
 // })
 
 // describe('Get expenses by category', () => {
-//     let expenseService: ExpenseServices
+//     let expenseService: ExpenseService
 //     let userService: UserService
-//     let categoryService: CategoryServices
+//     let categoryService: CategoryService
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseServices()
+//         expenseService = new ExpenseService()
 //         userService = new UserService()
-//         categoryService = new CategoryServices()
+//         categoryService = new CategoryService()
 //         await jestRegister('bob', 'password123', userService)
 //     })
     
@@ -192,14 +192,14 @@
 // })
 
 // describe('Get expense by id', () => {
-//     let expenseService: ExpenseServices
+//     let expenseService: ExpenseService
 //     let userService: UserService
-//     let categoryService: CategoryServices
+//     let categoryService: CategoryService
 
 //     beforeEach(async () => {
-//         expenseService = new ExpenseServices()
+//         expenseService = new ExpenseService()
 //         userService = new UserService()
-//         categoryService = new CategoryServices()
+//         categoryService = new CategoryService()
 //         await jestRegister('bob', 'password123', userService)
 //     })
 

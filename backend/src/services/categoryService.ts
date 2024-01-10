@@ -2,10 +2,15 @@ import { PrismaClient, Category as PrismaCategory } from '@prisma/client'
 
 interface Category extends PrismaCategory { }
 
-export class CategoryServices {
+export class CategoryService {
     private prisma: PrismaClient
 
-    private async populate_categories() {
+    constructor(prisma: PrismaClient) {
+        this.prisma = prisma
+        this.populate_categories()
+    }
+
+    async populate_categories() {
         const categories = [
             { name: "Food & Drink", colour: "#f5b642" },
             { name: "Entertainment", colour: "#f54e42" },
@@ -20,11 +25,6 @@ export class CategoryServices {
             await this.prisma.category.createMany({
                 data: categories
             })
-    }
-
-    constructor(prisma: PrismaClient) {
-        this.prisma = prisma
-        this.populate_categories()
     }
 
     public async getAllCategories(): Promise<Category[]> {
