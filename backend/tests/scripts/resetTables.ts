@@ -15,3 +15,8 @@ export async function resetTables(prisma: PrismaClient) {
         prisma.$executeRaw`SELECT setval('"Currency_id_seq"', 1, false)`
     ]);
 }
+
+export async function cleanUp(prisma: PrismaClient) {
+    await resetTables(prisma)
+    await prisma.$disconnect()
+}

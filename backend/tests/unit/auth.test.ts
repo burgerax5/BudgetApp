@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { UserService } from '../../src/services/userService';
 import { jestRegister } from '../scripts/registerUser';
 import { PrismaClient } from '@prisma/client';
-import { resetTables } from '../scripts/resetTables';
+import { resetTables, cleanUp } from '../scripts/resetTables';
 
 jest.mock('bcrypt');
 
@@ -43,10 +43,7 @@ describe('Get user by username or id', () => {
         expect(user?.username).toBe("alice")
     })
 
-    afterAll(async () => {
-        await resetTables(prisma)
-        await prisma.$disconnect()
-    })
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('registerUser', () => {
@@ -74,10 +71,7 @@ describe('registerUser', () => {
         expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
     })
 
-    afterAll(async () => {
-        await resetTables(prisma)
-        await prisma.$disconnect()
-    })
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('getAllUsers', () => {
@@ -107,8 +101,5 @@ describe('getAllUsers', () => {
         expect(allUsers[1]?.username).toBe('bob')
     })
 
-    afterAll(async () => {
-        await resetTables(prisma)
-        await prisma.$disconnect()
-    })
+    afterAll(async () => await cleanUp(prisma))
 })
