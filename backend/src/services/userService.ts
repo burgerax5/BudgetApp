@@ -1,33 +1,45 @@
 import bcrypt from 'bcrypt';
+import { User as PrismaUser } from '@prisma/client'
 
-import { User } from '../models/User';
+interface User extends PrismaUser { }
+import { prisma } from './service_init';
 
 export class UserService {
-    private users: User[];
     refreshTokens: string[]
-    private next_user_id: number
 
     constructor() {
-        this.users = []
         this.refreshTokens = []
-        this.next_user_id = 0
     }
 
-    public getUserByUsername(username: string): User | undefined {
-        return this.users.find(user => user.username === username);
+    public async getUserByUsername(username: string): Promise<User | null> {
+        return await prisma.user.findUnique({
+            where: {
+                username: username,
+            }
+        })
     }
 
-    public getUserById(user_id: number): User | undefined {
-        return this.users.find(user => user.user_id === user_id)
+    public async getUserById(user_id: number): Promise<User | null> {
+        return await prisma.user.findUnique({
+            where: {
+                id: user_id,
+            }
+        })
     }
 
-    public async registerUser(username: string, password: string): Promise<void> {
+    public async registerUser(username: string, password: string): Promise<User> {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        this.users.push({ user_id: this.next_user_id++ , username, password: hashedPassword });
+
+        return prisma.user.create({
+            data: {
+                username,
+                password: hashedPassword
+            }
+        })
     }
 
-    public getAllUsers(): User[] {
-        return this.users
+    public async getAllUsers(): Promise<User[]> {
+        return prisma.user.findMany()
     }
 }

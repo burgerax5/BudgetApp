@@ -8,7 +8,6 @@ import budgetRoutes from './routes/budgetRoutes'
 
 dotenv.config();
 
-
 const app: Express = express();
 const PORT: number = 8080;
 

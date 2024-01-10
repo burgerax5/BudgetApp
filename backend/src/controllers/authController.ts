@@ -22,10 +22,6 @@ export class AuthController {
         return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '15m' });
     }
 
-    private createSession() {
-
-    }
-
     public async login(req: Request, res: Response): Promise<void> {
         try {
             const { username, password } = req.body;
@@ -47,7 +43,7 @@ export class AuthController {
                 const secretKey = process.env.ACCESS_TOKEN_SECRET;
                 const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET
 
-                if (!secretKey) 
+                if (!secretKey)
                     throw new Error('JWT access token secret is not defined')
 
                 if (!refreshSecretKey)
