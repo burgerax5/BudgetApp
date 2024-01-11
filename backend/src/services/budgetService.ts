@@ -86,16 +86,26 @@ export class BudgetService {
         return true
     }
 
-    // getBudgetsByMonth(month: number, year: number): Budget[] {
-    //     return this.budgets.filter(budget => budget.budget_month === month &&
-    //         budget.budget_year === year)
-    // }
+    async getBudgetsByMonth(user_id: number, month: number, year: number): Promise<Budget[]> {
+        return await this.prisma.budget.findMany({
+            where: {
+                userId: user_id,
+                month,
+                year
+            }
+        })
+    }
 
-    // getBudgetsByYear(year: number): Budget[] {
-    //     return this.budgets.filter(budget => budget.budget_year === year)
-    // }
+    async getBudgetsByYear(user_id: number, year: number): Promise<Budget[]> {
+        return await this.prisma.budget.findMany({
+            where: {
+                userId: user_id,
+                year
+            }
+        })
+    }
 
-    // getBudgetsByCategory(category: Category): Budget[] {
-    //     return this.budgets.filter(budget => budget.category === category)
-    // }
+    async getBudgetsByCategory(categoryId: number): Promise<Budget[]> {
+        return await this.prisma.budget.findMany({ where: { categoryId } })
+    }
 }

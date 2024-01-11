@@ -106,55 +106,104 @@ describe('Test editing & deleting budgets for a user', () => {
     })
 
     it('should return false when we try to delete an invalid budget', async () => {
-        const deleteSuccess = await budgetService.deleteBudget(1) 
+        const deleteSuccess = await budgetService.deleteBudget(1)
         expect(deleteSuccess).toBeFalsy()
     })
 
     afterEach(async () => cleanUp(prisma))
 })
 
-// describe('Test getting budgets by user', () => {
-//     let userService: UserService
-//     let categoryService: CategoryServices
-//     let budgetService: BudgetServices
-//     let user: User
+describe('Test getting budgets by user', () => {
+    let userService: UserService
+    let categoryService: CategoryService
+    let budgetService: BudgetService
+    let currencyService: CurrencyService
 
-//     beforeEach(async () => {
-//         userService = new UserService()
-//         categoryService = new CategoryServices()
-//         budgetService = new BudgetServices()
-//         user = userService.getAllUsers()[0]
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        budgetService = new BudgetService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it('should return all budgets created by the user "alice"', () => {
-//         const budget_detail_template = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: 2,
-//             budget_year: 2023
-//         }
-    
-//         budgetService.addBudget(user, budget_detail_template)
-//         budgetService.addBudget(user, {...budget_detail_template, budget_year: 2022})
-//         budgetService.addBudget(user, {...budget_detail_template, budget_year: 2021})
+        await resetTables(prisma)
 
-//         const budgets = budgetService.getBudgetByUser(user)
-//         expect(budgets.length).toBe(3)
-//     })
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
 
-//     it('should return false since the user already has a budget for that category on that date', () => {
-//         const budget_detail_template = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: 2,
-//             budget_year: 2023
-//         }
+    it('should return all budgets created by the user "bob"', async () => {
+        await budgetService.addBudget(budget_details)
+        await budgetService.addBudget({ ...budget_details, month: 2 })
+        await budgetService.addBudget({ ...budget_details, month: 3 })
 
-//         const { category, budget_month, budget_year } = budget_detail_template
-    
-//         budgetService.addBudget(user, budget_detail_template)
-//         const isExist = budgetService.checkBudgetEmpty(user, category, budget_month, budget_year)
-//         expect(isExist).toBeTruthy()
-//     })
-// })
+        const budgets = await budgetService.getBudgetsByUser(1)
+        expect(budgets.length).toBe(3)
+    })
+
+    it('should return false since the user already has a budget for that category on that date', async () => {
+        const { categoryId, month, year } = budget_details
+
+        const budget = await budgetService.addBudget(budget_details)
+        expect(budget).not.toBeNull()
+
+        // Returns true if there exists a budget with the specified category, month, and year
+        const isExist1 = await budgetService.checkBudgetEmpty(1, categoryId, month, year)
+        expect(isExist1).toBeTruthy()
+
+        // Altering either of the category, month, or year will return false
+        const isExist2 = await budgetService.checkBudgetEmpty(1, categoryId, month, year + 1)
+        expect(isExist2).toBeFalsy()
+    })
+
+    afterEach(async () => cleanUp(prisma))
+})
+
+describe('Retrieve budgets by the user in a given category/month/year', () => {
+    let userService: UserService
+    let categoryService: CategoryService
+    let budgetService: BudgetService
+    let currencyService: CurrencyService
+
+    beforeEach(async () => {
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        budgetService = new BudgetService(prisma)
+        currencyService = new CurrencyService(prisma)
+
+        await resetTables(prisma)
+
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
+
+    it('should return 2 budgets from Jan 2023', async () => {
+        await budgetService.addBudget(budget_details)
+        await budgetService.addBudget({ ...budget_details, categoryId: 1 })
+        await budgetService.addBudget({ ...budget_details, month: 3 })
+
+        const budgetsFromJan2023 = await budgetService.getBudgetsByMonth(1, 1, 2023) // user_id, month, year
+        expect(budgetsFromJan2023.length).toBe(2)
+    })
+
+    it('should return 2 budgets from 2023', async () => {
+        await budgetService.addBudget(budget_details)
+        await budgetService.addBudget({ ...budget_details, month: 2 })
+        await budgetService.addBudget({ ...budget_details, year: 2024 })
+
+        const budgetsFrom2023 = await budgetService.getBudgetsByYear(1, 2023) // user_id, year
+        expect(budgetsFrom2023.length).toBe(2)
+    })
+
+    it('should return 2 budgets from the entertainment category', async () => {
+        await budgetService.addBudget(budget_details) // Entertainment
+        await budgetService.addBudget({ ...budget_details, categoryId: 1 }) // Food & Drink
+        await budgetService.addBudget({ ...budget_details, year: 2024 }) // Entertainment
+
+        const budgetsFromEntertainment = await budgetService.getBudgetsByCategory(2)
+        expect(budgetsFromEntertainment.length).toBe(2)
+    })
+
+    afterEach(async () => cleanUp(prisma))
+})
