@@ -154,15 +154,15 @@ describe('Test updating and deleting existing expenses', () => {
 
         await addMockExpense(userService, categoryService, expenseService)
 
-        const new_amount = 109.00
-        const new_name = "Final Fantasy VII Rebirth"
-        const new_day = 29
-        const new_month = 2
-        const new_year = 2024
-        const new_currency_id = 106
-        const new_category_id = 2
+        const amount = 109.00
+        const name = "Final Fantasy VII Rebirth"
+        const day = 29
+        const month = 2
+        const year = 2024
+        const currencyId = 106
+        const categoryId = 2
 
-        const new_details = { new_amount, new_day, new_month, new_year, new_name, new_currency_id, new_category_id }
+        const new_details = { amount, day, month, year, name, currencyId, categoryId }
 
         await expenseService.editExpense(1, new_details) // expenseId = 1
         const editedExpense = await expenseService.getExpenseById(1)
@@ -314,7 +314,7 @@ describe('Get expense by id', () => {
         // Ensure user, currency, & categories are succesfully initialized
         expect(await userService.getUserById(1)).not.toBeNull()
         expect(await categoryService.getCategoryById(2)).not.toBeNull()
-        expect(await currencyService.getCategoryByCode("NZD")).not.toBeNull()
+        expect(await currencyService.getCurrencyByCode("NZD")).not.toBeNull()
 
         await addMockExpense(userService, categoryService, expenseService)
 

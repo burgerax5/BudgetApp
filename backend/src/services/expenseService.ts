@@ -62,26 +62,26 @@ export class ExpenseService {
 
     public async editExpense(expense_id: number,
         new_expense_details: {
-            new_amount: number,
-            new_day: number,
-            new_month: number,
-            new_year: number,
-            new_name: string,
-            new_currency_id: number,
-            new_category_id: number
+            amount: number,
+            day: number,
+            month: number,
+            year: number,
+            name: string,
+            currencyId: number,
+            categoryId: number
         }): Promise<void> {
 
-        const { new_amount, new_day, new_month, new_year, new_name, new_currency_id, new_category_id } = new_expense_details
+        const { amount, day, month, year, name, currencyId, categoryId } = new_expense_details
 
         await this.prisma.expense.update({
             data: {
-                amount: new_amount,
-                day: new_day,
-                month: new_month,
-                year: new_year,
-                name: new_name,
-                currencyId: new_currency_id,
-                categoryId: new_category_id
+                amount,
+                day,
+                month,
+                year,
+                name,
+                currencyId,
+                categoryId
             },
             where: {
                 id: expense_id

@@ -32,14 +32,50 @@ export class ExpenseController {
         return user;
     }
 
-    private async getCurrency(code: string): Promise<Currency | null> {
-        return await this.currencyService.getCategoryByCode(code)
+    private async getCurrency(id: number): Promise<Currency | null> {
+        return await this.currencyService.getCurrencyById(id)
     }
 
     private async getUserFromParam(req: Request): Promise<User | null> {
         const userId = parseInt(req.params.userId)
         const user = await this.userService.getUserById(userId)
         return user
+    }
+
+    private async validateDetails(expense: {
+        amount: number,
+        name: string,
+        day: number,
+        month: number,
+        year: number,
+        currencyId: number,
+        categoryId: number,
+    }): Promise<void> {
+        // Validate currency
+        if (!expense.currencyId)
+            throw new Error('Expense currency is required')
+
+        const currency = await this.getCurrency(expense.currencyId)
+        if (!currency)
+            throw new Error(`No expense with the id ${expense.currencyId}`)
+
+        // Ensure required fields are present in the expense object
+        if (typeof expense.amount !== 'number')
+            throw new Error('Expense amount is required and must be a number.');
+
+        // Ensure the date is valid
+        const date = new Date(expense.year, expense.month - 1, expense.day)
+        if (!(date.getDate() === expense.day && date.getMonth() === expense.month - 1 && date.getFullYear() === expense.year))
+            throw new Error(`Invalid Date`)
+
+        // Ensure the name is a string
+        if (typeof expense.name !== 'string')
+            throw new Error('Name of expense must be a string')
+
+        // Ensure the category is valid
+        const category = await this.categoryService.getCategoryById(expense.categoryId)
+        if (!category)
+            throw new Error(`No category with the id ${expense.categoryId}`)
     }
 
     async getExpenseById(req: Request, res: Response) {
@@ -53,45 +89,16 @@ export class ExpenseController {
             // Validate input
             let { expense } = req.body;
 
-            if (!expense) {
-                throw new Error('Expenses details are required')
-            }
+            if (!expense)
+                throw new Error('No expense details found')
 
             // Validate user details
             const user = await this.getUserFromRequest(req)
-
             if (!user)
                 throw new Error('User does not exist')
 
-            // Validate currency
-            if (!expense.currency)
-                throw new Error('Expense currency is required')
-
-            const currency = await this.getCurrency(expense.currency)
-
-            if (!currency)
-                throw new Error(`Invalid currency: ${expense.currency}`)
-
-            expense.currencyId = currency.id
-
-            // Ensure required fields are present in the expense object
-            if (typeof expense.amount !== 'number')
-                throw new Error('Expense amount is required and must be a number.');
-
-            // Ensure the date is valid
-            if (typeof expense.day !== 'number' || typeof expense.day !== 'number' || typeof expense.year !== 'number')
-                throw new Error(`Invalid Date`)
-
-            // Ensure the name is a string
-            if (typeof expense.name !== 'string')
-                throw new Error('Name of expense must be a string')
-
-            // Ensure the category is valid
-            const category = await this.categoryService.getCategoryByName(expense.category)
-            if (category)
-                expense.categoryId = category.id
-            else
-                throw new Error(`Invalid category: ${expense.category}`)
+            // Validate expense details
+            this.validateDetails(expense)
 
             // Update user_id in expense to match the user making the request
             expense.userId = user.id;
@@ -107,54 +114,34 @@ export class ExpenseController {
         }
     }
 
-    // editExpense(req: Request, res: Response) {
-    //     try {
-    //         const { new_expense_details } = req.body
-    //         const expense_id = parseInt(req.params.expenseId)
-    //         let expense = this.expenseService.getExpenseById(expense_id)
+    async editExpense(req: Request, res: Response) {
+        try {
+            const { expense } = req.body
+            const expense_id = parseInt(req.params.expenseId)
 
-    //         const user = this.userService.getUserByUsername(req.body.user.username)
+            // Validate expense id
+            let expenseExists = await this.expenseService.getExpenseById(expense_id)
+            if (!expenseExists)
+                throw new Error('Expense does not exist')
 
-    //         if (!user) {
-    //             throw new Error('User does not exist')
-    //         }
+            // Validate user details
+            const user = await this.getUserFromRequest(req)
+            if (!user)
+                throw new Error('User does not exist')
 
-    //         if (!expense) {
-    //             throw new Error('Expense does not exist')
-    //         }
+            // Validate expense details
+            this.validateDetails(expense)
 
-    //         if (expense.user_id !== user.user_id) {
-    //             throw new Error(`User id of expense does not match the user requesting`)
-    //         }
-
-    //         // Validate currency
-    //         if (!new_expense_details.currency) {
-    //             throw new Error('Expense currency is required')
-    //         }
-
-    //         const currency = this.getCurrency(new_expense_details.currency)
-
-    //         if (!currency) {
-    //             console.error(`Received ${currency} as currency`)
-    //             throw new Error(`Invalid currency: ${new_expense_details.currency}`)
-    //         }
-
-    //         expense.currency = currency
-
-    //         if (expense) {
-    //             this.expenseService.editExpense(expense, new_expense_details)
-    //             res.json({
-    //                 message: 'Successfully edited expense',
-    //                 expense: this.expenseService.getExpenseById(expense_id)
-    //             })
-    //             return
-    //         } res.status(500).send('Whoops something went wrong!')
-
-    //     } catch (error) {
-    //         console.error('Error trying to edit expense:', error)
-    //         res.status(500).send('Internal Server Error')
-    //     }
-    // }
+            this.expenseService.editExpense(expense_id, expense)
+            res.json({
+                message: 'Successfully edited expense',
+                expense: this.expenseService.getExpenseById(expense_id)
+            })
+        } catch (error) {
+            console.error('Error trying to edit expense:', error)
+            res.status(500).send('Internal Server Error')
+        }
+    }
 
     // deleteExpense(req: Request, res: Response) {
     //     try {
@@ -185,7 +172,7 @@ export class ExpenseController {
         const user = await this.getUserFromParam(req)
 
         if (user)
-            res.status(200).send(this.expenseService.getExpenseByUser(user))
+            res.status(200).send(await this.expenseService.getExpensesByUser(user.id))
         else
             res.status(401).send(`No user with the id ${req.params.userId}`)
     }

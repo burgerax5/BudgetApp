@@ -23,11 +23,11 @@ export class CurrencyService {
         return await this.prisma.currency.findMany()
     }
 
-    public async getCategoryByCode(code: string): Promise<Currency | null> {
-        return await this.prisma.currency.findUnique({
-            where: {
-                cc: code
-            }
-        })
+    public async getCurrencyByCode(code: string): Promise<Currency | null> {
+        return await this.prisma.currency.findUnique({ where: { cc: code } })
+    }
+
+    public async getCurrencyById(id: number): Promise<Currency | null> {
+        return await this.prisma.currency.findUnique({ where: { id } })
     }
 }

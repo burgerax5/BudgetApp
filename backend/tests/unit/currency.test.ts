@@ -23,7 +23,7 @@ describe('Test we initialize currencies properly', () => {
     afterEach(async () => cleanUp(prisma))
 })
 
-describe('Test we can get the currency by the name', () => {
+describe('Test we can get the currency by the code and id', () => {
     let currencyService: CurrencyService
 
     beforeAll(async () => {
@@ -34,11 +34,16 @@ describe('Test we can get the currency by the name', () => {
         await currencyService.populate_currencies()
     })
 
-    it('should return NZD', async () => {
-        const currency = await currencyService.getCategoryByCode('NZD')
+    it('should take in a currency code and return the currency', async () => {
+        const currency = await currencyService.getCurrencyByCode('NZD')
         expect(currency).not.toBeNull()
         expect(currency?.name).toBe("New Zealand dollar")
         expect(currency?.cc).toBe("NZD")
+    })
+
+    it('should return the NZ currency with the id 106', async () => {
+        const currency = await currencyService.getCurrencyById(106)
+        expect(currency?.name).toBe("New Zealand dollar")
     })
 
     afterEach(async () => cleanUp(prisma))

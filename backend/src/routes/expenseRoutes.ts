@@ -19,9 +19,9 @@ router.post('/add', authenticateToken, (req: Request, res: Response) => {
     expenseController.addExpense(req, res);
 });
 
-// router.put('/edit/:expenseId', authenticateToken, (req: Request, res: Response) => {
-//     expenseController.editExpense(req, res)
-// })
+router.put('/edit/:expenseId', authenticateToken, (req: Request, res: Response) => {
+    expenseController.editExpense(req, res)
+})
 
 // router.delete('/delete/:expenseId', authenticateToken, (req: Request, res: Response) => {
 //     expenseController.deleteExpense(req, res)
