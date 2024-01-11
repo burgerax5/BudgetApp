@@ -76,15 +76,13 @@ export class ExpenseService {
         })
     }
 
-    // public deleteExpense(expense: Expense): boolean {
-    //     const index = this.expenses.findIndex(exp => exp.expense_id === expense.expense_id)
-
-    //     if (index > -1) {
-    //         this.expenses = this.expenses.filter(exp => exp.expense_id !== expense.expense_id)
-    //         return true
-    //     }
-    //     return false
-    // }
+    public async deleteExpense(expense_id: number): Promise<void> {
+        await this.prisma.expense.delete({
+            where: {
+                id: expense_id
+            }
+        })
+    }
 
     // getExpenseByUser(user: User): Expense[] {
     //     return this.expenses.filter(expense => expense.user_id === user.user_id)

@@ -17,8 +17,8 @@ describe('Get user by username or id', () => {
         await resetTables(prisma)
     })
 
-    it('should return null since user bob does not exist', async () => {
-        const user = await userService.getUserByUsername('bob')
+    it('should return null since user tom does not exist', async () => {
+        const user = await userService.getUserByUsername('tom')
         expect(user).toBeNull()
     })
 

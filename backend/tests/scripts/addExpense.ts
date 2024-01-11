@@ -42,6 +42,10 @@ export async function addMockExpense(userService: UserService, categoryService: 
 
     } catch (error) {
         console.error('Error occurred while adding mock expense:', error)
+
+        if (error instanceof Error && error.message.includes('deadlock detected'))
+            addMockExpense(userService, categoryService, expenseService)
+
         return { success: false, error: error }
     }
 }

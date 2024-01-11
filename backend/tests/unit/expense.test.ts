@@ -38,9 +38,7 @@ describe('Test initialization and adding', () => {
         const expenses1 = await expenseService.getAllExpenses()
         expect(expenses1.length).toBe(0)
 
-        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
-        expect(success).toBeTruthy()
-        expect(error).toBeNull()
+        await addMockExpense(userService, categoryService, expenseService)
 
         const expenses2 = await expenseService.getAllExpenses()
         expect(expenses2.length).toBe(1)
@@ -120,18 +118,20 @@ describe('Test updating and deleting existing expenses', () => {
         await jestRegister('bob', 'password123', userService)
     })
 
-    // it('should remove an expense from the list', () => {
-    //     addMockExpense(userService, categoryService, expenseService)
+    it('should remove an expense from the list', async () => {
+        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
 
-    //     let all_expenses = expenseService.getAllExpenses()
-    //     expect(all_expenses.length).toBe(1)
+        if (error instanceof Error)
+            expect(error.message).toBe('User does not exist')
 
-    //     let isDeleted: boolean = expenseService.deleteExpense(all_expenses[0])
-    //     expect(isDeleted).toBeTruthy()
+        let expenses_before = await expenseService.getAllExpenses()
+        expect(expenses_before.length).toBe(1)
 
-    //     all_expenses = expenseService.getAllExpenses()
-    //     expect(all_expenses.length).toBe(0)
-    // })
+        await expenseService.deleteExpense(1)
+
+        const expenses_after = await expenseService.getAllExpenses()
+        expect(expenses_after.length).toBe(0)
+    })
 
     it('should modify the details of an expense', async () => {
         await addMockExpense(userService, categoryService, expenseService)
@@ -282,9 +282,10 @@ describe('Get expense by id', () => {
     it('should return the expense with id 1', async () => {
         await categoryService.populate_categories()
         await currencyService.populate_currencies()
-        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+        await addMockExpense(userService, categoryService, expenseService)
 
         const expense = await expenseService.getExpenseById(1)
+
         expect(expense).not.toBeNull()
         expect(expense?.id).toBe(1)
         expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
