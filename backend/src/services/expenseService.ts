@@ -91,15 +91,15 @@ export class ExpenseService {
 
     public async deleteExpense(expense_id: number): Promise<void> {
         await this.prisma.expense.delete({
-            where: {
-                id: expense_id
-            }
+            where: { id: expense_id }
         })
     }
 
-    // getExpenseByUser(user: User): Expense[] {
-    //     return this.expenses.filter(expense => expense.user_id === user.user_id)
-    // }
+    async getExpenseByUser(user_id: number): Promise<Expense[]> {
+        return await this.prisma.expense.findMany({
+            where: { userId: user_id }
+        })
+    }
 
     async getUserExpenseByMonth(user_id: number, month: number, year: number): Promise<Expense[]> {
         return await this.prisma.expense.findMany({
@@ -120,15 +120,12 @@ export class ExpenseService {
         })
     }
 
-    // getUserExpenseByCategory(user: User, category: Category): Expense[] {
-    //     if (this.getExpenseByUser(user)) {
-    //         const categoryExpenses = this.expenses.filter(expense => {
-    //             if (expense.category === category &&
-    //                 expense.user_id === user.user_id) {
-    //                 return expense
-    //             }
-    //         })
-    //         return categoryExpenses
-    //     } return []
-    // }
+    async getUserExpenseByCategory(user_id: number, category_id: number): Promise<Expense[]> {
+        return await this.prisma.expense.findMany({
+            where: {
+                userId: user_id,
+                categoryId: category_id
+            }
+        })
+    }
 }

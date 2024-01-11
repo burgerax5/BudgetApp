@@ -74,12 +74,11 @@ export async function datedMockExpense(userService: UserService, categoryService
     }
 }
 
-// export function categorizedMockExpense(userService: UserService, categoryService: CategoryService,
-//     expenseService: ExpenseService, category: Category): void {
-//     let expense_details = get_expense_details(userService, categoryService, expenseService)
-//     expense_details.category = category
+export async function categorizedMockExpense(userService: UserService, categoryService: CategoryService,
+    expenseService: ExpenseService, category_id: number): Promise<void> {
+    let expense_details = get_expense_details()
+    expense_details.category_id = category_id
 
-//     if (expense_details.user_id !== undefined && category) {
-//         expenseService.addExpense(expense_details)
-//     }
-// }
+    if (expense_details.user_id && category_id)
+        await expenseService.addExpense(expense_details)
+}

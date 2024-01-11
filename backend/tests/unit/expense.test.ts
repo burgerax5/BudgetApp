@@ -2,7 +2,7 @@ import { ExpenseService } from "../../src/services/expenseService";
 import { UserService } from "../../src/services/userService";
 import { CategoryService } from "../../src/services/categoryService";
 import { jestRegister } from "../scripts/registerUser";
-import { addMockExpense, datedMockExpense } from "../scripts/addExpense";
+import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
@@ -236,41 +236,41 @@ describe('Get expenses by month and year', () => {
     afterAll(async () => cleanUp(prisma))
 })
 
-// describe('Get expenses by category', () => {
-//     let expenseService: ExpenseService
-//     let userService: UserService
-//     let categoryService: CategoryService
+describe('Get expenses by category', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let currencyService: CurrencyService
+    let categoryService: CategoryService
+    let prisma: PrismaClient
 
-//     beforeEach(async () => {
-//         expenseService = new ExpenseService()
-//         userService = new UserService()
-//         categoryService = new CategoryService()
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it("should return all of bob's expenses that are under entertainment", () => {
-//         const user: User = userService.getAllUsers()[0]
-//         const entertainment = categoryService.getCategoryByName('Entertainment')
-//         const foodndrink = categoryService.getCategoryByName('Food & Drink')
+        await jestRegister('bob', 'password123', userService)
+        await currencyService.populate_currencies()
+        await categoryService.populate_categories()
+    })
 
-//         expect(entertainment).not.toBeUndefined()
-//         expect(foodndrink).not.toBeUndefined()
+    it("should return all of bob's expenses that are under entertainment", async () => {
+        // Create mock expenses
+        await categorizedMockExpense(userService, categoryService, expenseService, 2)
+        await categorizedMockExpense(userService, categoryService, expenseService, 2)
+        await categorizedMockExpense(userService, categoryService, expenseService, 1)
 
-//         if (entertainment && foodndrink) {
-//             categorizedMockExpense(userService, categoryService, expenseService, entertainment)
-//             categorizedMockExpense(userService, categoryService, expenseService, entertainment)
-//             categorizedMockExpense(userService, categoryService, expenseService, foodndrink)
+        // Find expenses by category
+        const entertainment_expenses = await expenseService.getUserExpenseByCategory(1, 2) // 2 - Entertainment
+        const foodndrink_expenses = await expenseService.getUserExpenseByCategory(1, 1) // 1 - Food & Drink
 
-//             const all_expenses = expenseService.getAllExpenses()
+        expect(entertainment_expenses.length).toBe(2)
+        expect(foodndrink_expenses.length).toBe(1)
+    })
 
-//             const entertainment_expenses = expenseService.getUserExpenseByCategory(user, entertainment)
-//             const foodndrink_expenses = expenseService.getUserExpenseByCategory(user, foodndrink)
-
-//             expect(entertainment_expenses.length).toBe(2)
-//             expect(foodndrink_expenses.length).toBe(1)
-//         }
-//     })
-// })
+    afterAll(async () => cleanUp(prisma))
+})
 
 describe('Get expense by id', () => {
     let expenseService: ExpenseService
