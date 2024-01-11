@@ -15,7 +15,19 @@ auth.test.js
 category.test.js
 expense.test.js
 budget.test.js
+currency.test.js
+
+auth.test.js.map
+budget.test.js.map
+category.test.js.map
+currency.test.js.map
+expense.test.js.map
 
 # Ignore transpiled helper functions
 registerUser.js
 addExpense.js
+resetTables.js
+
+addExpense.js.map
+registerUser.js.map
+resetTables.js.map

@@ -84,14 +84,17 @@ export class AuthController {
                 return;
             }
 
-            const userExists = this.userService.getUserByUsername(username);
+            const userExists = await this.userService.getUserByUsername(username);
             if (userExists) {
                 res.status(400).send(`The user ${username} already exists.`);
                 return;
             }
 
-            await this.userService.registerUser(username, password);
-            res.send(`Registered the user ${username}`);
+            const user = await this.userService.registerUser(username, password);
+            if (user)
+                res.send(`Registered the user ${username}`);
+            else
+                throw new Error('Failed to register')
         } catch (error) {
             console.error('Error during registration:', error);
             res.status(500).send('Internal Server Error');
@@ -151,7 +154,7 @@ export class AuthController {
         }
     }
 
-    public getUsers(req: Request, res: Response): void {
-        res.status(200).send(this.userService.getAllUsers())
+    public async getUsers(req: Request, res: Response): Promise<void> {
+        res.status(200).send(await this.userService.getAllUsers())
     }
 }

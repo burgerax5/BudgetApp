@@ -8,20 +8,17 @@ import {
     Currency as PrismaCurrency,
 } from '@prisma/client'
 
-interface Category extends PrismaCategory { }
-interface Currency extends PrismaCurrency { }
-
 const get_expense_details = () => {
     return {
         // Parameters for expense
-        user_id: 1,
-        currency_id: 106,
+        userId: 1,
+        currencyId: 106,
         amount: 49.99,
         name: "Cyberpunk 2077: Phantom Liberty",
         day: 1,
         month: 1,
         year: 2023,
-        category_id: 2
+        categoryId: 2
     }
 }
 
@@ -62,7 +59,7 @@ export async function datedMockExpense(userService: UserService, categoryService
         expense_details.month = date.getMonth() + 1
         expense_details.year = date.getFullYear()
 
-        if (expense_details.user_id && expense_details.category_id) {
+        if (expense_details.userId && expense_details.categoryId) {
             await expenseService.addExpense(expense_details)
         }
         return { success: true, error: null }
@@ -81,8 +78,8 @@ export async function datedMockExpense(userService: UserService, categoryService
 export async function categorizedMockExpense(userService: UserService, categoryService: CategoryService,
     expenseService: ExpenseService, category_id: number): Promise<void> {
     let expense_details = get_expense_details()
-    expense_details.category_id = category_id
+    expense_details.categoryId = category_id
 
-    if (expense_details.user_id && category_id)
+    if (expense_details.userId && category_id)
         await expenseService.addExpense(expense_details)
 }

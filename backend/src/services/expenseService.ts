@@ -31,22 +31,22 @@ export class ExpenseService {
     }
 
     public async addExpense(expense_details: {
-        user_id: number,
-        currency_id: number,
+        userId: number,
+        currencyId: number,
         amount: number,
         name: string,
         day: number,
         month: number,
         year: number,
-        category_id: number
+        categoryId: number
     }): Promise<Expense | null> {
         return await this.prisma.expense.create({
             data: {
                 user: {
-                    connect: { id: expense_details.user_id }
+                    connect: { id: expense_details.userId }
                 },
                 currency: {
-                    connect: { id: expense_details.currency_id }
+                    connect: { id: expense_details.currencyId }
                 },
                 amount: expense_details.amount,
                 name: expense_details.name,
@@ -54,7 +54,7 @@ export class ExpenseService {
                 month: expense_details.month,
                 year: expense_details.year,
                 category: {
-                    connect: { id: expense_details.category_id }
+                    connect: { id: expense_details.categoryId }
                 }
             }
         });
@@ -95,7 +95,7 @@ export class ExpenseService {
         })
     }
 
-    async getExpenseByUser(user_id: number): Promise<Expense[]> {
+    async getExpensesByUser(user_id: number): Promise<Expense[]> {
         return await this.prisma.expense.findMany({
             where: { userId: user_id }
         })

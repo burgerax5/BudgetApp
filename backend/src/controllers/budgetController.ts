@@ -1,208 +1,206 @@
-import { Request, Response } from 'express';
+// import { Request, Response } from 'express';
 
-import { User } from '../models/User';
-import { Budget } from 'src/models/Budget';
-import { Category } from 'src/models/Category';
+// import { BudgetService } from '../services/budgetService';
+// import { UserService } from '../services/userService';
+// import { CategoryService } from '../services/categoryService';
 
-import { BudgetServices } from '../services/budgetService';
-import { UserService } from '../services/userService';
-import { CategoryServices } from '../services/categoryService';
+// import { prisma } from 'src/services/service_init';
 
-import { currencies } from '../constants/currencies';
+// import { currencies } from '../constants/currencies';
 
-export class BudgetController {
-    private budgetService: BudgetServices
-    private userService: UserService
-    private categoryService: CategoryServices
+// export class BudgetController {
+//     private budgetService: BudgetService
+//     private userService: UserService
+//     private categoryService: CategoryService
 
-    constructor(budgetService: BudgetServices, userService: UserService) {
-        this.budgetService = budgetService
-        this.userService = userService
-        this.categoryService = new CategoryServices()
-    }
+//     constructor(budgetService: BudgetService, userService: UserService) {
+//         this.budgetService = budgetService
+//         this.userService = userService
+//         this.categoryService = new CategoryService(prisma)
+//     }
 
-    private checkBudgetExists(user: User, budget: {
-        category: Category | undefined;
-        amount: number;
-        budget_month: number | undefined;
-        budget_year: number;
-    }): Boolean {
-        const { category, budget_month: month, budget_year: year } = budget
+//     private checkBudgetExists(user: User, budget: {
+//         category: Category | undefined;
+//         amount: number;
+//         budget_month: number | undefined;
+//         budget_year: number;
+//     }): Boolean {
+//         const { category, budget_month: month, budget_year: year } = budget
 
-        // Total budget for the month
-        if (!category && month && year) {
-            const monthly_budgets = this.budgetService.getBudgetsByMonth(month, year)
-            
-            return monthly_budgets.some(budget => !budget.category && budget.budget_month === month &&
-                budget.budget_year === year && budget.user === user)
-        }
+//         // Total budget for the month
+//         if (!category && month && year) {
+//             const monthly_budgets = this.budgetService.getBudgetsByMonth(month, year)
 
-        // Total budget for the year
-        if (!category && !month && year) {
-            const yearly_budgets = this.budgetService.getBudgetsByYear(year)
+//             return monthly_budgets.some(budget => !budget.category && budget.budget_month === month &&
+//                 budget.budget_year === year && budget.user === user)
+//         }
 
-            return yearly_budgets.some(budget => budget.budget_year === year &&
-                !budget.budget_month && !budget.category && budget.user === user)
-        }
+//         // Total budget for the year
+//         if (!category && !month && year) {
+//             const yearly_budgets = this.budgetService.getBudgetsByYear(year)
 
-        // Categorical budget for the month
-        if (category && month && year) {
-            const monthly_budgets = this.budgetService.getBudgetsByMonth(month, year)
+//             return yearly_budgets.some(budget => budget.budget_year === year &&
+//                 !budget.budget_month && !budget.category && budget.user === user)
+//         }
 
-            return monthly_budgets.some(budget => budget.category === category &&
-                budget.budget_month === month &&
-                budget.budget_year === year && budget.user === user)
-        }
+//         // Categorical budget for the month
+//         if (category && month && year) {
+//             const monthly_budgets = this.budgetService.getBudgetsByMonth(month, year)
 
-        // Categorical budget for the year
-        if (category && !month && year) {
-            const yearly_budgets = this.budgetService.getBudgetsByYear(year)
+//             return monthly_budgets.some(budget => budget.category === category &&
+//                 budget.budget_month === month &&
+//                 budget.budget_year === year && budget.user === user)
+//         }
 
-            return yearly_budgets.some(budget => budget.category === category &&
-                !budget.budget_month && budget.budget_year === year && budget.user === user)
-        }
+//         // Categorical budget for the year
+//         if (category && !month && year) {
+//             const yearly_budgets = this.budgetService.getBudgetsByYear(year)
 
-        return false
-    }
+//             return yearly_budgets.some(budget => budget.category === category &&
+//                 !budget.budget_month && budget.budget_year === year && budget.user === user)
+//         }
 
-    getBudgetByUser(req: Request, res: Response) {
-        try{
-            let month: unknown = req.query.month
-            let year: unknown = req.query.year
-            const userId = req.params.userId
+//         return false
+//     }
 
-            const user = this.userService.getUserById(parseInt(userId))
+    // getBudgetByUser(req: Request, res: Response) {
+    //     try{
+    //         let month: unknown = req.query.month
+    //         let year: unknown = req.query.year
+    //         const userId = req.params.userId
 
-            if (!user) {
-                throw new Error('User does not exist.')
-            }
+    //         const user = this.userService.getUserById(parseInt(userId))
 
-            let budgets: Budget[]
+    //         if (!user) {
+    //             throw new Error('User does not exist.')
+    //         }
 
-            if (typeof year === 'string' && typeof month === 'string') {
-                const m: number = parseInt(month)
-                const y: number = parseInt(year)
+    //         let budgets: Budget[]
 
-                budgets = this.budgetService.getBudgetsByMonth(m, y)
-                res.status(200).send(budgets)
-                return
-            } else if (typeof year === 'string') {
-                const y: number = parseInt(year)
+    //         if (typeof year === 'string' && typeof month === 'string') {
+    //             const m: number = parseInt(month)
+    //             const y: number = parseInt(year)
 
-                budgets = this.budgetService.getBudgetsByYear(y)
-                res.status(200).json({
-                    user: user.username,
-                    budgets
-                })
-                return
-            }else {
-                throw new Error('A year must be provided')
-            }
+    //             budgets = this.budgetService.getBudgetsByMonth(m, y)
+    //             res.status(200).send(budgets)
+    //             return
+    //         } else if (typeof year === 'string') {
+    //             const y: number = parseInt(year)
 
-            
-        } catch (error) {
-            console.error(`An error occurred while retrieving budget`, error)
-            res.status(500).send('Internal Server Error')
-        }
-    }
+    //             budgets = this.budgetService.getBudgetsByYear(y)
+    //             res.status(200).json({
+    //                 user: user.username,
+    //                 budgets
+    //             })
+    //             return
+    //         }else {
+    //             throw new Error('A year must be provided')
+    //         }
 
-    addBudget(req: Request, res: Response) {
-        try {
-            const username = req.body.user.username
-            const user = this.userService.getUserByUsername(username)
-            const { category_name, amount, month, year } = req.body
 
-            const category = this.categoryService.getCategoryByName(category_name)
-            const budget_amount = parseInt(amount)
-            let budget_month: number | undefined = undefined
-            const budget_year = parseInt(year)
+    //     } catch (error) {
+    //         console.error(`An error occurred while retrieving budget`, error)
+    //         res.status(500).send('Internal Server Error')
+    //     }
+    // }
 
-            if (month) {
-                budget_month = parseInt(month)
-            }
+    // addBudget(req: Request, res: Response) {
+    //     try {
+    //         const username = req.body.user.username
+    //         const user = this.userService.getUserByUsername(username)
+    //         const { category_name, amount, month, year } = req.body
 
-            const budget_details = {
-                category,
-                amount: budget_amount,
-                budget_month,
-                budget_year
-            }
+    //         const category = this.categoryService.getCategoryByName(category_name)
+    //         const budget_amount = parseInt(amount)
+    //         let budget_month: number | undefined = undefined
+    //         const budget_year = parseInt(year)
 
-            if (!user) {
-                throw new Error(`User does not exist. ${req.body.user}`)
-            }
-            
-            if (!budget_amount || !budget_year) {
-                throw new Error('Missing details; requires budget amount and year')
-            }
+    //         if (month) {
+    //             budget_month = parseInt(month)
+    //         }
 
-            if (this.checkBudgetExists(user, budget_details)) {
-                throw new Error('Budget already exists.')
-            }
+    //         const budget_details = {
+    //             category,
+    //             amount: budget_amount,
+    //             budget_month,
+    //             budget_year
+    //         }
 
-            this.budgetService.addBudget(user, budget_details)
-            res.status(200).json({
-                'succcess': true,
-                'message': 'Successfully added budget'
-            })
+    //         if (!user) {
+    //             throw new Error(`User does not exist. ${req.body.user}`)
+    //         }
 
-        } catch (error) {
-            console.error(`An error occurred while adding a budget: `, error)
-            res.status(500).send('Internal Server Error')
-        }
-    }
+    //         if (!budget_amount || !budget_year) {
+    //             throw new Error('Missing details; requires budget amount and year')
+    //         }
 
-    editBudget(req: Request, res: Response) {
-        try {
-            const username = req.body.user.username
-            const user = this.userService.getUserByUsername(username)
+    //         if (this.checkBudgetExists(user, budget_details)) {
+    //             throw new Error('Budget already exists.')
+    //         }
 
-            if (!user)
-                throw new Error('User does not exist.')
+    //         this.budgetService.addBudget(user, budget_details)
+    //         res.status(200).json({
+    //             'succcess': true,
+    //             'message': 'Successfully added budget'
+    //         })
 
-            const budget_id = parseInt(req.params.budgetId)
-            const budget = this.budgetService.getBudgetById(budget_id)
+    //     } catch (error) {
+    //         console.error(`An error occurred while adding a budget: `, error)
+    //         res.status(500).send('Internal Server Error')
+    //     }
+    // }
 
-            if (!budget)
-                throw new Error('Budget does not exist.')
+    // editBudget(req: Request, res: Response) {
+    //     try {
+    //         const username = req.body.user.username
+    //         const user = this.userService.getUserByUsername(username)
 
-            if (user !== budget.user)
-                throw new Error('User id does not match owner of budget id')
+    //         if (!user)
+    //             throw new Error('User does not exist.')
 
-            const budget_amount = parseInt(req.body.amount)
+    //         const budget_id = parseInt(req.params.budgetId)
+    //         const budget = this.budgetService.getBudgetById(budget_id)
 
-            if (!budget_amount)
-                throw new Error('Must supply a budget amount as a number')
+    //         if (!budget)
+    //             throw new Error('Budget does not exist.')
 
-            this.budgetService.editBudget(budget_id, budget_amount)
-            res.status(200).send('Succesfully edited budget.')
+    //         if (user !== budget.user)
+    //             throw new Error('User id does not match owner of budget id')
 
-        } catch (error) {
-            console.error('Error occured while editing budget', error)
-            res.status(500).send('Internal Server Error')
-        }
-    }
+    //         const budget_amount = parseInt(req.body.amount)
 
-    deleteBudget(req: Request, res: Response) {
-        try {
-            const username = req.body.user.username
-            const user = this.userService.getUserByUsername(username)
+    //         if (!budget_amount)
+    //             throw new Error('Must supply a budget amount as a number')
 
-            if (!user)
-                throw new Error('User does not exist') 
+    //         this.budgetService.editBudget(budget_id, budget_amount)
+    //         res.status(200).send('Succesfully edited budget.')
 
-            const budget_id = parseInt(req.params.budgetId)
-            const budget = this.budgetService.getBudgetById(budget_id)
+    //     } catch (error) {
+    //         console.error('Error occured while editing budget', error)
+    //         res.status(500).send('Internal Server Error')
+    //     }
+    // }
 
-            if (!budget)
-                throw new Error('Budget does not exist')
+    // deleteBudget(req: Request, res: Response) {
+    //     try {
+    //         const username = req.body.user.username
+    //         const user = this.userService.getUserByUsername(username)
 
-            this.budgetService.deleteBudget(budget_id)
-            res.status(200).send('Successfully deleted a budget.')
+    //         if (!user)
+    //             throw new Error('User does not exist') 
 
-        } catch (error) {
-            console.error('An error occurred while deleting a budget', error)
-            res.status(500).send('Internal Server Error')
-        }
-    }
+    //         const budget_id = parseInt(req.params.budgetId)
+    //         const budget = this.budgetService.getBudgetById(budget_id)
+
+    //         if (!budget)
+    //             throw new Error('Budget does not exist')
+
+    //         this.budgetService.deleteBudget(budget_id)
+    //         res.status(200).send('Successfully deleted a budget.')
+
+    //     } catch (error) {
+    //         console.error('An error occurred while deleting a budget', error)
+    //         res.status(500).send('Internal Server Error')
+    //     }
+    // }
 }

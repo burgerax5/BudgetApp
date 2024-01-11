@@ -196,6 +196,12 @@ describe('Retrieve budgets by the user in a given category/month/year', () => {
         expect(budgetsFrom2023.length).toBe(2)
     })
 
+    it('should return 0 budgets from 2025', async () => {
+        await budgetService.addBudget(budget_details)
+        const budgetsFrom2025 = await budgetService.getBudgetsByYear(1, 2025) // user_id, year
+        expect(budgetsFrom2025.length).toBe(0)
+    })
+
     it('should return 2 budgets from the entertainment category', async () => {
         await budgetService.addBudget(budget_details) // Entertainment
         await budgetService.addBudget({ ...budget_details, categoryId: 1 }) // Food & Drink

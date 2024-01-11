@@ -327,3 +327,33 @@ describe('Get expense by id', () => {
 
     afterEach(async () => await cleanUp(prisma))
 })
+
+describe('Get all expenses by user', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let categoryService: CategoryService
+    let currencyService: CurrencyService
+
+    beforeEach(async () => {
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
+
+        await resetTables(prisma)
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
+
+    it('should return 3 expenses', async () => {
+        await addMockExpense(userService, categoryService, expenseService)
+        await addMockExpense(userService, categoryService, expenseService)
+        await addMockExpense(userService, categoryService, expenseService)
+
+        const expenses = await expenseService.getExpensesByUser(1)
+        expect(expenses.length).toBe(3)
+    })
+
+    afterEach(async () => await cleanUp(prisma))
+})
