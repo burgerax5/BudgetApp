@@ -6,7 +6,7 @@ import { prisma } from "../../src/services/service_init";
 describe('Test we initialize categories properly', () => {
     let categoryService: CategoryService
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         categoryService = new CategoryService(prisma)
 
         await resetTables(prisma)
@@ -19,13 +19,13 @@ describe('Test we initialize categories properly', () => {
         expect(numCategories).toBe(7)
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })
 
 describe('Test we can get the category object by the name and id', () => {
     let categoryService: CategoryService
 
-    beforeAll(async () => {
+    beforeEach(async () => {
         categoryService = new CategoryService(prisma)
 
         await resetTables(prisma)
@@ -43,5 +43,5 @@ describe('Test we can get the category object by the name and id', () => {
         expect(category?.name).toBe("Food & Drink")
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })

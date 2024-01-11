@@ -42,7 +42,7 @@ describe('Get user by username or id', () => {
         expect(user?.username).toBe("alice")
     })
 
-    afterAll(async () => await cleanUp(prisma))
+    afterEach(async () => await cleanUp(prisma))
 })
 
 describe('registerUser', () => {
@@ -68,7 +68,7 @@ describe('registerUser', () => {
         expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
     })
 
-    afterAll(async () => await cleanUp(prisma))
+    afterEach(async () => await cleanUp(prisma))
 })
 
 describe('getAllUsers', () => {
@@ -96,5 +96,5 @@ describe('getAllUsers', () => {
         expect(allUsers[1]?.username).toBe('bob')
     })
 
-    afterAll(async () => await cleanUp(prisma))
+    afterEach(async () => await cleanUp(prisma))
 })

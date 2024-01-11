@@ -20,7 +20,7 @@ describe('Test we initialize currencies properly', () => {
         expect(numCurrencies).toBe(156)
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })
 
 describe('Test we can get the currency by the name', () => {
@@ -41,5 +41,5 @@ describe('Test we can get the currency by the name', () => {
         expect(currency?.cc).toBe("NZD")
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })

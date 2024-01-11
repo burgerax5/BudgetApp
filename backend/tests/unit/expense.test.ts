@@ -8,7 +8,7 @@ import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 import { prisma } from "../../src/services/service_init";
 
-describe('Test initialization and adding', () => {
+describe('Test initialization and adding of expenses', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
@@ -37,6 +37,10 @@ describe('Test initialization and adding', () => {
         const expenses1 = await expenseService.getAllExpenses()
         expect(expenses1.length).toBe(0)
 
+        // Ensure user and categories are succesfully initialized
+        expect(await userService.getUserById(1)).not.toBeNull()
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+
         await addMockExpense(userService, categoryService, expenseService)
 
         const expenses2 = await expenseService.getAllExpenses()
@@ -44,6 +48,10 @@ describe('Test initialization and adding', () => {
     })
 
     it('should increment the expense_id after each expense added', async () => {
+        // Ensure user and categories are succesfully initialized
+        expect(await userService.getUserById(1)).not.toBeNull()
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+
         const { success: s1, error: err1 } = await addMockExpense(userService, categoryService, expenseService)
         expect(s1).toBeTruthy()
 
@@ -63,16 +71,23 @@ describe('Test if there are ids provided for rows that do not exist', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
+    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
+
+        await currencyService.populate_currencies()
     })
 
     it('should return an error saying user does not exist', async () => {
+        // Ensure user is not initialized
+        expect(await userService.getUserById(1)).toBeNull()
+
         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
         expect(success).toBeFalsy()
 
@@ -82,6 +97,11 @@ describe('Test if there are ids provided for rows that do not exist', () => {
 
     it('should return an error saying category does not exist', async () => {
         await jestRegister('xiao', 'password', userService)
+        expect(await userService.getUserById(1)).not.toBeNull()
+
+        // Ensure category is not initialized
+        expect(await categoryService.getCategoryById(2)).toBeNull()
+
         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
         expect(success).toBeFalsy()
 
@@ -112,6 +132,10 @@ describe('Test updating and deleting existing expenses', () => {
     })
 
     it('should remove an expense from the list', async () => {
+        // Ensure user and categories are succesfully initialized
+        expect(await userService.getUserById(1)).not.toBeNull()
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+
         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
 
         let expenses_before = await expenseService.getAllExpenses()
@@ -124,6 +148,10 @@ describe('Test updating and deleting existing expenses', () => {
     })
 
     it('should edit the details of an expense', async () => {
+        // Ensure user and categories are succesfully initialized
+        expect(await userService.getUserById(1)).not.toBeNull()
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+
         await addMockExpense(userService, categoryService, expenseService)
 
         const new_amount = 109.00
@@ -221,7 +249,7 @@ describe('Get expenses by month and year', () => {
         expect(expenses_in_2023[1]).toEqual(all_expenses[3])
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })
 
 describe('Get expenses by category', () => {
@@ -255,7 +283,7 @@ describe('Get expenses by category', () => {
         expect(foodndrink_expenses.length).toBe(1)
     })
 
-    afterAll(async () => cleanUp(prisma))
+    afterEach(async () => cleanUp(prisma))
 })
 
 describe('Get expense by id', () => {
@@ -282,6 +310,12 @@ describe('Get expense by id', () => {
     it('should return the expense with id 1', async () => {
         await categoryService.populate_categories()
         await currencyService.populate_currencies()
+
+        // Ensure user, currency, & categories are succesfully initialized
+        expect(await userService.getUserById(1)).not.toBeNull()
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+        expect(await currencyService.getCategoryByCode("NZD")).not.toBeNull()
+
         await addMockExpense(userService, categoryService, expenseService)
 
         const expense = await expenseService.getExpenseById(1)

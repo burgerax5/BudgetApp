@@ -45,8 +45,10 @@ export async function addMockExpense(userService: UserService, categoryService: 
     } catch (error) {
         console.error('Error occurred while adding mock expense:', error)
 
-        if (error instanceof Error && error.message.includes('deadlock detected'))
+        if (error instanceof Error && error.message.includes('deadlock detected')) {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
             return addMockExpense(userService, categoryService, expenseService)
+        }
 
         return { success: false, error: error }
     }
@@ -67,8 +69,10 @@ export async function datedMockExpense(userService: UserService, categoryService
     } catch (error) {
         console.error('An error occurred while creating dated mock expense:', error)
 
-        if (error instanceof Error && error.message.includes('deadlock detected'))
+        if (error instanceof Error && error.message.includes('deadlock detected')) {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
             return addMockExpense(userService, categoryService, expenseService)
+        }
 
         return { success: false, error: error }
     }

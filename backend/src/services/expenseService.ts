@@ -39,7 +39,7 @@ export class ExpenseService {
         month: number,
         year: number,
         category_id: number
-    }): Promise<Expense> {
+    }): Promise<Expense | null> {
         return await this.prisma.expense.create({
             data: {
                 user: {

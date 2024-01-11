@@ -1,95 +1,98 @@
-// import { Budget } from "../models/Budget"
-// import { User } from "../models/User"
-// import { Category } from "../models/Category"
+import { PrismaClient, Budget as PrismaBudget } from "@prisma/client"
 
-// export interface budgetServiceReturn {
-//     success: boolean,
-//     budget?: Budget,
-//     error?: string
-// }
+interface Budget extends PrismaBudget { }
 
-// export class BudgetServices {
-//     private budgets: Budget[]
-//     private next_budget_id
+export class BudgetService {
+    private prisma: PrismaClient
 
-//     constructor() {
-//         this.budgets = []
-//         this.next_budget_id = 0
-//     }
+    constructor(prisma: PrismaClient) {
+        this.prisma = prisma
+    }
 
-//     getAllBudgets(): Budget[] {
-//         return this.budgets
-//     }
+    async getAllBudgets(): Promise<Budget[]> {
+        return await this.prisma.budget.findMany()
+    }
 
-//     getBudgetByUser(user: User): Budget[] {
-//         return this.budgets.filter(budget => budget.user === user)
-//     }
+    async getBudgetsByUser(user_id: number): Promise<Budget[]> {
+        return await this.prisma.budget.findMany({
+            where: { userId: user_id }
+        })
+    }
 
-//     getBudgetById(budget_id: number): Budget | undefined {
-//         return this.budgets.find(budget => budget.budget_id === budget_id)
-//     }
+    async getBudgetById(budget_id: number): Promise<Budget | null> {
+        return await this.prisma.budget.findUnique({
+            where: { id: budget_id }
+        })
+    }
 
-//     checkBudgetEmpty(user: User, category: Category | undefined, month: number | undefined, year: number): boolean {
-//         // If there isn't already a budget set for the specified the category & date for the user
-//         return this.budgets.some(budget => {
-//             if (category) {
-//                 return budget.budget_month === month
-//                 && budget.budget_year === year
-//                 && budget.user === user
-//                 && budget.category === category
-//             } return false
-//         })
-//     }
+    async checkBudgetEmpty(user_id: number, category_id: number, month: number | undefined, year: number): Promise<boolean> {
+        // If there isn't already a budget set for the specified the category & date for the user
+        const budget = await this.prisma.budget.findFirst({
+            where: {
+                userId: user_id,
+                categoryId: category_id,
+                month,
+                year
+            }
+        })
 
-//     addBudget(user: User, budget_details: {
-//         category: Category | undefined,
-//         amount: number,
-//         budget_month: number | undefined,
-//         budget_year: number
-//     }): budgetServiceReturn {
-//         const { category, amount, budget_month, budget_year } = budget_details
+        return budget ? true : false
+    }
 
-//         const new_budget: Budget = {
-//             budget_id: this.next_budget_id++,
-//             user,
-//             ...budget_details
-//         }
+    async addBudget(budget_details: {
+        user_id: number,
+        category_id: number,
+        currency_id: number,
+        amount: number,
+        month: number | undefined,
+        year: number
+    }): Promise<Budget | null> {
+        const { category_id, user_id, currency_id, amount, month, year } = budget_details
 
-//         // Make sure there isn't a budget for the user with the same date & category
-//         if (!this.checkBudgetEmpty(user, category, budget_month, budget_year)) {
-//             this.budgets.push(new_budget)
-//             return { success: true, budget: new_budget }
-//         } return { success: false, error: "Budget not found" }
-//     }
+        // Make sure there isn't a budget for the user with the same date & category
+        const budgetExists = await this.checkBudgetEmpty(user_id, category_id, month, year)
+        if (!budgetExists) {
+            return await this.prisma.budget.create({
+                data: {
+                    userId: user_id,
+                    categoryId: category_id,
+                    amount,
+                    month,
+                    year,
+                    currencyId: currency_id
+                }
+            })
+        } return null
+    }
 
-//     editBudget(budget_id: number, new_amount: number): budgetServiceReturn {
-//         const budget = this.getBudgetById(budget_id)
+    // editBudget(budget_id: number, new_amount: number): budgetServiceReturn {
+    //     const budget = this.getBudgetById(budget_id)
 
-//         if (budget) {
-//             budget.amount = new_amount
-//             return { success: true, budget: budget }
-//         } return { success: false, error: `No budget with the id ${budget_id}` }
-//     }
+    //     if (budget) {
+    //         budget.amount = new_amount
+    //         return { success: true, budget: budget }
+    //     } return { success: false, error: `No budget with the id ${budget_id}` }
+    // }
 
-//     deleteBudget(budget_id: number): budgetServiceReturn {
-//         const budget = this.getBudgetById(budget_id)
+    // deleteBudget(budget_id: number): budgetServiceReturn {
+    //     const budget = this.getBudgetById(budget_id)
 
-//         if (budget) {
-//             this.budgets = this.budgets.filter(b => b.budget_id !== budget_id)
-//             return { success: true }
-//         } return { success: false, error: `No budget with the id ${budget_id}` }
-//     }
+    //     if (budget) {
+    //         this.budgets = this.budgets.filter(b => b.budget_id !== budget_id)
+    //         return { success: true }
+    //     } return { success: false, error: `No budget with the id ${budget_id}` }
+    // }
 
-//     getBudgetsByMonth(month: number, year: number): Budget[] {
-//         return this.budgets.filter(budget => budget.budget_month === month &&
-//             budget.budget_year === year)
-//     }
+    // getBudgetsByMonth(month: number, year: number): Budget[] {
+    //     return this.budgets.filter(budget => budget.budget_month === month &&
+    //         budget.budget_year === year)
+    // }
 
-//     getBudgetsByYear(year: number): Budget[] {
-//         return this.budgets.filter(budget => budget.budget_year === year)
-//     }
+    // getBudgetsByYear(year: number): Budget[] {
+    //     return this.budgets.filter(budget => budget.budget_year === year)
+    // }
 
-//     getBudgetsByCategory(category: Category): Budget[] {
-//         return this.budgets.filter(budget => budget.category === category)
-//     }
-// }
+    // getBudgetsByCategory(category: Category): Budget[] {
+    //     return this.budgets.filter(budget => budget.category === category)
+    // }
+}

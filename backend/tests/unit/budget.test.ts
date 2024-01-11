@@ -1,61 +1,72 @@
-// import { BudgetServices, budgetServiceReturn } from "../../src/services/budgetService";
-// import { Budget } from "../../src/models/Budget";
-// import { User } from "../../src/models/User";
-// import { UserService } from "../../src/services/userService";
-// import { Category } from "../../src/models/Category";
-// import { CategoryServices } from "../../src/services/categoryService";
-// import { jestRegister } from "../registerUser";
+import { BudgetService } from "../../src/services/budgetService";
+import { UserService } from "../../src/services/userService";
+import { CategoryService } from "../../src/services/categoryService";
+import { jestRegister } from "../scripts/registerUser";
+import { prisma } from "../../src/services/service_init";
+import { CurrencyService } from "../../src/services/currencyService";
+import { resetTables, cleanUp } from "../scripts/resetTables";
 
-// describe('Test adding budgets', () => {
-//     let userService: UserService
-//     let categoryService: CategoryServices
-//     let budgetService: BudgetServices
-//     let user: User
+describe('Test adding budgets', () => {
+    let userService: UserService
+    let categoryService: CategoryService
+    let budgetService: BudgetService
+    let currencyService: CurrencyService
 
-//     beforeEach(async () => {
-//         userService = new UserService()
-//         categoryService = new CategoryServices()
-//         budgetService = new BudgetServices()
-//         user = userService.getAllUsers()[0]
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        budgetService = new BudgetService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it('should add a monthly budget', () => {
-//         const budget_details = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: undefined,
-//             budget_year: 2023
-//         }
+        await resetTables(prisma)
 
-//         budgetService.addBudget(user, budget_details)
-//         const budgets = budgetService.getAllBudgets()
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
 
-//         expect(budgets.length).toBe(1)
-//         expect(budgets[0].user).toBe(user)
-//     })
+    it('should add a budget for January 2023', async () => {
+        const budget_details = {
+            user_id: 1,
+            category_id: 2,
+            currency_id: 106,
+            amount: 49.99,
+            month: 1,
+            year: 2023
+        }
 
-//     it('should not allow a user to have multiple budgets for the same category on the same date', () => {
-//         const budget1_details = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: 2,
-//             budget_year: 2023
-//         }
+        expect(await userService.getUserById(1)).not.toBeNull()
 
-//         const budget2_details = { ...budget1_details, amount: 99.99 }
+        await budgetService.addBudget(budget_details)
+        const budget = await budgetService.getBudgetById(1)
+        expect(budget).not.toBeNull()
 
-//         // Only the first budget added will be considered
-//         const isAdded1 = budgetService.addBudget(user, budget1_details).success
-//         const isAdded2 = budgetService.addBudget(user, budget2_details).success
+        expect(budget?.userId).toBe(1)
+        expect(budget?.month).toBe(1)
+        expect(budget?.year).toBe(2023)
+    })
 
-//         const all_budgets: Budget[] = budgetService.getAllBudgets()
+    it('should not allow a user to have multiple budgets for the same category on the same date', async () => {
+        const budget1_details = {
+            user_id: 1,
+            category_id: 2,
+            currency_id: 106,
+            amount: 49.99,
+            month: 1,
+            year: 2023
+        }
 
-//         expect(all_budgets.length).toBe(1)
-//         expect(isAdded1).toBeTruthy()
-//         expect(isAdded2).toBeFalsy()
-//     })
-// })
+        const budget2_details = { ...budget1_details, amount: 99.99 }
+
+        expect(await budgetService.addBudget(budget1_details)).not.toBeNull() // Adds
+        expect(await budgetService.addBudget(budget2_details)).toBeNull() // Doesn't add
+
+        const all_budgets = await budgetService.getAllBudgets()
+        expect(all_budgets.length).toBe(1)
+    })
+
+    afterEach(async () => cleanUp(prisma))
+})
 
 // describe('Test editing & deleting budgets for a user', () => {
 //     let userService: UserService
