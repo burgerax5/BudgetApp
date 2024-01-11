@@ -18,7 +18,9 @@ const get_expense_details = () => {
         currency_id: 106,
         amount: 49.99,
         name: "Cyberpunk 2077: Phantom Liberty",
-        date: new Date(),
+        day: 1,
+        month: 1,
+        year: 2023,
         category_id: 2
     }
 }
@@ -44,21 +46,33 @@ export async function addMockExpense(userService: UserService, categoryService: 
         console.error('Error occurred while adding mock expense:', error)
 
         if (error instanceof Error && error.message.includes('deadlock detected'))
-            addMockExpense(userService, categoryService, expenseService)
+            return addMockExpense(userService, categoryService, expenseService)
 
         return { success: false, error: error }
     }
 }
 
-// export function datedMockExpense(userService: UserService, categoryService: CategoryService,
-//     expenseService: ExpenseService, date: Date): void {
-//     let expense_details = get_expense_details(userService, categoryService, expenseService)
-//     expense_details.date = date
+export async function datedMockExpense(userService: UserService, categoryService: CategoryService,
+    expenseService: ExpenseService, date: Date) {
+    try {
+        let expense_details = get_expense_details()
+        expense_details.day = date.getDate()
+        expense_details.month = date.getMonth() + 1
+        expense_details.year = date.getFullYear()
 
-//     if (expense_details.user_id !== undefined && expense_details.category) {
-//         expenseService.addExpense(expense_details)
-//     }
-// }
+        if (expense_details.user_id && expense_details.category_id) {
+            await expenseService.addExpense(expense_details)
+        }
+        return { success: true, error: null }
+    } catch (error) {
+        console.error('An error occurred while creating dated mock expense:', error)
+
+        if (error instanceof Error && error.message.includes('deadlock detected'))
+            return addMockExpense(userService, categoryService, expenseService)
+
+        return { success: false, error: error }
+    }
+}
 
 // export function categorizedMockExpense(userService: UserService, categoryService: CategoryService,
 //     expenseService: ExpenseService, category: Category): void {

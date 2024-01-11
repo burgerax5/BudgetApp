@@ -2,7 +2,7 @@ import { ExpenseService } from "../../src/services/expenseService";
 import { UserService } from "../../src/services/userService";
 import { CategoryService } from "../../src/services/categoryService";
 import { jestRegister } from "../scripts/registerUser";
-import { addMockExpense } from "../scripts/addExpense";
+import { addMockExpense, datedMockExpense } from "../scripts/addExpense";
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
@@ -133,16 +133,18 @@ describe('Test updating and deleting existing expenses', () => {
         expect(expenses_after.length).toBe(0)
     })
 
-    it('should modify the details of an expense', async () => {
+    it('should edit the details of an expense', async () => {
         await addMockExpense(userService, categoryService, expenseService)
 
         const new_amount = 109.00
         const new_name = "Final Fantasy VII Rebirth"
-        const new_date = new Date()
+        const new_day = 29
+        const new_month = 2
+        const new_year = 2024
         const new_currency_id = 106
         const new_category_id = 2
 
-        const new_details = { new_amount, new_date, new_name, new_currency_id, new_category_id }
+        const new_details = { new_amount, new_day, new_month, new_year, new_name, new_currency_id, new_category_id }
 
         await expenseService.editExpense(1, new_details) // expenseId = 1
         const editedExpense = await expenseService.getExpenseById(1)
@@ -150,75 +152,89 @@ describe('Test updating and deleting existing expenses', () => {
         expect(editedExpense?.currencyId).toBe(106)
         expect(editedExpense?.amount).toBe(109.00)
         expect(editedExpense?.name).toBe("Final Fantasy VII Rebirth")
-        expect(editedExpense?.date.toISOString()).toBe(new_date.toISOString())
+        expect(editedExpense?.day).toBe(29)
+        expect(editedExpense?.month).toBe(2)
+        expect(editedExpense?.year).toBe(2024)
         expect(editedExpense?.categoryId).toBe(2)
     })
 
     afterEach(async () => await cleanUp(prisma))
 })
 
-// describe('Get expenses by month and year', () => {
-//     let expenseService: ExpenseService
-//     let userService: UserService
-//     let categoryService: CategoryService
+describe('Get expenses by month and year', () => {
+    let expenseService: ExpenseService
+    let userService: UserService
+    let categoryService: CategoryService
+    let currencyService: CurrencyService
+    let prisma: PrismaClient
 
-//     beforeEach(async () => {
-//         expenseService = new ExpenseService()
-//         userService = new UserService()
-//         categoryService = new CategoryService()
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        prisma = new PrismaClient()
+        expenseService = new ExpenseService(prisma)
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it("should return alice's expenses by month", () => {
-//         const user: User = userService.getAllUsers()[0]
+        await resetTables(prisma)
 
-//         datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023'))
-//         datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
-//         datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
-//         datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023')) // Dec 2023
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+        await jestRegister('bob', 'password123', userService)
+    })
 
-//         const all_expenses: Expense[] = expenseService.getAllExpenses()
+    it("should return alice's expenses by month", async () => {
+        const user = await userService.getUserById(1)
 
-//         const august: Expense[] = expenseService.getUserExpenseByMonth(user, 8, 2023)
-//         const october: Expense[] = expenseService.getUserExpenseByMonth(user, 10, 2023)
-//         const december: Expense[] = expenseService.getUserExpenseByMonth(user, 12, 2023)
+        await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023')) // Aug 2023
+        await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
+        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
+        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023')) // Dec 2023
 
-//         // Confirm correct number of expenses
-//         expect(august.length).toBe(1)
-//         expect(october.length).toBe(1)
-//         expect(december.length).toBe(2)
+        const all_expenses = await expenseService.getAllExpenses()
+        expect(all_expenses.length).toBe(4)
 
-//         // Confirm the validity of entries
-//         expect(august[0]).toBe(all_expenses[0])
-//         expect(october[0]).toBe(all_expenses[1])
-//         expect(december[0]).toBe(all_expenses[2])
-//         expect(december[1]).toBe(all_expenses[3])
-//     })
+        const august = await expenseService.getUserExpenseByMonth(1, 8, 2023) // user_id, month, year
+        const october = await expenseService.getUserExpenseByMonth(1, 10, 2023)
+        const december = await expenseService.getUserExpenseByMonth(1, 12, 2023)
 
-//     it("should return all expenses from 2023", () => {
-//         const user: User = userService.getAllUsers()[0]
+        // Confirm correct number of expenses
+        expect(august.length).toBe(1)
+        expect(october.length).toBe(1)
+        expect(december.length).toBe(2)
 
-//         datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2021'))
-//         datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2022'))
-//         datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023'))
-//         datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023'))
+        // Confirm the validity of entries
+        expect(august[0]).toEqual(all_expenses[0])
+        expect(october[0]).toEqual(all_expenses[1])
+        expect(december[0]).toEqual(all_expenses[2])
+        expect(december[1]).toEqual(all_expenses[3])
+    })
 
-//         const all_expenses: Expense[] = expenseService.getAllExpenses()
+    it("should return all expenses from 2023", async () => {
+        const user = userService.getUserById(1)
 
-//         const expenses_in_2021: Expense[] = expenseService.getUserExpenseByYear(user, 2021)
-//         expect(expenses_in_2021.length).toBe(1)
-//         expect(expenses_in_2021[0]).toBe(all_expenses[0])
+        await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2021'))
+        await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2022'))
+        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023'))
+        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023'))
 
-//         const expenses_in_2022: Expense[] = expenseService.getUserExpenseByYear(user, 2022)
-//         expect(expenses_in_2022.length).toBe(1)
-//         expect(expenses_in_2022[0]).toBe(all_expenses[1])
+        const all_expenses = await expenseService.getAllExpenses()
 
-//         const expenses_in_2023: Expense[] = expenseService.getUserExpenseByYear(user, 2023)
-//         expect(expenses_in_2023.length).toBe(2)
-//         expect(expenses_in_2023[0]).toBe(all_expenses[2])
-//         expect(expenses_in_2023[1]).toBe(all_expenses[3])
-//     })
-// })
+        const expenses_in_2021 = await expenseService.getUserExpenseByYear(1, 2021) // user_id, year
+        expect(expenses_in_2021.length).toBe(1)
+        expect(expenses_in_2021[0]).toEqual(all_expenses[0])
+
+        const expenses_in_2022 = await expenseService.getUserExpenseByYear(1, 2022)
+        expect(expenses_in_2022.length).toBe(1)
+        expect(expenses_in_2022[0]).toEqual(all_expenses[1])
+
+        const expenses_in_2023 = await expenseService.getUserExpenseByYear(1, 2023)
+        expect(expenses_in_2023.length).toBe(2)
+        expect(expenses_in_2023[0]).toEqual(all_expenses[2])
+        expect(expenses_in_2023[1]).toEqual(all_expenses[3])
+    })
+
+    afterAll(async () => cleanUp(prisma))
+})
 
 // describe('Get expenses by category', () => {
 //     let expenseService: ExpenseService

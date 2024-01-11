@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { resetTables } from "../scripts/resetTables";
+import { resetTables, cleanUp } from "../scripts/resetTables";
 import { CategoryService } from "../../src/services/categoryService";
 
 describe('Test we initialize categories properly', () => {
@@ -19,6 +19,8 @@ describe('Test we initialize categories properly', () => {
         const numCategories = allCategories.length
         expect(numCategories).toBe(7)
     })
+
+    afterAll(async () => cleanUp(prisma))
 })
 
 describe('Test we can get the category object by the name and id', () => {
@@ -43,4 +45,6 @@ describe('Test we can get the category object by the name and id', () => {
         const category = await categoryService.getCategoryById(1)
         expect(category?.name).toBe("Food & Drink")
     })
+
+    afterAll(async () => cleanUp(prisma))
 })

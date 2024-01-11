@@ -31,7 +31,14 @@ export class ExpenseService {
     }
 
     public async addExpense(expense_details: {
-        user_id: number, currency_id: number, amount: number, name: string, date: Date, category_id: number
+        user_id: number,
+        currency_id: number,
+        amount: number,
+        name: string,
+        day: number,
+        month: number,
+        year: number,
+        category_id: number
     }): Promise<Expense> {
         return await this.prisma.expense.create({
             data: {
@@ -43,7 +50,9 @@ export class ExpenseService {
                 },
                 amount: expense_details.amount,
                 name: expense_details.name,
-                date: expense_details.date,
+                day: expense_details.day,
+                month: expense_details.month,
+                year: expense_details.year,
                 category: {
                     connect: { id: expense_details.category_id }
                 }
@@ -53,19 +62,23 @@ export class ExpenseService {
 
     public async editExpense(expense_id: number,
         new_expense_details: {
-            new_amount?: number,
-            new_date?: Date,
-            new_name?: string,
-            new_currency_id?: number,
-            new_category_id?: number
+            new_amount: number,
+            new_day: number,
+            new_month: number,
+            new_year: number,
+            new_name: string,
+            new_currency_id: number,
+            new_category_id: number
         }): Promise<void> {
 
-        const { new_amount, new_date, new_name, new_currency_id, new_category_id } = new_expense_details
+        const { new_amount, new_day, new_month, new_year, new_name, new_currency_id, new_category_id } = new_expense_details
 
         await this.prisma.expense.update({
             data: {
                 amount: new_amount,
-                date: new_date,
+                day: new_day,
+                month: new_month,
+                year: new_year,
                 name: new_name,
                 currencyId: new_currency_id,
                 categoryId: new_category_id
@@ -88,30 +101,24 @@ export class ExpenseService {
     //     return this.expenses.filter(expense => expense.user_id === user.user_id)
     // }
 
-    // getUserExpenseByMonth(user: User, month: number, year: number): Expense[] {
-    //     if (this.getExpenseByUser(user)) {
-    //         const monthlyExpenses = this.expenses.filter(expense => {
-    //             if (expense.date.getMonth() + 1 === month &&
-    //                 expense.date.getFullYear() === year &&
-    //                 expense.user_id === user.user_id) {
-    //                 return expense
-    //             }
-    //         })
-    //         return monthlyExpenses
-    //     } return []
-    // }
+    async getUserExpenseByMonth(user_id: number, month: number, year: number): Promise<Expense[]> {
+        return await this.prisma.expense.findMany({
+            where: {
+                userId: user_id,
+                month,
+                year
+            }
+        })
+    }
 
-    // getUserExpenseByYear(user: User, year: number): Expense[] {
-    //     if (this.getExpenseByUser(user)) {
-    //         const yearlyExpenses = this.expenses.filter(expense => {
-    //             if (expense.date.getFullYear() === year &&
-    //                 expense.user_id === user.user_id) {
-    //                 return expense
-    //             }
-    //         })
-    //         return yearlyExpenses
-    //     } return []
-    // }
+    async getUserExpenseByYear(user_id: number, year: number): Promise<Expense[]> {
+        return await this.prisma.expense.findMany({
+            where: {
+                userId: user_id,
+                year
+            }
+        })
+    }
 
     // getUserExpenseByCategory(user: User, category: Category): Expense[] {
     //     if (this.getExpenseByUser(user)) {
