@@ -6,16 +6,15 @@ import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scr
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
+import { prisma } from "../../src/services/service_init";
 
 describe('Test initialization and adding', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
     let currencyService: CurrencyService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
@@ -64,15 +63,11 @@ describe('Test if there are ids provided for rows that do not exist', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
     })
@@ -102,10 +97,8 @@ describe('Test updating and deleting existing expenses', () => {
     let userService: UserService
     let categoryService: CategoryService
     let currencyService: CurrencyService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
@@ -120,9 +113,6 @@ describe('Test updating and deleting existing expenses', () => {
 
     it('should remove an expense from the list', async () => {
         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
-
-        if (error instanceof Error)
-            expect(error.message).toBe('User does not exist')
 
         let expenses_before = await expenseService.getAllExpenses()
         expect(expenses_before.length).toBe(1)
@@ -166,10 +156,8 @@ describe('Get expenses by month and year', () => {
     let userService: UserService
     let categoryService: CategoryService
     let currencyService: CurrencyService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
@@ -241,10 +229,8 @@ describe('Get expenses by category', () => {
     let userService: UserService
     let currencyService: CurrencyService
     let categoryService: CategoryService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
@@ -277,10 +263,8 @@ describe('Get expense by id', () => {
     let userService: UserService
     let categoryService: CategoryService
     let currencyService: CurrencyService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)

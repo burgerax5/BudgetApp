@@ -3,15 +3,14 @@ import { UserService } from '../../src/services/userService';
 import { jestRegister } from '../scripts/registerUser';
 import { PrismaClient } from '@prisma/client';
 import { resetTables, cleanUp } from '../scripts/resetTables';
+import { prisma } from '../../src/services/service_init';
 
 jest.mock('bcrypt');
 
 describe('Get user by username or id', () => {
     let userService: UserService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         userService = new UserService(prisma)
 
         await resetTables(prisma)
@@ -48,10 +47,8 @@ describe('Get user by username or id', () => {
 
 describe('registerUser', () => {
     let userService: UserService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         userService = new UserService(prisma)
 
         await resetTables(prisma)
@@ -76,10 +73,8 @@ describe('registerUser', () => {
 
 describe('getAllUsers', () => {
     let userService: UserService
-    let prisma: PrismaClient
 
     beforeEach(async () => {
-        prisma = new PrismaClient()
         userService = new UserService(prisma)
 
         await resetTables(prisma)

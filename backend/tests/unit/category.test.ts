@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 import { CategoryService } from "../../src/services/categoryService";
+import { prisma } from "../../src/services/service_init";
 
 describe('Test we initialize categories properly', () => {
-    let prisma: PrismaClient
     let categoryService: CategoryService
 
     beforeAll(async () => {
-        prisma = new PrismaClient()
         categoryService = new CategoryService(prisma)
 
         await resetTables(prisma)
@@ -24,11 +23,9 @@ describe('Test we initialize categories properly', () => {
 })
 
 describe('Test we can get the category object by the name and id', () => {
-    let prisma: PrismaClient
     let categoryService: CategoryService
 
     beforeAll(async () => {
-        prisma = new PrismaClient()
         categoryService = new CategoryService(prisma)
 
         await resetTables(prisma)

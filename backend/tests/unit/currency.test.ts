@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from '../scripts/resetTables'
+import { prisma } from "../../src/services/service_init";
 
 describe('Test we initialize currencies properly', () => {
-    let prisma: PrismaClient
     let currencyService: CurrencyService
 
     beforeAll(async () => {
-        prisma = new PrismaClient()
         currencyService = new CurrencyService(prisma)
 
         // Reset table and id after each test
@@ -25,11 +24,9 @@ describe('Test we initialize currencies properly', () => {
 })
 
 describe('Test we can get the currency by the name', () => {
-    let prisma: PrismaClient
     let currencyService: CurrencyService
 
     beforeAll(async () => {
-        prisma = new PrismaClient()
         currencyService = new CurrencyService(prisma)
 
         // Reset table and id after each test
