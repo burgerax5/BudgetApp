@@ -6,6 +6,15 @@ import { prisma } from "../../src/services/service_init";
 import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 
+const budget_details = {
+    userId: 1,
+    categoryId: 2,
+    currencyId: 106,
+    amount: 49.99,
+    month: 1,
+    year: 2023
+}
+
 describe('Test adding budgets', () => {
     let userService: UserService
     let categoryService: CategoryService
@@ -26,15 +35,6 @@ describe('Test adding budgets', () => {
     })
 
     it('should add a budget for January 2023', async () => {
-        const budget_details = {
-            user_id: 1,
-            category_id: 2,
-            currency_id: 106,
-            amount: 49.99,
-            month: 1,
-            year: 2023
-        }
-
         expect(await userService.getUserById(1)).not.toBeNull()
 
         await budgetService.addBudget(budget_details)
@@ -47,18 +47,9 @@ describe('Test adding budgets', () => {
     })
 
     it('should not allow a user to have multiple budgets for the same category on the same date', async () => {
-        const budget1_details = {
-            user_id: 1,
-            category_id: 2,
-            currency_id: 106,
-            amount: 49.99,
-            month: 1,
-            year: 2023
-        }
+        const budget2_details = { ...budget_details, amount: 99.99 }
 
-        const budget2_details = { ...budget1_details, amount: 99.99 }
-
-        expect(await budgetService.addBudget(budget1_details)).not.toBeNull() // Adds
+        expect(await budgetService.addBudget(budget_details)).not.toBeNull() // Adds
         expect(await budgetService.addBudget(budget2_details)).toBeNull() // Doesn't add
 
         const all_budgets = await budgetService.getAllBudgets()
@@ -68,70 +59,59 @@ describe('Test adding budgets', () => {
     afterEach(async () => cleanUp(prisma))
 })
 
-// describe('Test editing & deleting budgets for a user', () => {
-//     let userService: UserService
-//     let categoryService: CategoryServices
-//     let budgetService: BudgetServices
-//     let user: User
+describe('Test editing & deleting budgets for a user', () => {
+    let userService: UserService
+    let categoryService: CategoryService
+    let budgetService: BudgetService
+    let currencyService: CurrencyService
 
-//     beforeEach(async () => {
-//         userService = new UserService()
-//         categoryService = new CategoryServices()
-//         budgetService = new BudgetServices()
-//         user = userService.getAllUsers()[0]
-//         await jestRegister('bob', 'password123', userService)
-//     })
+    beforeEach(async () => {
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        budgetService = new BudgetService(prisma)
+        currencyService = new CurrencyService(prisma)
 
-//     it('should modify the price of the budget', () => {
-//         const budget1 = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: 2,
-//             budget_year: 2023
-//         }
+        await resetTables(prisma)
 
-//         const { success, budget } = budgetService.addBudget(user, budget1)
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+        await currencyService.populate_currencies()
+    })
 
-//         expect(budget?.budget_id).not.toBeUndefined()
+    it('should edit the price of the budget', async () => {
+        const budget_before = await budgetService.addBudget(budget_details)
+        expect(budget_before?.id).toBe(1)
 
-//         if (budget?.budget_id !== undefined) {
-//             budgetService.editBudget(budget?.budget_id, 99.99)
-//         }
+        const budget_details2 = { ...budget_details, amount: 99.99 }
+        const isEdited = await budgetService.editBudget(1, budget_details2)
+        expect(isEdited).toBeTruthy()
 
-//         expect(budget?.amount).toBe(99.99)
-//     })
+        const budget_after = await budgetService.getBudgetById(1)
+        expect(budget_after?.amount).toBe(99.99)
+    })
 
-//     it('should return an error saying that the there is no budget with id 1', () => {
-//         const { success, error, budget } = budgetService.editBudget(1, 50.00)
+    it('should return false if the budget to be edited does not exist', async () => {
+        expect(await budgetService.editBudget(1, budget_details)).toBeFalsy()
+    })
 
-//         expect(success).toBeFalsy()
-//         expect(error).toBe("No budget with the id 1")
-//         expect(budget).toBeUndefined()
-//     })
+    it('should delete the budget with id of 1', async () => {
+        const budget = await budgetService.addBudget(budget_details)
+        expect(budget).not.toBeNull()
 
-//     it('should remove the budget with id of 0', () => {
-//         const budget1_details = {
-//             category: categoryService.getCategoryByName('Entertainment'),
-//             amount: 49.99,
-//             budget_month: 2,
-//             budget_year: 2023
-//         }
+        const deleteSuccess = await budgetService.deleteBudget(1)
+        expect(deleteSuccess).toBeTruthy()
 
-//         const { success, budget } = budgetService.addBudget(user, budget1_details)
-//         expect(success).toBeTruthy()
-//         expect(budget?.budget_id).toBe(0)
+        const budget_after = await budgetService.getBudgetById(1)
+        expect(budget_after).toBeNull()
+    })
 
-//         if (budget) {
-//             const { success: deleteSuccess } = budgetService.deleteBudget(budget?.budget_id) 
-//             expect(deleteSuccess).toBeTruthy()
-//         }
-//     })
+    it('should return false when we try to delete an invalid budget', async () => {
+        const deleteSuccess = await budgetService.deleteBudget(1) 
+        expect(deleteSuccess).toBeFalsy()
+    })
 
-//     it('should return an error when we try deleting a budget with id 1', () => {
-//         const { success: deleteSuccess } = budgetService.deleteBudget(1) 
-//         expect(deleteSuccess).toBeFalsy()
-//     })
-// })
+    afterEach(async () => cleanUp(prisma))
+})
 
 // describe('Test getting budgets by user', () => {
 //     let userService: UserService

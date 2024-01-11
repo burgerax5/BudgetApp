@@ -40,48 +40,51 @@ export class BudgetService {
     }
 
     async addBudget(budget_details: {
-        user_id: number,
-        category_id: number,
-        currency_id: number,
+        userId: number,
+        categoryId: number,
+        currencyId: number,
         amount: number,
         month: number | undefined,
         year: number
     }): Promise<Budget | null> {
-        const { category_id, user_id, currency_id, amount, month, year } = budget_details
+        const { categoryId, userId, currencyId, amount, month, year } = budget_details
 
         // Make sure there isn't a budget for the user with the same date & category
-        const budgetExists = await this.checkBudgetEmpty(user_id, category_id, month, year)
+        const budgetExists = await this.checkBudgetEmpty(userId, categoryId, month, year)
         if (!budgetExists) {
             return await this.prisma.budget.create({
-                data: {
-                    userId: user_id,
-                    categoryId: category_id,
-                    amount,
-                    month,
-                    year,
-                    currencyId: currency_id
-                }
+                data: budget_details
             })
         } return null
     }
 
-    // editBudget(budget_id: number, new_amount: number): budgetServiceReturn {
-    //     const budget = this.getBudgetById(budget_id)
+    async editBudget(budget_id: number, budget_details: {
+        userId: number,
+        categoryId: number,
+        currencyId: number,
+        amount: number,
+        month: number | undefined,
+        year: number
+    }): Promise<boolean> {
+        const budgetExists = await this.prisma.budget.findUnique({
+            where: { id: budget_id }
+        })
 
-    //     if (budget) {
-    //         budget.amount = new_amount
-    //         return { success: true, budget: budget }
-    //     } return { success: false, error: `No budget with the id ${budget_id}` }
-    // }
+        if (budgetExists) {
+            await this.prisma.budget.update({
+                data: budget_details,
+                where: { id: budget_id }
+            }); return true
+        } return false
+    }
 
-    // deleteBudget(budget_id: number): budgetServiceReturn {
-    //     const budget = this.getBudgetById(budget_id)
+    async deleteBudget(budget_id: number): Promise<boolean> {
+        const budget = await this.getBudgetById(budget_id)
+        if (!budget) return false
 
-    //     if (budget) {
-    //         this.budgets = this.budgets.filter(b => b.budget_id !== budget_id)
-    //         return { success: true }
-    //     } return { success: false, error: `No budget with the id ${budget_id}` }
-    // }
+        await this.prisma.budget.delete({ where: { id: budget_id } })
+        return true
+    }
 
     // getBudgetsByMonth(month: number, year: number): Budget[] {
     //     return this.budgets.filter(budget => budget.budget_month === month &&
