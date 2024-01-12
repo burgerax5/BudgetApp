@@ -23,9 +23,9 @@ router.put('/edit/:expenseId', authenticateToken, (req: Request, res: Response) 
     expenseController.editExpense(req, res)
 })
 
-// router.delete('/delete/:expenseId', authenticateToken, (req: Request, res: Response) => {
-//     expenseController.deleteExpense(req, res)
-// })
+router.delete('/delete/:expenseId', authenticateToken, (req: Request, res: Response) => {
+    expenseController.deleteExpense(req, res)
+})
 
 // router.get('/month/:userId', authenticateToken, (req: Request, res: Response) => {
 //     // expecting: { month: number, year: number }

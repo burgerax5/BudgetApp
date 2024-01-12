@@ -143,30 +143,27 @@ export class ExpenseController {
         }
     }
 
-    // deleteExpense(req: Request, res: Response) {
-    //     try {
-    //         const expense_id = parseInt(req.params.expenseId)
-    //         const user_details = req.body.user
-    //         const expense = this.expenseService.getExpenseById(expense_id)
+    async deleteExpense(req: Request, res: Response) {
+        try {
+            const expense_id = parseInt(req.params.expenseId)
+            const expense = await this.expenseService.getExpenseById(expense_id)
 
-    //         if (!expense) {
-    //             throw new Error(`No expense with id ${expense_id}`)
-    //         }
+            const user = await this.getUserFromRequest(req)
 
-    //         const user = this.userService.getUserById(user_details.user_id)
+            if (!expense)
+                throw new Error(`No expense with id ${expense_id}`)
 
-    //         if (user?.user_id && user.user_id === expense?.user_id) {
-    //             throw new Error(`User id of expense does not match the user requesting`)
-    //         }
+            if (!user)
+                throw new Error(`User does not exist`)
 
-    //         this.expenseService.deleteExpense(expense)
-    //         res.status(200).json({ message: 'Successfully deleted' });
+            await this.expenseService.deleteExpense(expense_id)
+            res.status(200).json({ message: 'Successfully deleted' });
 
-    //     } catch (error) {
-    //         console.error('Error trying to delete expense:', error)
-    //         res.status(500).send('Internal Server Error')
-    //     }
-    // }
+        } catch (error) {
+            console.error('Error trying to delete expense:', error)
+            res.status(500).send('Internal Server Error')
+        }
+    }
 
     async getExpenseByUser(req: Request, res: Response): Promise<void> {
         const user = await this.getUserFromParam(req)

@@ -65,7 +65,7 @@ export class AuthController {
                     httpOnly: true
                 })
 
-                res.json({ accessToken, refreshToken });
+                res.status(200).send(`Successfully logged in as ${user.username}`);
             } else {
                 res.status(401).send('Invalid password');
             }
