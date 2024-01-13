@@ -209,9 +209,21 @@ describe('Get expenses by month and year', () => {
         const all_expenses = await expenseService.getAllExpenses()
         expect(all_expenses.length).toBe(4)
 
-        const august = await expenseService.getUserExpenseByMonth(1, 8, 2023) // user_id, month, year
-        const october = await expenseService.getUserExpenseByMonth(1, 10, 2023)
-        const december = await expenseService.getUserExpenseByMonth(1, 12, 2023)
+        const august = await expenseService.getExpenseByParams({
+            userId: 1,
+            month: 8,
+            year: 2023
+        })
+        const october = await expenseService.getExpenseByParams({
+            userId: 1,
+            month: 10,
+            year: 2023
+        })
+        const december = await expenseService.getExpenseByParams({
+            userId: 1,
+            month: 12,
+            year: 2023
+        })
 
         // Confirm correct number of expenses
         expect(august.length).toBe(1)
@@ -235,15 +247,24 @@ describe('Get expenses by month and year', () => {
 
         const all_expenses = await expenseService.getAllExpenses()
 
-        const expenses_in_2021 = await expenseService.getUserExpenseByYear(1, 2021) // user_id, year
+        const expenses_in_2021 = await expenseService.getExpenseByParams({
+            userId: 1,
+            year: 2021
+        })
         expect(expenses_in_2021.length).toBe(1)
         expect(expenses_in_2021[0]).toEqual(all_expenses[0])
 
-        const expenses_in_2022 = await expenseService.getUserExpenseByYear(1, 2022)
+        const expenses_in_2022 = await expenseService.getExpenseByParams({
+            userId: 1,
+            year: 2022
+        })
         expect(expenses_in_2022.length).toBe(1)
         expect(expenses_in_2022[0]).toEqual(all_expenses[1])
 
-        const expenses_in_2023 = await expenseService.getUserExpenseByYear(1, 2023)
+        const expenses_in_2023 = await expenseService.getExpenseByParams({
+            userId: 1,
+            year: 2023
+        })
         expect(expenses_in_2023.length).toBe(2)
         expect(expenses_in_2023[0]).toEqual(all_expenses[2])
         expect(expenses_in_2023[1]).toEqual(all_expenses[3])
@@ -276,8 +297,14 @@ describe('Get expenses by category', () => {
         await categorizedMockExpense(userService, categoryService, expenseService, 1)
 
         // Find expenses by category
-        const entertainment_expenses = await expenseService.getUserExpenseByCategory(1, 2) // 2 - Entertainment
-        const foodndrink_expenses = await expenseService.getUserExpenseByCategory(1, 1) // 1 - Food & Drink
+        const entertainment_expenses = await expenseService.getExpenseByParams({
+            userId: 1,
+            categoryId: 2 // Entertainment
+        })
+        const foodndrink_expenses = await expenseService.getExpenseByParams({
+            userId: 2,
+            categoryId: 1 // Food & Drink
+        })
 
         expect(entertainment_expenses.length).toBe(2)
         expect(foodndrink_expenses.length).toBe(1)

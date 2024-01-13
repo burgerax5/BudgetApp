@@ -3,10 +3,14 @@ import { Request, Response } from 'express';
 import { ExpenseService } from '../services/expenseService';
 import { UserService } from '../services/userService';
 import { CategoryService } from '../services/categoryService';
-import { PrismaClient, User as PrismaUser, Currency as PrismaCurrency } from '@prisma/client';
+import {
+    PrismaClient, User as PrismaUser, Currency as PrismaCurrency,
+    Expense as PrismaExpense
+} from '@prisma/client';
 
 interface User extends PrismaUser { }
 interface Currency extends PrismaCurrency { }
+interface Expense extends PrismaExpense { }
 
 import { prisma } from '../services/service_init';
 import { CurrencyService } from '../services/currencyService';
@@ -174,38 +178,31 @@ export class ExpenseController {
             res.status(401).send(`No user with the id ${req.params.userId}`)
     }
 
-    // getUserExpenseByMonth(req: Request, res: Response): void {
-    //     const user = this.getUserFromParam(req)
-    //     const { month, year } = req.body
+    async getExpenseByParams(req: Request, res: Response): Promise<void> {
+        const { search, month, year, category, currency } = req.query
+        const user = await this.getUserFromRequest(req)
 
-    //     if (user) {
-    //         res.status(200).send(this.expenseService.getUserExpenseByMonth(user, month, year))
-    //     } else {
-    //         res.status(401).send(`No user with the id ${req.params.userId}`)
-    //     }
-    // }
+        if (!user)
+            throw new Error(`User does not exist`)
 
-    // getUserExpenseByYear(req: Request, res: Response): void {
-    //     const user = this.getUserFromParam(req)
-    //     const { year } = req.body
+        let where: any = { userId: user.id }
 
-    //     if (user) {
-    //         res.status(200).send(this.expenseService.getUserExpenseByYear(user, year))
-    //     } else {
-    //         res.status(401).send(`No user with the id ${req.params.userId}`)
-    //     }
-    // }
+        if (search)
+            where.name = { contains: search as string }
 
-    // getUserExpenseByCategory(req: Request, res: Response): void {
-    //     const user = this.getUserFromParam(req)
-    //     const { category: category_name } = req.body
+        if (!isNaN(parseInt(month as string, 10)))
+            where.month = parseInt(month as string, 10)
 
-    //     const category = this.categoryService.getCategoryByName(category_name)
+        if (!isNaN(parseInt(year as string, 10)))
+            where.year = parseInt(year as string, 10)
 
-    //     if (user && category) {
-    //         res.status(200).send(this.expenseService.getUserExpenseByCategory(user, category))
-    //     } else {
-    //         res.status(401).send(`No user with the id ${req.params.userId}`)
-    //     }
-    // }
+        if (!isNaN(parseInt(category as string, 10)))
+            where.categoryId = parseInt(category as string, 10)
+
+        if (!isNaN(parseInt(currency as string, 10)))
+            where.currencyId = parseInt(currency as string, 10)
+
+        const expenses = await this.expenseService.getExpenseByParams(where)
+        res.json({ expenses })
+    }
 }

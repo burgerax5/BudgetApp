@@ -7,11 +7,11 @@ import { expenseService, userService, currencyService } from '../services/servic
 const router: Router = express.Router();
 const expenseController: ExpenseController = new ExpenseController(expenseService, userService, currencyService)
 
-router.get('/user/:userId', (req: Request, res: Response) => {
-    expenseController.getExpenseByUser(req, res)
+router.get('/', authenticateToken, (req: Request, res: Response) => {
+    expenseController.getExpenseByParams(req, res)
 })
 
-router.get('/:expenseId', (req: Request, res: Response) => {
+router.get('/:expenseId', authenticateToken, (req: Request, res: Response) => {
     expenseController.getExpenseById(req, res);
 });
 
@@ -26,20 +26,5 @@ router.put('/edit/:expenseId', authenticateToken, (req: Request, res: Response) 
 router.delete('/delete/:expenseId', authenticateToken, (req: Request, res: Response) => {
     expenseController.deleteExpense(req, res)
 })
-
-// router.get('/month/:userId', authenticateToken, (req: Request, res: Response) => {
-//     // expecting: { month: number, year: number }
-//     expenseController.getUserExpenseByMonth(req, res)
-// })
-
-// router.get('/year/:userId', authenticateToken, (req: Request, res: Response) => {
-//     // expecting: { year: number }
-//     expenseController.getUserExpenseByYear(req, res)
-// })
-
-// router.get('/category/:userId', authenticateToken, (req: Request, res: Response) => {
-//     // expecting: { category: string }
-//     expenseController.getUserExpenseByCategory(req, res)
-// })
 
 export default router;

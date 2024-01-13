@@ -30,6 +30,19 @@ export class ExpenseService {
         })
     }
 
+    async getExpenseByParams(where: {
+        userId: number,
+        name?: string,
+        month?: number,
+        year?: number,
+        categoryId?: number,
+        currencyId?: number
+    }): Promise<Expense[]> {
+        return this.prisma.expense.findMany({
+            where
+        })
+    }
+
     public async addExpense(expense_details: {
         userId: number,
         currencyId: number,
@@ -101,31 +114,31 @@ export class ExpenseService {
         })
     }
 
-    async getUserExpenseByMonth(user_id: number, month: number, year: number): Promise<Expense[]> {
-        return await this.prisma.expense.findMany({
-            where: {
-                userId: user_id,
-                month,
-                year
-            }
-        })
-    }
+    // async getUserExpenseByMonth(user_id: number, month: number, year: number): Promise<Expense[]> {
+    //     return await this.prisma.expense.findMany({
+    //         where: {
+    //             userId: user_id,
+    //             month,
+    //             year
+    //         }
+    //     })
+    // }
 
-    async getUserExpenseByYear(user_id: number, year: number): Promise<Expense[]> {
-        return await this.prisma.expense.findMany({
-            where: {
-                userId: user_id,
-                year
-            }
-        })
-    }
+    // async getUserExpenseByYear(user_id: number, year: number): Promise<Expense[]> {
+    //     return await this.prisma.expense.findMany({
+    //         where: {
+    //             userId: user_id,
+    //             year
+    //         }
+    //     })
+    // }
 
-    async getUserExpenseByCategory(user_id: number, category_id: number): Promise<Expense[]> {
-        return await this.prisma.expense.findMany({
-            where: {
-                userId: user_id,
-                categoryId: category_id
-            }
-        })
-    }
+    // async getUserExpenseByCategory(user_id: number, category_id: number): Promise<Expense[]> {
+    //     return await this.prisma.expense.findMany({
+    //         where: {
+    //             userId: user_id,
+    //             categoryId: category_id
+    //         }
+    //     })
+    // }
 }
