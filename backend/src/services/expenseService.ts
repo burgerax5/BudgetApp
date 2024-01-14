@@ -113,32 +113,4 @@ export class ExpenseService {
             where: { userId: user_id }
         })
     }
-
-    // async getUserExpenseByMonth(user_id: number, month: number, year: number): Promise<Expense[]> {
-    //     return await this.prisma.expense.findMany({
-    //         where: {
-    //             userId: user_id,
-    //             month,
-    //             year
-    //         }
-    //     })
-    // }
-
-    // async getUserExpenseByYear(user_id: number, year: number): Promise<Expense[]> {
-    //     return await this.prisma.expense.findMany({
-    //         where: {
-    //             userId: user_id,
-    //             year
-    //         }
-    //     })
-    // }
-
-    // async getUserExpenseByCategory(user_id: number, category_id: number): Promise<Expense[]> {
-    //     return await this.prisma.expense.findMany({
-    //         where: {
-    //             userId: user_id,
-    //             categoryId: category_id
-    //         }
-    //     })
-    // }
 }

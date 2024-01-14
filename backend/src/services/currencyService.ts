@@ -1,21 +1,22 @@
 import { PrismaClient, Currency as PrismaCurrency } from '@prisma/client'
 import { currencies as Currencies } from '../constants/currencies'
-
 interface Currency extends PrismaCurrency { }
 
 export class CurrencyService {
     private prisma: PrismaClient
+    private isPopulating: boolean = false
 
     constructor(prisma: PrismaClient) {
         this.prisma = prisma
     }
 
     async populate_currencies() {
-        const currencies = Currencies
+        const currencies = Currencies;
 
-        if (await this.prisma.currency.count() === 0)
-            await this.prisma.currency.createMany({
-                data: currencies
+        if (await this.prisma.currency.count() === 0 && currencies.length === 156)
+            this.prisma.currency.createMany({
+                data: currencies,
+                skipDuplicates: true
             })
     }
 

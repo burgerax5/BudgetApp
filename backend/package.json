@@ -40,7 +40,13 @@
       "json",
       "node"
     ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$"
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/build/",
+      "/dist/",
+      ".*\\.d\\.ts"
+    ]
   },
   "testOutput": "<rootDir>/testOutput",
   "type": "commonjs"

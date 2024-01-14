@@ -96,5 +96,5 @@ describe('getAllUsers', () => {
         expect(allUsers[1]?.username).toBe('bob')
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })

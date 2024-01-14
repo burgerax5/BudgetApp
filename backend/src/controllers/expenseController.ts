@@ -120,12 +120,12 @@ export class ExpenseController {
 
     async editExpense(req: Request, res: Response) {
         try {
-            const { expense } = req.body
+            const { expense: expense_details } = req.body
             const expense_id = parseInt(req.params.expenseId)
 
             // Validate expense id
-            let expenseExists = await this.expenseService.getExpenseById(expense_id)
-            if (!expenseExists)
+            let expense = await this.expenseService.getExpenseById(expense_id)
+            if (!expense)
                 throw new Error('Expense does not exist')
 
             // Validate user details
@@ -133,10 +133,13 @@ export class ExpenseController {
             if (!user)
                 throw new Error('User does not exist')
 
-            // Validate expense details
-            this.validateDetails(expense)
+            if (user.id !== expense.userId)
+                throw new Error('User id does not match the expense user id')
 
-            this.expenseService.editExpense(expense_id, expense)
+            // Validate expense details
+            this.validateDetails(expense_details)
+
+            this.expenseService.editExpense(expense_id, expense_details)
             res.json({
                 message: 'Successfully edited expense',
                 expense: this.expenseService.getExpenseById(expense_id)
@@ -159,6 +162,9 @@ export class ExpenseController {
 
             if (!user)
                 throw new Error(`User does not exist`)
+
+            if (user.id !== expense.userId)
+                throw new Error('User id does not match the expense user id')
 
             await this.expenseService.deleteExpense(expense_id)
             res.status(200).json({ message: 'Successfully deleted' });

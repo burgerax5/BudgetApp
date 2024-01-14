@@ -86,26 +86,26 @@ export class BudgetService {
         return true
     }
 
-    async getBudgetsByMonth(user_id: number, month: number, year: number): Promise<Budget[]> {
-        return await this.prisma.budget.findMany({
-            where: {
-                userId: user_id,
-                month,
-                year
-            }
-        })
-    }
+    async getBudgets(budget_details: {
+        userId: number,
+        categoryId?: number,
+        month?: number,
+        year?: number
+    }): Promise<Budget[]> {
+        const { userId, categoryId, month, year } = budget_details
+        let where: any = { userId }
 
-    async getBudgetsByYear(user_id: number, year: number): Promise<Budget[]> {
-        return await this.prisma.budget.findMany({
-            where: {
-                userId: user_id,
-                year
-            }
-        })
-    }
+        if (categoryId)
+            where.categoryId = categoryId
 
-    async getBudgetsByCategory(categoryId: number): Promise<Budget[]> {
-        return await this.prisma.budget.findMany({ where: { categoryId } })
+        if (month)
+            where.month = month
+
+        if (year)
+            where.year = year
+
+        return await this.prisma.budget.findMany({
+            where: where
+        })
     }
 }

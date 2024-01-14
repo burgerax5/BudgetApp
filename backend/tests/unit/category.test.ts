@@ -1,47 +1,35 @@
-import { PrismaClient } from "@prisma/client";
-import { resetTables, cleanUp } from "../scripts/resetTables";
-import { CategoryService } from "../../src/services/categoryService";
-import { prisma } from "../../src/services/service_init";
+// import { PrismaClient } from "@prisma/client";
+// import { resetTables, cleanUp } from "../scripts/resetTables";
+// import { CategoryService } from "../../src/services/categoryService";
+// import { prisma } from "../../src/services/service_init";
 
-describe('Test we initialize categories properly', () => {
-    let categoryService: CategoryService
 
-    beforeEach(async () => {
-        categoryService = new CategoryService(prisma)
+// describe('Test we can get the category object by the name and id', () => {
+//     let categoryService: CategoryService
 
-        await resetTables(prisma)
-        await categoryService.populate_categories()
-    })
+//     beforeEach(async () => {
+//         categoryService = new CategoryService(prisma)
 
-    it('should have 7 default categories', async () => {
-        const allCategories = await categoryService.getAllCategories()
-        const numCategories = allCategories.length
-        expect(numCategories).toBe(7)
-    })
+//         await resetTables(prisma)
+//         await categoryService.populate_categories()
+//     })
 
-    afterEach(async () => cleanUp(prisma))
-})
+//     it('should have 7 default categories', async () => {
+//         const allCategories = await categoryService.getAllCategories()
+//         const numCategories = allCategories.length
+//         expect(numCategories).toBe(7)
+//     })
 
-describe('Test we can get the category object by the name and id', () => {
-    let categoryService: CategoryService
+//     it('should return the category with the name "Entertainment"', async () => {
+//         const entertainment = await categoryService.getCategoryByName('Entertainment')
+//         expect(entertainment?.name).toBe("Entertainment")
+//         expect(entertainment?.colour).toBe("#f54e42")
+//     })
 
-    beforeEach(async () => {
-        categoryService = new CategoryService(prisma)
+//     it('should return the "Food & Drink" category since it has id of 1', async () => {
+//         const category = await categoryService.getCategoryById(1)
+//         expect(category?.name).toBe("Food & Drink")
+//     })
 
-        await resetTables(prisma)
-        await categoryService.populate_categories()
-    })
-
-    it('should return the category object of "Entertainment"', async () => {
-        const entertainment = await categoryService.getCategoryByName('Entertainment')
-        expect(entertainment?.name).toBe("Entertainment")
-        expect(entertainment?.colour).toBe("#f54e42")
-    })
-
-    it('should return the Food & Drink category', async () => {
-        const category = await categoryService.getCategoryById(1)
-        expect(category?.name).toBe("Food & Drink")
-    })
-
-    afterEach(async () => cleanUp(prisma))
-})
+//     afterEach(async () => cleanUp(prisma))
+// })

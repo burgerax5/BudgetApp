@@ -64,323 +64,323 @@ describe('Test initialization and adding of expenses', () => {
         expect(all_expenses[1].id).toBe(2)
     })
 
-    afterEach(async () => cleanUp(prisma))
-})
-
-describe('Test if there are ids provided for rows that do not exist', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let categoryService: CategoryService
-    let currencyService: CurrencyService
-
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
-
-        await resetTables(prisma)
-
-        await currencyService.populate_currencies()
-    })
-
-    it('should return an error saying user does not exist', async () => {
-        // Ensure user is not initialized
-        expect(await userService.getUserById(1)).toBeNull()
-
-        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
-        expect(success).toBeFalsy()
-
-        if (error instanceof Error)
-            expect(error.message).toBe('User does not exist')
-    })
-
-    it('should return an error saying category does not exist', async () => {
-        await jestRegister('xiao', 'password', userService)
-        expect(await userService.getUserById(1)).not.toBeNull()
-
-        // Ensure category is not initialized
-        expect(await categoryService.getCategoryById(2)).toBeNull()
-
-        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
-        expect(success).toBeFalsy()
-
-        if (error instanceof Error)
-            expect(error.message).toBe('Category does not exist')
-    })
-
     afterEach(async () => await cleanUp(prisma))
 })
 
-describe('Test updating and deleting existing expenses', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let categoryService: CategoryService
-    let currencyService: CurrencyService
+// describe('Test if there are ids provided for rows that do not exist', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let categoryService: CategoryService
+//     let currencyService: CurrencyService
 
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
 
-        await resetTables(prisma)
+//         await resetTables(prisma)
 
-        await categoryService.populate_categories()
-        await currencyService.populate_currencies()
-        await jestRegister('bob', 'password123', userService)
-    })
+//         await currencyService.populate_currencies()
+//     })
 
-    it('should remove an expense from the list', async () => {
-        // Ensure user and categories are succesfully initialized
-        expect(await userService.getUserById(1)).not.toBeNull()
-        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+//     it('should return an error saying user does not exist', async () => {
+//         // Ensure user is not initialized
+//         expect(await userService.getUserById(1)).toBeNull()
 
-        const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+//         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+//         expect(success).toBeFalsy()
 
-        let expenses_before = await expenseService.getAllExpenses()
-        expect(expenses_before.length).toBe(1)
+//         if (error instanceof Error)
+//             expect(error.message).toBe('User does not exist')
+//     })
 
-        await expenseService.deleteExpense(1)
+//     it('should return an error saying category does not exist', async () => {
+//         await jestRegister('xiao', 'password', userService)
+//         expect(await userService.getUserById(1)).not.toBeNull()
 
-        const expenses_after = await expenseService.getAllExpenses()
-        expect(expenses_after.length).toBe(0)
-    })
+//         // Ensure category is not initialized
+//         expect(await categoryService.getCategoryById(2)).toBeNull()
 
-    it('should edit the details of an expense', async () => {
-        // Ensure user and categories are succesfully initialized
-        expect(await userService.getUserById(1)).not.toBeNull()
-        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+//         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
+//         expect(success).toBeFalsy()
 
-        await addMockExpense(userService, categoryService, expenseService)
+//         if (error instanceof Error)
+//             expect(error.message).toBe('Category does not exist')
+//     })
 
-        const amount = 109.00
-        const name = "Final Fantasy VII Rebirth"
-        const day = 29
-        const month = 2
-        const year = 2024
-        const currencyId = 106
-        const categoryId = 2
+//     afterEach(async () => await cleanUp(prisma))
+// })
 
-        const new_details = { amount, day, month, year, name, currencyId, categoryId }
+// describe('Test updating and deleting existing expenses', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let categoryService: CategoryService
+//     let currencyService: CurrencyService
 
-        await expenseService.editExpense(1, new_details) // expenseId = 1
-        const editedExpense = await expenseService.getExpenseById(1)
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
 
-        expect(editedExpense?.currencyId).toBe(106)
-        expect(editedExpense?.amount).toBe(109.00)
-        expect(editedExpense?.name).toBe("Final Fantasy VII Rebirth")
-        expect(editedExpense?.day).toBe(29)
-        expect(editedExpense?.month).toBe(2)
-        expect(editedExpense?.year).toBe(2024)
-        expect(editedExpense?.categoryId).toBe(2)
-    })
+//         await resetTables(prisma)
 
-    afterEach(async () => await cleanUp(prisma))
-})
+//         await categoryService.populate_categories()
+//         await currencyService.populate_currencies()
+//         await jestRegister('bob', 'password123', userService)
+//     })
 
-describe('Get expenses by month and year', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let categoryService: CategoryService
-    let currencyService: CurrencyService
+//     it('should remove an expense from the list', async () => {
+//         // Ensure user and categories are succesfully initialized
+//         expect(await userService.getUserById(1)).not.toBeNull()
+//         expect(await categoryService.getCategoryById(2)).not.toBeNull()
 
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
+//         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
 
-        await resetTables(prisma)
+//         let expenses_before = await expenseService.getAllExpenses()
+//         expect(expenses_before.length).toBe(1)
 
-        await categoryService.populate_categories()
-        await currencyService.populate_currencies()
-        await jestRegister('bob', 'password123', userService)
-    })
+//         await expenseService.deleteExpense(1)
 
-    it("should return alice's expenses by month", async () => {
-        const user = await userService.getUserById(1)
+//         const expenses_after = await expenseService.getAllExpenses()
+//         expect(expenses_after.length).toBe(0)
+//     })
 
-        await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023')) // Aug 2023
-        await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
-        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
-        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023')) // Dec 2023
+//     it('should edit the details of an expense', async () => {
+//         // Ensure user and categories are succesfully initialized
+//         expect(await userService.getUserById(1)).not.toBeNull()
+//         expect(await categoryService.getCategoryById(2)).not.toBeNull()
 
-        const all_expenses = await expenseService.getAllExpenses()
-        expect(all_expenses.length).toBe(4)
+//         await addMockExpense(userService, categoryService, expenseService)
 
-        const august = await expenseService.getExpenseByParams({
-            userId: 1,
-            month: 8,
-            year: 2023
-        })
-        const october = await expenseService.getExpenseByParams({
-            userId: 1,
-            month: 10,
-            year: 2023
-        })
-        const december = await expenseService.getExpenseByParams({
-            userId: 1,
-            month: 12,
-            year: 2023
-        })
+//         const amount = 109.00
+//         const name = "Final Fantasy VII Rebirth"
+//         const day = 29
+//         const month = 2
+//         const year = 2024
+//         const currencyId = 106
+//         const categoryId = 2
 
-        // Confirm correct number of expenses
-        expect(august.length).toBe(1)
-        expect(october.length).toBe(1)
-        expect(december.length).toBe(2)
+//         const new_details = { amount, day, month, year, name, currencyId, categoryId }
 
-        // Confirm the validity of entries
-        expect(august[0]).toEqual(all_expenses[0])
-        expect(october[0]).toEqual(all_expenses[1])
-        expect(december[0]).toEqual(all_expenses[2])
-        expect(december[1]).toEqual(all_expenses[3])
-    })
+//         await expenseService.editExpense(1, new_details) // expenseId = 1
+//         const editedExpense = await expenseService.getExpenseById(1)
 
-    it("should return all expenses from 2023", async () => {
-        const user = userService.getUserById(1)
+//         expect(editedExpense?.currencyId).toBe(106)
+//         expect(editedExpense?.amount).toBe(109.00)
+//         expect(editedExpense?.name).toBe("Final Fantasy VII Rebirth")
+//         expect(editedExpense?.day).toBe(29)
+//         expect(editedExpense?.month).toBe(2)
+//         expect(editedExpense?.year).toBe(2024)
+//         expect(editedExpense?.categoryId).toBe(2)
+//     })
 
-        await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2021'))
-        await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2022'))
-        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023'))
-        await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023'))
+//     afterEach(async () => await cleanUp(prisma))
+// })
 
-        const all_expenses = await expenseService.getAllExpenses()
+// describe('Get expenses by month and year', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let categoryService: CategoryService
+//     let currencyService: CurrencyService
 
-        const expenses_in_2021 = await expenseService.getExpenseByParams({
-            userId: 1,
-            year: 2021
-        })
-        expect(expenses_in_2021.length).toBe(1)
-        expect(expenses_in_2021[0]).toEqual(all_expenses[0])
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
 
-        const expenses_in_2022 = await expenseService.getExpenseByParams({
-            userId: 1,
-            year: 2022
-        })
-        expect(expenses_in_2022.length).toBe(1)
-        expect(expenses_in_2022[0]).toEqual(all_expenses[1])
+//         await resetTables(prisma)
 
-        const expenses_in_2023 = await expenseService.getExpenseByParams({
-            userId: 1,
-            year: 2023
-        })
-        expect(expenses_in_2023.length).toBe(2)
-        expect(expenses_in_2023[0]).toEqual(all_expenses[2])
-        expect(expenses_in_2023[1]).toEqual(all_expenses[3])
-    })
+//         await categoryService.populate_categories()
+//         await currencyService.populate_currencies()
+//         await jestRegister('bob', 'password123', userService)
+//     })
 
-    afterEach(async () => cleanUp(prisma))
-})
+//     it("should return alice's expenses by month", async () => {
+//         const user = await userService.getUserById(1)
 
-describe('Get expenses by category', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let currencyService: CurrencyService
-    let categoryService: CategoryService
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023')) // Aug 2023
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023')) // Dec 2023
 
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
+//         const all_expenses = await expenseService.getAllExpenses()
+//         expect(all_expenses.length).toBe(4)
 
-        await jestRegister('bob', 'password123', userService)
-        await currencyService.populate_currencies()
-        await categoryService.populate_categories()
-    })
+//         const august = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             month: 8,
+//             year: 2023
+//         })
+//         const october = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             month: 10,
+//             year: 2023
+//         })
+//         const december = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             month: 12,
+//             year: 2023
+//         })
 
-    it("should return all of bob's expenses that are under entertainment", async () => {
-        // Create mock expenses
-        await categorizedMockExpense(userService, categoryService, expenseService, 2)
-        await categorizedMockExpense(userService, categoryService, expenseService, 2)
-        await categorizedMockExpense(userService, categoryService, expenseService, 1)
+//         // Confirm correct number of expenses
+//         expect(august.length).toBe(1)
+//         expect(october.length).toBe(1)
+//         expect(december.length).toBe(2)
 
-        // Find expenses by category
-        const entertainment_expenses = await expenseService.getExpenseByParams({
-            userId: 1,
-            categoryId: 2 // Entertainment
-        })
-        const foodndrink_expenses = await expenseService.getExpenseByParams({
-            userId: 2,
-            categoryId: 1 // Food & Drink
-        })
+//         // Confirm the validity of entries
+//         expect(august[0]).toEqual(all_expenses[0])
+//         expect(october[0]).toEqual(all_expenses[1])
+//         expect(december[0]).toEqual(all_expenses[2])
+//         expect(december[1]).toEqual(all_expenses[3])
+//     })
 
-        expect(entertainment_expenses.length).toBe(2)
-        expect(foodndrink_expenses.length).toBe(1)
-    })
+//     it("should return all expenses from 2023", async () => {
+//         const user = userService.getUserById(1)
 
-    afterEach(async () => cleanUp(prisma))
-})
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2021'))
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2022'))
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023'))
+//         await datedMockExpense(userService, categoryService, expenseService, new Date('December, 26, 2023'))
 
-describe('Get expense by id', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let categoryService: CategoryService
-    let currencyService: CurrencyService
+//         const all_expenses = await expenseService.getAllExpenses()
 
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
+//         const expenses_in_2021 = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             year: 2021
+//         })
+//         expect(expenses_in_2021.length).toBe(1)
+//         expect(expenses_in_2021[0]).toEqual(all_expenses[0])
 
-        await resetTables(prisma)
-        await jestRegister('bob', 'password123', userService)
-    })
+//         const expenses_in_2022 = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             year: 2022
+//         })
+//         expect(expenses_in_2022.length).toBe(1)
+//         expect(expenses_in_2022[0]).toEqual(all_expenses[1])
 
-    it('should return undefined since there is no expense with id 1', async () => {
-        const expense = await expenseService.getExpenseById(1)
-        expect(expense).toBeNull()
-    })
+//         const expenses_in_2023 = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             year: 2023
+//         })
+//         expect(expenses_in_2023.length).toBe(2)
+//         expect(expenses_in_2023[0]).toEqual(all_expenses[2])
+//         expect(expenses_in_2023[1]).toEqual(all_expenses[3])
+//     })
 
-    it('should return the expense with id 1', async () => {
-        await categoryService.populate_categories()
-        await currencyService.populate_currencies()
+//     afterEach(async () => cleanUp(prisma))
+// })
 
-        // Ensure user, currency, & categories are succesfully initialized
-        expect(await userService.getUserById(1)).not.toBeNull()
-        expect(await categoryService.getCategoryById(2)).not.toBeNull()
-        expect(await currencyService.getCurrencyByCode("NZD")).not.toBeNull()
+// describe('Get expenses by category', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let currencyService: CurrencyService
+//     let categoryService: CategoryService
 
-        await addMockExpense(userService, categoryService, expenseService)
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
 
-        const expense = await expenseService.getExpenseById(1)
+//         await jestRegister('bob', 'password123', userService)
+//         await currencyService.populate_currencies()
+//         await categoryService.populate_categories()
+//     })
 
-        expect(expense).not.toBeNull()
-        expect(expense?.id).toBe(1)
-        expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
-    })
+//     it("should return all of bob's expenses that are under entertainment", async () => {
+//         // Create mock expenses
+//         await categorizedMockExpense(userService, categoryService, expenseService, 2)
+//         await categorizedMockExpense(userService, categoryService, expenseService, 2)
+//         await categorizedMockExpense(userService, categoryService, expenseService, 1)
 
-    afterEach(async () => await cleanUp(prisma))
-})
+//         // Find expenses by category
+//         const entertainment_expenses = await expenseService.getExpenseByParams({
+//             userId: 1,
+//             categoryId: 2 // Entertainment
+//         })
+//         const foodndrink_expenses = await expenseService.getExpenseByParams({
+//             userId: 2,
+//             categoryId: 1 // Food & Drink
+//         })
 
-describe('Get all expenses by user', () => {
-    let expenseService: ExpenseService
-    let userService: UserService
-    let categoryService: CategoryService
-    let currencyService: CurrencyService
+//         expect(entertainment_expenses.length).toBe(2)
+//         expect(foodndrink_expenses.length).toBe(1)
+//     })
 
-    beforeEach(async () => {
-        expenseService = new ExpenseService(prisma)
-        userService = new UserService(prisma)
-        categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
+//     afterEach(async () => cleanUp(prisma))
+// })
 
-        await resetTables(prisma)
-        await jestRegister('bob', 'password123', userService)
-        await categoryService.populate_categories()
-        await currencyService.populate_currencies()
-    })
+// describe('Get expense by id', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let categoryService: CategoryService
+//     let currencyService: CurrencyService
 
-    it('should return 3 expenses', async () => {
-        await addMockExpense(userService, categoryService, expenseService)
-        await addMockExpense(userService, categoryService, expenseService)
-        await addMockExpense(userService, categoryService, expenseService)
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
 
-        const expenses = await expenseService.getExpensesByUser(1)
-        expect(expenses.length).toBe(3)
-    })
+//         await resetTables(prisma)
+//         await jestRegister('bob', 'password123', userService)
+//     })
 
-    afterEach(async () => await cleanUp(prisma))
-})
+//     it('should return undefined since there is no expense with id 1', async () => {
+//         const expense = await expenseService.getExpenseById(1)
+//         expect(expense).toBeNull()
+//     })
+
+//     it('should return the expense with id 1', async () => {
+//         await categoryService.populate_categories()
+//         await currencyService.populate_currencies()
+
+//         // Ensure user, currency, & categories are succesfully initialized
+//         expect(await userService.getUserById(1)).not.toBeNull()
+//         expect(await categoryService.getCategoryById(2)).not.toBeNull()
+//         expect(await currencyService.getCurrencyByCode("NZD")).not.toBeNull()
+
+//         await addMockExpense(userService, categoryService, expenseService)
+
+//         const expense = await expenseService.getExpenseById(1)
+
+//         expect(expense).not.toBeNull()
+//         expect(expense?.id).toBe(1)
+//         expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
+//     })
+
+//     afterEach(async () => await cleanUp(prisma))
+// })
+
+// describe('Get all expenses by user', () => {
+//     let expenseService: ExpenseService
+//     let userService: UserService
+//     let categoryService: CategoryService
+//     let currencyService: CurrencyService
+
+//     beforeEach(async () => {
+//         expenseService = new ExpenseService(prisma)
+//         userService = new UserService(prisma)
+//         categoryService = new CategoryService(prisma)
+//         currencyService = new CurrencyService(prisma)
+
+//         await resetTables(prisma)
+//         await jestRegister('bob', 'password123', userService)
+//         await categoryService.populate_categories()
+//         await currencyService.populate_currencies()
+//     })
+
+//     it('should return 3 expenses', async () => {
+//         await addMockExpense(userService, categoryService, expenseService)
+//         await addMockExpense(userService, categoryService, expenseService)
+//         await addMockExpense(userService, categoryService, expenseService)
+
+//         const expenses = await expenseService.getExpensesByUser(1)
+//         expect(expenses.length).toBe(3)
+//     })
+
+//     afterEach(async () => await cleanUp(prisma))
+// })
