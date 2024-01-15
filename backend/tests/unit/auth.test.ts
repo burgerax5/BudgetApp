@@ -12,7 +12,6 @@ describe('Get user by username or id', () => {
 
     beforeEach(async () => {
         userService = new UserService(prisma)
-
         await resetTables(prisma)
     })
 
@@ -42,7 +41,7 @@ describe('Get user by username or id', () => {
         expect(user?.username).toBe("alice")
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('registerUser', () => {
@@ -50,7 +49,6 @@ describe('registerUser', () => {
 
     beforeEach(async () => {
         userService = new UserService(prisma)
-
         await resetTables(prisma)
     })
 
@@ -68,7 +66,7 @@ describe('registerUser', () => {
         expect(bcrypt.hash).toHaveBeenCalledWith('password123', 'mockedSalt')
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('getAllUsers', () => {
@@ -76,7 +74,6 @@ describe('getAllUsers', () => {
 
     beforeEach(async () => {
         userService = new UserService(prisma)
-
         await resetTables(prisma)
     })
 

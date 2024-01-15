@@ -13,7 +13,7 @@ export class CurrencyService {
     async populate_currencies() {
         const currencies = Currencies;
 
-        if (await this.prisma.currency.count() === 0 && currencies.length === 156)
+        if (await this.prisma.currency.count() === 0)
             this.prisma.currency.createMany({
                 data: currencies,
                 skipDuplicates: true
