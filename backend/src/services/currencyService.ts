@@ -10,16 +10,6 @@ export class CurrencyService {
         this.prisma = prisma
     }
 
-    async populate_currencies() {
-        const currencies = Currencies;
-
-        if (await this.prisma.currency.count() === 0)
-            this.prisma.currency.createMany({
-                data: currencies,
-                skipDuplicates: true
-            })
-    }
-
     public async getAllCurrencies(): Promise<Currency[]> {
         return await this.prisma.currency.findMany()
     }

@@ -5,7 +5,7 @@ import { jestRegister } from "../scripts/registerUser";
 import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
-import { resetTables, cleanUp } from "../scripts/resetTables";
+import { resetTables, cleanUp, populate } from "../scripts/resetTables";
 import { prisma } from "../../src/services/service_init";
 
 import { currencies } from "../../src/constants/currencies";

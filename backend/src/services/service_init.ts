@@ -4,6 +4,7 @@ import { BudgetService } from "./budgetService";
 import { CategoryService } from "./categoryService";
 import { CurrencyService } from './currencyService';
 import { PrismaClient } from '@prisma/client';
+import { currencies } from '../constants/currencies';
 
 export const prisma = new PrismaClient()
 export const userService: UserService = new UserService(prisma)
@@ -13,9 +14,10 @@ export const currencyService: CurrencyService = new CurrencyService(prisma)
 export const budgetService: BudgetService = new BudgetService(prisma)
 
 // Populate default entries
-const populate = async () => {
+export const populate = async () => {
     await categoryService.populate_categories()
-    await currencyService.populate_currencies()
+    await prisma.currency.createMany({
+        data: currencies,
+        skipDuplicates: true
+    })
 }
-
-populate()

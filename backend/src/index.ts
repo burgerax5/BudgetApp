@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoutes';
 import expenseRoutes from './routes/expenseRoutes'
 import budgetRoutes from './routes/budgetRoutes'
 
+import { populate } from './services/service_init';
+
 dotenv.config();
 
 const app: Express = express();
@@ -22,6 +24,7 @@ app.use('/auth', authRoutes);
 app.use('/expense', expenseRoutes)
 app.use('/budget', budgetRoutes)
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
+    await populate()
 });
