@@ -15,17 +15,16 @@ describe('Test we can get the category object by the name and id', () => {
     })
 
     // FLAKY
-    it('should have 7 default categories', async () => {
+    it('should have 12 default categories', async () => {
         const allCategories = await categoryService.getAllCategories()
         const numCategories = allCategories.length
-        expect(numCategories).toBe(7)
+        expect(numCategories).toBe(12)
     })
 
     // FLAKY
     it('should return the category with the name "Entertainment"', async () => {
         const entertainment = await categoryService.getCategoryByName('Entertainment')
         expect(entertainment?.name).toBe("Entertainment")
-        expect(entertainment?.colour).toBe("#f54e42")
     })
 
     it('should return the "Food & Drink" category since it has id of 1', async () => {

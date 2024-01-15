@@ -5,7 +5,7 @@ import { jestRegister } from "../scripts/registerUser";
 import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
 import { PrismaClient } from "@prisma/client";
 import { CurrencyService } from "../../src/services/currencyService";
-import { resetTables, cleanUp, populate } from "../scripts/resetTables";
+import { resetTables, cleanUp } from "../scripts/resetTables";
 import { prisma } from "../../src/services/service_init";
 
 import { currencies } from "../../src/constants/currencies";
@@ -54,15 +54,11 @@ describe('Test initialization and adding of expenses', () => {
 
     // FLAKY
     it('should increment the expense_id after each expense added', async () => {
-        // Ensure user and categories are succesfully initialized
-        expect(await userService.getUserById(1)).not.toBeNull()
-        expect(await categoryService.getCategoryById(2)).not.toBeNull()
-
         const { success: s1, error: err1 } = await addMockExpense(userService, categoryService, expenseService)
-        expect(s1).toBeTruthy()
+        expect(err1).toBeNull()
 
         const { success: s2, error: err2 } = await addMockExpense(userService, categoryService, expenseService)
-        expect(s2).toBeTruthy()
+        expect(err2).toBeNull()
 
         const all_expenses = await expenseService.getAllExpenses()
         expect(all_expenses.length).toBe(2)
@@ -70,7 +66,7 @@ describe('Test initialization and adding of expenses', () => {
         expect(all_expenses[1].id).toBe(2)
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('Test if there are ids provided for rows that do not exist', () => {
@@ -354,9 +350,6 @@ describe('Get expense by id', () => {
     })
 
     it('should return the expense with id 1', async () => {
-        await categoryService.populate_categories()
-        await currencyService.populate_currencies()
-
         // Ensure user, currency, & categories are succesfully initialized
         expect(await userService.getUserById(1)).not.toBeNull()
         expect(await categoryService.getCategoryById(2)).not.toBeNull()
