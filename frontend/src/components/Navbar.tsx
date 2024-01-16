@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
+import { Button, buttonVariants } from "./ui/button";
 
 function Navbar() {
     const routes = ["Overview", "Expenses"];
@@ -11,7 +12,7 @@ function Navbar() {
     const handleClick = () => setToggled(t => !t)
 
     return (
-        <header class="relative">
+        <header className="relative">
             <nav className="flex gap-8 items-center bg-background relative px-5 py-2 justify-between border-b border-slate-400 sm:justify-normal z-50">
                 <div className="flex font-bold text-lg z-1">
                     <a href="/">
@@ -28,21 +29,35 @@ function Navbar() {
                         ))
                     }
                 </ul>
-                <div className="sm:hidden hover:text-sky-700 cursor-pointer z-1" onClick={handleClick}>
+                <div className="sm:hidden hover:bg-secondary rounded-sm cursor-pointer z-1" onClick={handleClick}>
                     {!toggled && <Menu />}
                     {toggled && <X />}
                 </div>
                 <ul className="list-none flex gap-3 ml-auto hidden sm:flex">
                     <Input type="text" placeholder="Search..." />
-                    <ModeToggle client="load" />
+                    <Button variant="outline" >
+                        <a href="/login">Login</a>
+                    </Button>
+                    <Button>
+                        <a href="/register">Register</a>
+                    </Button>
+                    {/* <ModeToggle client="load" /> */}
                 </ul>
             </nav>
-            <div className={`absolute top-0 w-full grid bg-background border-b border-slate-400 duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
+            <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
                 {routes.map((route) => (
-                    <a key={`mobile-${route}`} className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b border-slate-400 text-center" href={`/${route.toLowerCase()}`}>
+                    <a key={`mobile-${route}`} className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center" href={`/${route.toLowerCase()}`}>
                         <span>{route}</span>
                     </a>
                 ))}
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer"
+                    href="/login">
+                    Login
+                </a>
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer"
+                    href="Register">
+                    Register
+                </a>
                 <ul className="list-none flex gap-3 mx-auto py-3">
                     <Input type="text" placeholder="Search..." />
                     <ModeToggle client="load" />
