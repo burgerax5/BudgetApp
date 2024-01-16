@@ -1,7 +1,7 @@
 ---
 import "@/styles/globals.css";
 import { ModeToggle } from "@/components/ModeToggle";
-import Navbar from "@/components/Navbar.astro";
+import Navbar from "@/components/Navbar";
 
 interface Props {
 	title: string;
@@ -48,7 +48,7 @@ if (typeof localStorage !== "undefined") {
 		<title>{title}</title>
 	</head>
 	<body>
-		<Navbar />
+		<Navbar client:load />
 		<slot />
 	</body>
 </html>
