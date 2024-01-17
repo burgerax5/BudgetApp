@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 
@@ -27,6 +27,12 @@ const initialFormState: RegistrationFormState = {
 
 function RegisterForm() {
     const [formState, setFormState] = useState<RegistrationFormState>(initialFormState)
+    const [data, setData] = useState<{ user_exists: boolean } | null>(null)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        checkUserExists(formState.username)
+    }, [formState])
 
     const validateForm = () => {
         const errors = {
@@ -42,19 +48,36 @@ function RegisterForm() {
         return Object.values(errors).every((error) => error === '');
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (validateForm()) {
-            // Perform registration logic here
-            console.log('Registration successful!');
-            // You can send a request to the server or handle registration logic accordingly
-            const backendUrl = 'http://localhost:8080/auth/register'
-            const formData = new FormData(e.currentTarget)
-            const userData = {
-                username: formData.get('username') as string,
-                password: formData.get('password') as string
-            }
+    const checkUserExists = async (username: string) => {
+        const backendUrl = 'http://localhost:8080/auth/users/'
 
+        try {
+            const res = await fetch(backendUrl + username)
+            if (!res.ok)
+                throw new Error(`Network response was not ok: ${res.status}`)
+
+            const data = await res.json()
+
+            // Check if the username is taken
+            if (data.user_exists)
+                setError('Username is already taken.')
+            else {
+                // Username is available
+                setError(null)
+                setData(data)
+            }
+        } catch (err) {
+            if (err instanceof Error)
+                setError(err.message || 'An error occurred')
+            console.log('There was a problem with the fetch operation:', err)
+        }
+    }
+
+    const registerUser = async (backendUrl: string, userData: {
+        username: string,
+        password: string
+    }) => {
+        if (!data?.user_exists)
             fetch(backendUrl, {
                 method: 'POST',
                 headers: {
@@ -63,16 +86,31 @@ function RegisterForm() {
                 body: JSON.stringify(userData)
             })
                 .then(res => {
-                    if (!res.ok)
-                        throw new Error(`Network response was not ok: ${res.status}`)
-                    return res.json()
+                    if (res.status === 400)
+                        throw new Error(`Username is already taken`)
+                    return res
                 })
                 .then(data => {
                     console.log(data)
+                    location.replace('/login')
                 })
                 .catch(err => {
                     console.log('There was a problem with the fetch operation:', err)
                 })
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (validateForm() && !error) {
+            const backendUrl = 'http://localhost:8080/auth/register'
+            const formData = new FormData(e.currentTarget)
+            const userData = {
+                username: formData.get('username') as string,
+                password: formData.get('password') as string
+            }
+
+            await checkUserExists(userData.username)
+            await registerUser(backendUrl, userData)
         } else {
             console.log('Form has errors. Cannot submit.');
         }
@@ -104,6 +142,7 @@ function RegisterForm() {
                     value={formState.username}
                     onChange={handleChange}
                 />
+                {error && <span className="text-sm">{error}</span>}
                 {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
             </div>
             <div>

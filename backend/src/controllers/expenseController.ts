@@ -181,7 +181,7 @@ export class ExpenseController {
         if (user)
             res.status(200).send(await this.expenseService.getExpensesByUser(user.id))
         else
-            res.status(401).send(`No user with the id ${req.params.userId}`)
+            res.status(400).send(`No user with the id ${req.params.userId}`)
     }
 
     async getExpenseByParams(req: Request, res: Response): Promise<void> {

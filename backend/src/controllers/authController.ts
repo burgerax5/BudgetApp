@@ -108,10 +108,10 @@ export class AuthController {
         const token = req.cookies['refresh-token']
 
         if (!token)
-            return res.status(400).send('Expected refresh token in header')
+            return res.status(401).send('Expected refresh token in header')
 
         if (!this.userService.refreshTokens.includes(token))
-            return res.status(401).send('Invalid token')
+            return res.status(403).send('Invalid token')
 
         res.cookie("access-token", "", {
             maxAge: 0,
@@ -159,5 +159,12 @@ export class AuthController {
 
     public async getUsers(req: Request, res: Response): Promise<void> {
         res.status(200).send(await this.userService.getAllUsers())
+    }
+
+    public async getUserByUsername(req: Request, res: Response): Promise<void> {
+        const user = await this.userService.getUserByUsername(req.params.username)
+        res.json({
+            user_exists: user ? true : false
+        })
     }
 }

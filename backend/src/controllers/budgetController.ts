@@ -58,7 +58,7 @@ export class BudgetController {
 
             const budgetExists = await this.budgetService.checkBudgetEmpty(user_id, categoryId, month, year)
             if (budgetExists) {
-                res.status(401).json({
+                res.status(400).json({
                     'success': false,
                     'message': 'Budget already exists'
                 })

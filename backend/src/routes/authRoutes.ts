@@ -12,7 +12,7 @@ router.get('/', authenticateToken, AuthController.home);
 router.post('/login', async (req: Request, res: Response) => {
     await authController.login(req, res);
 });
-  
+
 router.post('/register', async (req: Request, res: Response) => {
     await authController.register(req, res);
 });
@@ -27,6 +27,10 @@ router.post('/refresh-token', (req: Request, res: Response) => {
 
 router.get('/users', (req: Request, res: Response) => {
     authController.getUsers(req, res)
+})
+
+router.get('/users/:username', (req: Request, res: Response) => {
+    authController.getUserByUsername(req, res)
 })
 
 export default router;
