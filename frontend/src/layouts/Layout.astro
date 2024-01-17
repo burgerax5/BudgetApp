@@ -1,6 +1,5 @@
 ---
 import "@/styles/globals.css";
-import { ModeToggle } from "@/components/ModeToggle";
 import Navbar from "@/components/Navbar";
 import { ViewTransitions } from "astro:transitions";
 
@@ -11,8 +10,8 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<!doctype html>
 <script is:inline>
+console.log();
 const getThemePreference = () => {
 	if (
 		typeof localStorage !== "undefined" &&
@@ -25,18 +24,8 @@ const getThemePreference = () => {
 		: "light";
 };
 const isDark = getThemePreference() === "dark";
+console.log(isDark);
 document.documentElement.classList[isDark ? "add" : "remove"]("dark");
-
-if (typeof localStorage !== "undefined") {
-	const observer = new MutationObserver(() => {
-		const isDark = document.documentElement.classList.contains("dark");
-		localStorage.setItem("theme", isDark ? "dark" : "light");
-	});
-	observer.observe(document.documentElement, {
-		attributes: true,
-		attributeFilter: ["class"],
-	});
-}
 </script>
 
 <html lang="en">
