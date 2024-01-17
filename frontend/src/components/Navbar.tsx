@@ -5,10 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 
 function Navbar() {
-    const routes = ["Overview", "Expenses"];
-
     const [toggled, setToggled] = useState(false)
-
     const handleClick = () => setToggled(t => !t)
 
     return (
@@ -21,19 +18,19 @@ function Navbar() {
                     </a>
                 </div>
                 <ul className="list-none flex gap-3 hidden sm:flex">
-                    {
-                        routes.map((route) => (
-                            <li key={route} className="hover:text-blue-600">
-                                <a href={`/${route.toLowerCase()}`}>{route}</a>
-                            </li>
-                        ))
-                    }
+                    <li className="hover:text-blue-600">
+                        <a href="/">Dashboard</a>
+                    </li>
+                    <li className="hover:text-blue-600">
+                        <a href="/expenses">Expenses</a>
+                    </li>
                 </ul>
                 <div className="sm:hidden hover:bg-secondary rounded-sm cursor-pointer z-1" onClick={handleClick}>
                     {!toggled && <Menu />}
                     {toggled && <X />}
                 </div>
                 <ul className="list-none flex gap-3 ml-auto hidden sm:flex">
+                    <ModeToggle />
                     <Input type="text" placeholder="Search..." />
                     <Button variant="outline" >
                         <a href="/login">Login</a>
@@ -41,26 +38,16 @@ function Navbar() {
                     <Button>
                         <a href="/register">Register</a>
                     </Button>
-                    {/* <ModeToggle client="load" /> */}
                 </ul>
             </nav>
             <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
-                {routes.map((route) => (
-                    <a key={`mobile-${route}`} className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center" href={`/${route.toLowerCase()}`}>
-                        <span>{route}</span>
-                    </a>
-                ))}
-                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer"
-                    href="/login">
-                    Login
-                </a>
-                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer"
-                    href="Register">
-                    Register
-                </a>
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/login">Login</a>
+                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/register">Register</a>
                 <ul className="list-none flex gap-3 mx-auto py-3">
                     <Input type="text" placeholder="Search..." />
-                    <ModeToggle client="load" />
+                    <ModeToggle />
                 </ul>
             </div>
             {toggled && <div className="absolute top-0 h-svh w-full bg-black opacity-20 z-2"
