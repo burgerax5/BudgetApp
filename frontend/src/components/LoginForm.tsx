@@ -1,31 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
+import { Input } from './ui/input';
+import { Button } from './ui/button';
 
 interface RegistrationFormState {
     username: string;
     password: string;
-    confirmPassword: string;
     errors: {
         username: string;
         password: string;
-        confirmPassword: string;
     };
 }
 
 const initialFormState: RegistrationFormState = {
     username: '',
     password: '',
-    confirmPassword: '',
     errors: {
         username: '',
         password: '',
-        confirmPassword: '',
     },
 };
 
-
-function RegisterForm() {
+function LoginForm() {
     const [formState, setFormState] = useState<RegistrationFormState>(initialFormState)
     const [data, setData] = useState<{ user_exists: boolean } | null>(null)
     const [error, setError] = useState<string | null>(null)
@@ -38,11 +33,7 @@ function RegisterForm() {
     const validateForm = () => {
         const errors = {
             username: formState.username.trim() === '' ? 'Username is required' : '',
-            password: formState.password.length < 6 ? 'Password must be at least 6 characters' : '',
-            confirmPassword:
-                formState.password === formState.confirmPassword
-                    ? ''
-                    : 'Passwords do not match',
+            password: formState.password.length < 6 ? 'Password is required' : ''
         };
 
         setFormState((prev) => ({ ...prev, errors }));
@@ -59,9 +50,9 @@ function RegisterForm() {
 
             const data = await res.json()
 
-            // Check if the username is taken
-            if (data.user_exists)
-                setError('Username is already taken.')
+            // Check if the user exists
+            if (!data.user_exists)
+                setError('User does not exist')
             else {
                 // Username is available
                 setError(null)
@@ -74,11 +65,11 @@ function RegisterForm() {
         }
     }
 
-    const registerUser = async (backendUrl: string, userData: {
+    const loginUser = async (backendUrl: string, userData: {
         username: string,
         password: string
     }) => {
-        if (!data?.user_exists)
+        if (data?.user_exists)
             fetch(backendUrl, {
                 method: 'POST',
                 headers: {
@@ -88,12 +79,13 @@ function RegisterForm() {
             })
                 .then(res => {
                     if (res.status === 400)
-                        throw new Error(`Username is already taken`)
-                    return res
+                        setError('Username or password is incorrect')
+
+                    return res.json()
                 })
                 .then(data => {
+                    location.replace('/')
                     console.log(data)
-                    location.replace('/login')
                 })
                 .catch(err => {
                     console.log('There was a problem with the fetch operation:', err)
@@ -104,7 +96,7 @@ function RegisterForm() {
         e.preventDefault();
         setSubmitted(true)
         if (validateForm() && !error) {
-            const backendUrl = 'http://localhost:8080/auth/register'
+            const backendUrl = 'http://localhost:8080/auth/login'
             const formData = new FormData(e.currentTarget)
             const userData = {
                 username: formData.get('username') as string,
@@ -112,7 +104,7 @@ function RegisterForm() {
             }
 
             await checkUserExists(userData.username)
-            await registerUser(backendUrl, userData)
+            await loginUser(backendUrl, userData)
         } else {
             console.log('Form has errors. Cannot submit.');
         }
@@ -130,10 +122,9 @@ function RegisterForm() {
             },
         }));
     };
-
     return (
         <form className="w-96 p-3 flex flex-col gap-3" onSubmit={handleSubmit}>
-            {submitted && (!formState.username || !formState.password || !formState.confirmPassword) &&
+            {submitted && (!formState.username || !formState.password) &&
                 <span>Please fill in all fields</span>}
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -146,7 +137,6 @@ function RegisterForm() {
                     value={formState.username}
                     onChange={handleChange}
                 />
-                {error && <span className="text-sm">{error}</span>}
                 {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
             </div>
             <div>
@@ -162,24 +152,10 @@ function RegisterForm() {
                 />
                 {formState.errors.password && <span className="text-sm">{formState.errors.password}</span>}
             </div>
-            <div>
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    htmlFor="confirmPassword">
-                    Confirm Password:
-                </label>
-                <Input
-                    type="password"
-                    name="confirmPassword"
-                    value={formState.confirmPassword}
-                    onChange={handleChange}
-                />
-                {formState.errors.confirmPassword && (
-                    <span className="text-sm">{formState.errors.confirmPassword}</span>
-                )}
-            </div>
-            <Button type="submit">Register</Button>
+            {error && <span className="text-sm">{error}</span>}
+            <Button type="submit">Sign In</Button>
         </form>
     )
 }
 
-export default RegisterForm
+export default LoginForm

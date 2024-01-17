@@ -70,7 +70,7 @@ export class AuthController {
                     user: user
                 });
             } else {
-                res.status(401).send('Invalid password');
+                res.status(400).send('Invalid password');
             }
         } catch (error) {
             console.error('Error during login:', error);
