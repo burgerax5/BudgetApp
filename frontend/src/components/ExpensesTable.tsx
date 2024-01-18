@@ -10,26 +10,44 @@ interface expenseDetails {
     id: number
 }
 
+interface resDetails {
+    username: string,
+    user_id: number,
+    refreshToken: string
+}
+
 function ExpensesTable() {
     const [expenses, setExpenses] = useState<expenseDetails[]>([])
+    const [token, setToken] = useState<string | null>(null)
 
     useEffect(() => {
+        const shit = async () => {
+            const res = await axios.get<resDetails>('/auth/', { withCredentials: true })
+            if (res.data)
+                setToken(res.data.refreshToken)
+        }
+
+        shit()
         getExpenses()
     }, [])
 
     const getExpenses = async () => {
-        const res = await axios.get('/expense/')
+        const res = await axios.get('/expense/', { withCredentials: true })
         if (!res.data)
             console.log('No expenses')
         else
-            setExpenses(res.data)
+            setExpenses(res.data.expenses)
     }
+
+    console.log(expenses)
+    console.log(token)
 
     return (
         <div>
             {expenses.map(expense => (
                 <div>{expense.name}</div>
             ))}
+            {token}
         </div>
     )
 }

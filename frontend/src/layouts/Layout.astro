@@ -3,6 +3,8 @@ import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import { ViewTransitions } from "astro:transitions";
 
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+
 interface Props {
 	title: string;
 }
@@ -11,7 +13,6 @@ const { title } = Astro.props;
 ---
 
 <script is:inline>
-console.log();
 const getThemePreference = () => {
 	if (
 		typeof localStorage !== "undefined" &&

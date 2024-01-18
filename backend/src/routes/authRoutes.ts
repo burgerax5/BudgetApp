@@ -7,7 +7,9 @@ import { userService } from '../services/service_init';
 const router: Router = express.Router();
 const authController: AuthController = new AuthController(userService)
 
-router.get('/', authenticateToken, AuthController.home);
+router.get('/', authenticateToken, (req: Request, res: Response) => {
+    authController.home(req, res)
+});
 
 router.post('/login', async (req: Request, res: Response) => {
     await authController.login(req, res);

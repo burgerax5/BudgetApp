@@ -14,8 +14,16 @@ export class AuthController {
         this.userService = userService
     }
 
-    public static home(req: Request, res: Response) {
-        res.status(200).send(`Welcome, ${req.body.user.username}`)
+    public home(req: Request, res: Response) {
+        res.cookie('username', req.body.user.username)
+        res.cookie('user_id', req.body.user_id)
+        res.cookie('refresh-token', req.cookies['refresh-token'])
+
+        res.status(200).json({
+            username: req.body.user.username,
+            user_id: req.body.user.user_id,
+            refreshToken: req.cookies['refresh-token']
+        })
     }
 
     private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {

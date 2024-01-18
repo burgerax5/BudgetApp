@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.cookies['access-token'];
+    console.log(token)
 
     const secretKey = process.env.ACCESS_TOKEN_SECRET;
 
@@ -12,10 +13,10 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     if (token) {
         jwt.verify(token, secretKey, (err, user) => {
             if (err) return res.status(401).send('Token is invalid or expired')
-    
+
             // Attach the user information to the request object
             if (!user) return res.sendStatus(403)
-    
+
             req.body.user = user;
             next();
         });

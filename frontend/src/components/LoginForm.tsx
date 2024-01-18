@@ -71,12 +71,11 @@ function LoginForm() {
         const { username, password } = userData
         if (userExists)
             try {
-                const res = await axios.post('/auth/login', { username, password })
+                const res = await axios.post('/auth/login', { username, password }, { withCredentials: true })
                 if (res.status === 400)
                     setError('Username or password is incorrect')
-                else {
+                if (res.data.username)
                     location.replace('/')
-                }
             } catch (err) {
                 setError('Username or password is incorrect')
             }
