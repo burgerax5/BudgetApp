@@ -50,7 +50,7 @@ function Navbar() {
                     <ModeToggle />
                 </ul>
             </div>
-            {toggled && <div className="absolute top-0 h-svh w-full bg-black opacity-20 z-2"
+            {toggled && <div className="absolute top-0 h-svh w-full bg-black opacity-20 z-30"
                 onClick={handleClick}></div>}
         </header >
     )

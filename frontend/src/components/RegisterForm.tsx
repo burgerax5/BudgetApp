@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from './ui/input'
+import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button'
 
 interface RegistrationFormState {
@@ -154,8 +155,7 @@ function RegisterForm() {
                     htmlFor="password">
                     Password:
                 </label>
-                <Input
-                    type="password"
+                <PasswordInput
                     name="password"
                     value={formState.password}
                     onChange={handleChange}
@@ -167,8 +167,7 @@ function RegisterForm() {
                     htmlFor="confirmPassword">
                     Confirm Password:
                 </label>
-                <Input
-                    type="password"
+                <PasswordInput
                     name="confirmPassword"
                     value={formState.confirmPassword}
                     onChange={handleChange}

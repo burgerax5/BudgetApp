@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Input } from './ui/input';
+import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button';
+import axios from '@/api/axios';
 
 interface RegistrationFormState {
     username: string;
@@ -22,7 +24,7 @@ const initialFormState: RegistrationFormState = {
 
 function LoginForm() {
     const [formState, setFormState] = useState<RegistrationFormState>(initialFormState)
-    const [data, setData] = useState<{ user_exists: boolean } | null>(null)
+    const [userExists, setUserExists] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [submitted, setSubmitted] = useState(false)
 
@@ -41,22 +43,19 @@ function LoginForm() {
     };
 
     const checkUserExists = async (username: string) => {
-        const backendUrl = 'http://localhost:8080/auth/users/'
-
         try {
-            const res = await fetch(backendUrl + username)
-            if (!res.ok)
+            const res = await axios.get(`/auth/users/${username}`)
+            if (res.status !== 200)
                 throw new Error(`Network response was not ok: ${res.status}`)
 
-            const data = await res.json()
+            const data = await res.data
 
             // Check if the user exists
-            if (!data.user_exists)
-                setError('User does not exist')
-            else {
-                // Username is available
+            if (data.user_exists) {
                 setError(null)
-                setData(data)
+                setUserExists(true)
+            } else {
+                setUserExists(false)
             }
         } catch (err) {
             if (err instanceof Error)
@@ -65,38 +64,30 @@ function LoginForm() {
         }
     }
 
-    const loginUser = async (backendUrl: string, userData: {
+    const loginUser = async (userData: {
         username: string,
         password: string
     }) => {
-        if (data?.user_exists)
-            fetch(backendUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            })
-                .then(res => {
-                    if (res.status === 400)
-                        setError('Username or password is incorrect')
-
-                    return res.json()
-                })
-                .then(data => {
+        const { username, password } = userData
+        if (userExists)
+            try {
+                const res = await axios.post('/auth/login', { username, password })
+                if (res.status === 400)
+                    setError('Username or password is incorrect')
+                else {
                     location.replace('/')
-                    console.log(data)
-                })
-                .catch(err => {
-                    console.log('There was a problem with the fetch operation:', err)
-                })
+                }
+            } catch (err) {
+                setError('Username or password is incorrect')
+            }
+        else
+            setError('Username or password is incorrect')
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitted(true)
-        if (validateForm() && !error) {
-            const backendUrl = 'http://localhost:8080/auth/login'
+        if (validateForm()) {
             const formData = new FormData(e.currentTarget)
             const userData = {
                 username: formData.get('username') as string,
@@ -104,7 +95,7 @@ function LoginForm() {
             }
 
             await checkUserExists(userData.username)
-            await loginUser(backendUrl, userData)
+            await loginUser(userData)
         } else {
             console.log('Form has errors. Cannot submit.');
         }
@@ -144,15 +135,14 @@ function LoginForm() {
                     htmlFor="password">
                     Password:
                 </label>
-                <Input
-                    type="password"
+                <PasswordInput
                     name="password"
                     value={formState.password}
                     onChange={handleChange}
                 />
                 {formState.errors.password && <span className="text-sm">{formState.errors.password}</span>}
             </div>
-            {error && <span className="text-sm">{error}</span>}
+            {submitted && error && <span className="text-sm">{error}</span>}
             <Button type="submit">Sign In</Button>
         </form>
     )

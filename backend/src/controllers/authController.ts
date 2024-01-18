@@ -22,6 +22,18 @@ export class AuthController {
         return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '15m' });
     }
 
+    private addRefreshToken(refreshToken: string) {
+        this.userService.refreshTokens.push(refreshToken)
+    }
+
+    private removeRefreshToken(refreshToken: string) {
+        this.userService.refreshTokens = this.userService.refreshTokens.filter(t => t !== refreshToken)
+    }
+
+    private verifyRefreshToken(refreshToken: string) {
+        return this.userService.refreshTokens.includes(refreshToken)
+    }
+
     public async login(req: Request, res: Response): Promise<void> {
         try {
             const { username, password } = req.body;
@@ -54,7 +66,7 @@ export class AuthController {
 
                 const accessToken = this.generateAccessToken(secretKey, user_token_details)
                 const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
-                this.userService.refreshTokens.push(refreshToken)
+                this.addRefreshToken(refreshToken)
 
                 res.cookie("access-token", accessToken, {
                     maxAge: 2.592e+9, // 1 month
@@ -66,8 +78,7 @@ export class AuthController {
                 })
 
                 res.status(200).json({
-                    message: `Successfully logged in as ${user.username}`,
-                    user: user
+                    username
                 });
             } else {
                 res.status(400).send('Invalid password');
@@ -123,7 +134,7 @@ export class AuthController {
             httpOnly: true
         })
 
-        this.userService.refreshTokens = this.userService.refreshTokens.filter(t => t !== token)
+        this.removeRefreshToken(token)
         res.status(200).send('Successful logout.')
     }
 
@@ -132,7 +143,7 @@ export class AuthController {
             const refreshToken = req.body.refreshToken
             if (!refreshToken) return res.status(401).send('Missing refresh token')
 
-            if (!this.userService.refreshTokens.includes(refreshToken))
+            if (!this.verifyRefreshToken(refreshToken))
                 return res.status(401).send('Invalid refresh token')
 
             const refreshSecret = process.env.REFRESH_TOKEN_SECRET
@@ -144,7 +155,7 @@ export class AuthController {
             if (!accessSecret)
                 throw new Error('JWT access token secret is not defined')
 
-            jwt.verify(refreshToken, refreshSecret, (err, user) => {
+            jwt.verify(refreshToken, refreshSecret, (err: unknown, user: unknown) => {
                 if (err) return res.status(401).send('Invalid refresh token')
                 if (!user) return res.sendStatus(403)
 
@@ -163,7 +174,7 @@ export class AuthController {
 
     public async getUserByUsername(req: Request, res: Response): Promise<void> {
         const user = await this.userService.getUserByUsername(req.params.username)
-        res.json({
+        res.status(200).send({
             user_exists: user ? true : false
         })
     }
