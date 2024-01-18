@@ -4,6 +4,7 @@ import { DialogButton } from "@/components/Dialog";
 import Calendar from "@/components/Calendar";
 
 import Budget from "@/components/Budget";
+import ExpensesCard from "@/components/ExpensesCard";
 ---
 
 <Layout title="Dashboard">
@@ -23,8 +24,9 @@ import Budget from "@/components/Budget";
 
 		<div class="flex flex-col sm:flex-row mt-5">
 			<!-- Left side -->
-			<div>
+			<div class="flex flex-col gap-3.5">
 				<Budget />
+				<ExpensesCard />
 			</div>
 
 			<!-- Right side -->

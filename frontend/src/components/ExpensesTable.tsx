@@ -39,13 +39,10 @@ function ExpensesTable() {
             setExpenses(res.data.expenses)
     }
 
-    console.log(expenses)
-    console.log(token)
-
     return (
         <div>
             {expenses.map(expense => (
-                <div>{expense.name}</div>
+                <div key={expense.id}>{expense.name}</div>
             ))}
             {token}
         </div>

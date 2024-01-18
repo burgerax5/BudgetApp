@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
-import { Button, buttonVariants } from "./ui/button";
+import { Button } from "./ui/button";
 import axios from "@/api/axios";
 
 function Navbar() {
@@ -74,9 +74,9 @@ function Navbar() {
                     <li className="hover:text-blue-600">
                         <a href="/">Dashboard</a>
                     </li>
-                    <li className="hover:text-blue-600">
+                    {loggedIn && <li className="hover:text-blue-600">
                         <a href="/expenses">Expenses</a>
-                    </li>
+                    </li>}
                 </ul>
                 <div className="sm:hidden hover:bg-secondary rounded-sm cursor-pointer z-1" onClick={handleClick}>
                     {!toggled && <Menu />}
@@ -101,9 +101,15 @@ function Navbar() {
             </nav>
             <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
                 <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
-                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>
-                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/login">Login</a>
-                <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/register">Register</a>
+                {loggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
+                {loggedIn ?
+                    <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout}>Logout</a>
+                    :
+                    <>
+                        <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/login">Login</a>
+                        <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/register">Register</a>
+                    </>
+                }
                 <ul className="list-none flex gap-3 mx-auto py-3">
                     <Input type="text" placeholder="Search..." />
                     <ModeToggle />
