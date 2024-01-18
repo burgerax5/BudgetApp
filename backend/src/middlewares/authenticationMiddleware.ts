@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken'
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const token = req.cookies['access-token'];
-    console.log(token)
 
     const secretKey = process.env.ACCESS_TOKEN_SECRET;
 

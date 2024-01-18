@@ -1,12 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
+import axios from "@/api/axios";
 
 function Navbar() {
-    const [toggled, setToggled] = useState(false)
+    const [toggled, setToggled] = useState<boolean>(false)
+    const [loggedIn, setLoggedIn] = useState<boolean>(false)
     const handleClick = () => setToggled(t => !t)
+
+    useEffect(() => {
+        const checkLoggedIn = async () => {
+            const res = await axios.get('/auth/', { withCredentials: true })
+            if (res.data)
+                setLoggedIn(true)
+            else
+                setLoggedIn(false)
+        }
+
+        checkLoggedIn()
+    }, [])
+
+    const readCookie = (cookieName: string) => {
+        const name = cookieName + '='
+        const decodedCookie = decodeURIComponent(document.cookie)
+        const cookieArray = decodedCookie.split(';')
+
+        for (let i = 0; i < cookieArray.length; i++) {
+            let cookie = cookieArray[i].trim();
+            if (cookie.indexOf(name) === 0) {
+                return cookie.substring(name.length, cookie.length);
+            }
+        }
+
+        return null; // Cookie not found
+    }
+
+    const deleteCookie = (cookieName: string) => {
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+    }
+
+    const handleLogout = async () => {
+        const res = await axios.post('/auth/logout', {}, { withCredentials: true })
+        if (res.status === 200) {
+            setLoggedIn(false)
+            deleteCookie('username')
+            deleteCookie('user_id')
+            deleteCookie('refresh-token')
+            location.replace('/')
+        }
+        // Token expired
+        else if (res.status === 401) {
+            const res2 = await axios.post('/auth/refresh-token', { 'refresh-token': readCookie('refresh-token') })
+            if (res2.status === 200) {
+                handleLogout()
+            }
+            else
+                console.error(res2.statusText)
+        }
+    }
 
     return (
         <header className="relative">
@@ -32,12 +85,18 @@ function Navbar() {
                 <ul className="list-none flex gap-3 ml-auto hidden sm:flex">
                     <ModeToggle />
                     <Input type="text" placeholder="Search..." />
-                    <Button variant="outline" >
-                        <a href="/login">Login</a>
-                    </Button>
-                    <Button>
-                        <a href="/register">Register</a>
-                    </Button>
+                    {loggedIn ?
+                        <Button onClick={handleLogout}>
+                            Logout
+                        </Button> :
+                        <>
+                            <Button variant="outline" >
+                                <a href="/login">Login</a>
+                            </Button>
+                            <Button>
+                                <a href="/register">Register</a>
+                            </Button>
+                        </>}
                 </ul>
             </nav>
             <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
