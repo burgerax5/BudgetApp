@@ -1,36 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { DialogButton } from "@/components/ExpenseDialog";
-import Calendar from "@/components/Calendar";
-
-import Budget from "@/components/Budget";
-import CategoriesCard from "@/components/CategoriesCard";
+import Dashboard from "@/components/Dashboard";
+import LandingPage from "@/components/LandingPage.astro";
+const cookies = Astro.request.headers.get("cookie");
 ---
 
-<Layout title="Dashboard">
+<Layout title={cookies ? "Dashboard" : "Budget App"}>
 	<main class="p-3 h-full max-w-screen-lg mx-auto">
-		<!-- Top -->
-		<div
-			class="flex items-center mt-3 flex-col justify-center gap-3 sm:flex-row sm:justify-between"
-		>
-			<h1 class="text-center sm:text-left text-2xl font-bold">
-				Dashboard
-			</h1>
-			<div class="flex items-center gap-3.5">
-				<Calendar />
-				<DialogButton client:load />
-			</div>
-		</div>
-
-		<div class="flex flex-col sm:flex-row mt-5">
-			<!-- Left side -->
-			<div class="flex flex-col gap-3.5 w-96">
-				<Budget />
-				<CategoriesCard client:load />
-			</div>
-
-			<!-- Right side -->
-			<div></div>
-		</div>
+		{cookies ? <Dashboard /> : <LandingPage />}
 	</main>
 </Layout>
