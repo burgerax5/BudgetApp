@@ -8,7 +8,6 @@ export const categories = [
     { name: "Utilities" },
     { name: "Insurance" },
     { name: "Debt Repayment" },
-    { name: "Education" },
     { name: "Clothing" },
     { name: "Miscellaneous" }
 ]

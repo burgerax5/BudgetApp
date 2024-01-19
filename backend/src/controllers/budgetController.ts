@@ -12,10 +12,10 @@ export class BudgetController {
         this.userService = userService
     }
 
-    async getBudgetByUser(req: Request, res: Response) {
+    async getBudgets(req: Request, res: Response) {
         try {
             const { month, year, categoryId } = req.query
-            const userId = parseInt(req.params.userId)
+            const userId = parseInt(req.body.user.user_id as string, 10)
             const user = await this.userService.getUserById(userId)
 
             if (!user)

@@ -4,19 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
 import { Button } from "./ui/button";
 import axios from "@/api/axios";
+import { useStore } from '@nanostores/react'
+import { isLoggedIn } from "@/userStore";
 
 function Navbar() {
     const [toggled, setToggled] = useState<boolean>(false)
-    const [loggedIn, setLoggedIn] = useState<boolean>(false)
     const handleClick = () => setToggled(t => !t)
+    const $isLoggedIn = useStore(isLoggedIn)
 
     useEffect(() => {
         const checkLoggedIn = async () => {
             const res = await axios.get('/auth/', { withCredentials: true })
             if (res.data)
-                setLoggedIn(true)
+                isLoggedIn.set(true)
             else
-                setLoggedIn(false)
+                isLoggedIn.set(false)
         }
 
         checkLoggedIn()
@@ -44,7 +46,7 @@ function Navbar() {
     const handleLogout = async () => {
         const res = await axios.post('/auth/logout', {}, { withCredentials: true })
         if (res.status === 200) {
-            setLoggedIn(false)
+            isLoggedIn.set(false)
             deleteCookie('username')
             deleteCookie('user_id')
             deleteCookie('refresh-token')
@@ -74,7 +76,7 @@ function Navbar() {
                     <li className="hover:text-blue-600">
                         <a href="/">Dashboard</a>
                     </li>
-                    {loggedIn && <li className="hover:text-blue-600">
+                    {isLoggedIn && <li className="hover:text-blue-600">
                         <a href="/expenses">Expenses</a>
                     </li>}
                 </ul>
@@ -85,7 +87,7 @@ function Navbar() {
                 <ul className="list-none flex gap-3 ml-auto hidden sm:flex">
                     <ModeToggle />
                     <Input type="text" placeholder="Search..." />
-                    {loggedIn ?
+                    {isLoggedIn ?
                         <Button onClick={handleLogout}>
                             Logout
                         </Button> :
@@ -101,8 +103,8 @@ function Navbar() {
             </nav>
             <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
                 <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
-                {loggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
-                {loggedIn ?
+                {isLoggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
+                {isLoggedIn ?
                     <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout}>Logout</a>
                     :
                     <>

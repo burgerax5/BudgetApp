@@ -4,6 +4,9 @@ import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button';
 import axios from '@/api/axios';
 
+import { useStore } from '@nanostores/react';
+import { isLoggedIn } from '@/userStore';
+
 interface RegistrationFormState {
     username: string;
     password: string;
@@ -27,6 +30,8 @@ function LoginForm() {
     const [userExists, setUserExists] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
     const [submitted, setSubmitted] = useState(false)
+
+    const $isLoggedIn = useStore(isLoggedIn)
 
     useEffect(() => {
         checkUserExists(formState.username)
@@ -74,8 +79,10 @@ function LoginForm() {
                 const res = await axios.post('/auth/login', { username, password }, { withCredentials: true })
                 if (res.status === 400)
                     setError('Username or password is incorrect')
-                if (res.data.username)
+                if (res.data.username) {
+                    isLoggedIn.set(!$isLoggedIn)
                     location.replace('/')
+                }
             } catch (err) {
                 setError('Username or password is incorrect')
             }

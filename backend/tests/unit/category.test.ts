@@ -15,10 +15,10 @@ describe('Test we can get the category object by the name and id', () => {
     })
 
     // FLAKY
-    it('should have 12 default categories', async () => {
+    it('should have 11 default categories', async () => {
         const allCategories = await categoryService.getAllCategories()
         const numCategories = allCategories.length
-        expect(numCategories).toBe(12)
+        expect(numCategories).toBe(11)
     })
 
     // FLAKY
