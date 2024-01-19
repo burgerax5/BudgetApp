@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/authRoutes';
 import expenseRoutes from './routes/expenseRoutes'
 import budgetRoutes from './routes/budgetRoutes'
+import categoryRoutes from './routes/categoryRoutes'
 
 import { populate } from './services/service_init';
 
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/expense', expenseRoutes)
 app.use('/budget', budgetRoutes)
+app.use('/category', categoryRoutes)
 
 app.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
