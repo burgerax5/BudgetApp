@@ -1,7 +1,10 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import ExpensesTable from "@/components/ExpensesTable";
-import ProtectRoute from "@/components/ProtectRoute";
+
+// Redirect to login if user is not logged in
+const cookie = Astro.request.headers.get("cookie");
+if (!cookie) return Astro.redirect("/login");
 ---
 
 <Layout title="Dashboard">

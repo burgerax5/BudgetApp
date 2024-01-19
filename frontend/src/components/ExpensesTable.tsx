@@ -1,7 +1,5 @@
 import axios from '@/api/axios'
-import React, { useState, useEffect } from 'react'
-import { useStore } from '@nanostores/react'
-import { isLoggedIn } from '@/userStore'
+import { useState, useEffect } from 'react'
 
 interface expenseDetails {
     name: string,
@@ -21,21 +19,6 @@ interface resDetails {
 function ExpensesTable() {
     const [expenses, setExpenses] = useState<expenseDetails[]>([])
     const [token, setToken] = useState<string | null>(null)
-    const $isLoggedIn = useStore(isLoggedIn)
-
-    useEffect(() => {
-        if (!$isLoggedIn)
-            location.replace('/login')
-
-        const shit = async () => {
-            const res = await axios.get<resDetails>('/auth/', { withCredentials: true })
-            if (res.data)
-                setToken(res.data.refreshToken)
-        }
-
-        shit()
-        getExpenses()
-    }, [])
 
     const getExpenses = async () => {
         const res = await axios.get('/expense/', { withCredentials: true })

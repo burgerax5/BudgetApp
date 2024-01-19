@@ -1,6 +1,10 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import LoginForm from "@/components/LoginForm";
+
+// Redirect to home if user is logged in
+const cookie = Astro.request.headers.get("cookie");
+if (cookie) return Astro.redirect("/");
 ---
 
 <Layout title="Login">

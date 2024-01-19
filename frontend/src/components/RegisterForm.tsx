@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from './ui/input'
 import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button'
-import { isLoggedIn } from '@/userStore';
 
 interface RegistrationFormState {
     username: string;
@@ -32,10 +31,6 @@ function RegisterForm() {
     const [data, setData] = useState<{ user_exists: boolean } | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [submitted, setSubmitted] = useState(false)
-
-    useEffect(() => {
-        if (isLoggedIn) location.replace('/')
-    }, [])
 
     useEffect(() => {
         checkUserExists(formState.username)

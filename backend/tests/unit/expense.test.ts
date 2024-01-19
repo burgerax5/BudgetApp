@@ -234,22 +234,22 @@ describe('Get expenses by month and year', () => {
             year: 2021
         })
         expect(expenses_in_2021.length).toBe(1)
-        expect(expenses_in_2021[0]).toEqual(all_expenses[0])
+        expect(expenses_in_2021[0]).toEqual(all_expenses.find(exp => exp.year === 2021))
 
         const expenses_in_2022 = await expenseService.getExpenseByParams({
             userId: 1,
             year: 2022
         })
         expect(expenses_in_2022.length).toBe(1)
-        expect(expenses_in_2022[0]).toEqual(all_expenses[1])
+        expect(expenses_in_2022[0]).toEqual(all_expenses.find(exp => exp.year === 2022))
 
         const expenses_in_2023 = await expenseService.getExpenseByParams({
             userId: 1,
             year: 2023
         })
         expect(expenses_in_2023.length).toBe(2)
-        expect(expenses_in_2023[0]).toEqual(all_expenses[2])
-        expect(expenses_in_2023[1]).toEqual(all_expenses[3])
+        expect(expenses_in_2023).toContainEqual(all_expenses[2])
+        expect(expenses_in_2023).toContainEqual(all_expenses[3])
     })
 
     afterEach(async () => cleanUp(prisma))
