@@ -42,12 +42,11 @@ export class BudgetService {
     async addBudget(budget_details: {
         userId: number,
         categoryId: number,
-        currencyId: number,
         amount: number,
         month: number | undefined,
         year: number
     }): Promise<Budget | null> {
-        const { categoryId, userId, currencyId, amount, month, year } = budget_details
+        const { categoryId, userId, amount, month, year } = budget_details
 
         // Make sure there isn't a budget for the user with the same date & category
         const budgetExists = await this.checkBudgetEmpty(userId, categoryId, month, year)
@@ -61,7 +60,6 @@ export class BudgetService {
     async editBudget(budget_id: number, budget_details: {
         userId: number,
         categoryId: number,
-        currencyId: number,
         amount: number,
         month: number | undefined,
         year: number

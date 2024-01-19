@@ -1,18 +1,15 @@
 import { UserService } from "../../src/services/userService"
 import { CategoryService } from "../../src/services/categoryService"
 import { ExpenseService } from "../../src/services/expenseService"
-import { currencies } from "src/constants/currencies"
 
 import {
     Category as PrismaCategory,
-    Currency as PrismaCurrency,
 } from '@prisma/client'
 
 const get_expense_details = () => {
     return {
         // Parameters for expense
         userId: 1,
-        currencyId: 106,
         amount: 49.99,
         name: "Cyberpunk 2077: Phantom Liberty",
         day: 1,

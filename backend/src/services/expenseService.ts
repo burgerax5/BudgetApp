@@ -1,12 +1,10 @@
 import {
     PrismaClient,
-    Currency as PrismaCurrency,
     Expense as PrismaExpense,
     User as PrismaUser,
     Category as PrismaCategory
 } from '@prisma/client'
 
-interface Currency extends PrismaCurrency { }
 interface Expense extends PrismaExpense { }
 interface User extends PrismaUser { }
 interface Category extends PrismaCategory { }
@@ -36,7 +34,6 @@ export class ExpenseService {
         month?: number,
         year?: number,
         categoryId?: number,
-        currencyId?: number
     }): Promise<Expense[]> {
         return this.prisma.expense.findMany({
             where
@@ -45,7 +42,6 @@ export class ExpenseService {
 
     public async addExpense(expense_details: {
         userId: number,
-        currencyId: number,
         amount: number,
         name: string,
         day: number,
@@ -57,9 +53,6 @@ export class ExpenseService {
             data: {
                 user: {
                     connect: { id: expense_details.userId }
-                },
-                currency: {
-                    connect: { id: expense_details.currencyId }
                 },
                 amount: expense_details.amount,
                 name: expense_details.name,
@@ -80,11 +73,10 @@ export class ExpenseService {
             month: number,
             year: number,
             name: string,
-            currencyId: number,
             categoryId: number
         }): Promise<void> {
 
-        const { amount, day, month, year, name, currencyId, categoryId } = new_expense_details
+        const { amount, day, month, year, name, categoryId } = new_expense_details
 
         await this.prisma.expense.update({
             data: {
@@ -93,7 +85,6 @@ export class ExpenseService {
                 month,
                 year,
                 name,
-                currencyId,
                 categoryId
             },
             where: {

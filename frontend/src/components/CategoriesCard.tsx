@@ -99,15 +99,12 @@ function CategoriesCard() {
 
     useEffect(() => {
         let newExpenseByCategory: Record<string, number> = expensesByCategory
-        console.log(expenses)
         Object.entries(expensesByCategory).forEach(([key, index]: [string, number]) => {
             expenses.map(exp => {
                 exp.categoryId === index ? newExpenseByCategory[key] + exp.amount : 0
             })
         })
     }, [expenses])
-
-    console.log(budgetByCategory)
 
     return (
         <Card className='h-full'>

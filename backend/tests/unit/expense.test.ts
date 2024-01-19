@@ -4,32 +4,24 @@ import { CategoryService } from "../../src/services/categoryService";
 import { jestRegister } from "../scripts/registerUser";
 import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scripts/addExpense";
 import { PrismaClient } from "@prisma/client";
-import { CurrencyService } from "../../src/services/currencyService";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 import { prisma } from "../../src/services/service_init";
-
-import { currencies } from "../../src/constants/currencies";
 
 describe('Test initialization and adding of expenses', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
 
         // Initialize user, categories, and currencies
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it('should initially be an empty list', async () => {
@@ -73,19 +65,13 @@ describe('Test if there are ids provided for rows that do not exist', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
-
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it('should return an error saying user does not exist', async () => {
@@ -120,21 +106,16 @@ describe('Test updating and deleting existing expenses', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
 
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it('should remove an expense from the list', async () => {
@@ -165,15 +146,13 @@ describe('Test updating and deleting existing expenses', () => {
         const day = 29
         const month = 2
         const year = 2024
-        const currencyId = 106
         const categoryId = 2
 
-        const new_details = { amount, day, month, year, name, currencyId, categoryId }
+        const new_details = { amount, day, month, year, name, categoryId }
 
         await expenseService.editExpense(1, new_details) // expenseId = 1
         const editedExpense = await expenseService.getExpenseById(1)
 
-        expect(editedExpense?.currencyId).toBe(106)
         expect(editedExpense?.amount).toBe(109.00)
         expect(editedExpense?.name).toBe("Final Fantasy VII Rebirth")
         expect(editedExpense?.day).toBe(29)
@@ -189,21 +168,16 @@ describe('Get expenses by month and year', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
 
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it("should return alice's expenses by month", async () => {
@@ -284,20 +258,15 @@ describe('Get expenses by month and year', () => {
 describe('Get expenses by category', () => {
     let expenseService: ExpenseService
     let userService: UserService
-    let currencyService: CurrencyService
     let categoryService: CategoryService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it("should return all of bob's expenses that are under a particular category", async () => {
@@ -327,21 +296,16 @@ describe('Get expense by id', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
 
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it('should return undefined since there is no expense with id 1', async () => {
@@ -350,10 +314,9 @@ describe('Get expense by id', () => {
     })
 
     it('should return the expense with id 1', async () => {
-        // Ensure user, currency, & categories are succesfully initialized
+        // Ensure user & categories are succesfully initialized
         expect(await userService.getUserById(1)).not.toBeNull()
         expect(await categoryService.getCategoryById(2)).not.toBeNull()
-        expect(await currencyService.getCurrencyByCode("NZD")).not.toBeNull()
 
         await addMockExpense(userService, categoryService, expenseService)
 
@@ -371,21 +334,16 @@ describe('Get all expenses by user', () => {
     let expenseService: ExpenseService
     let userService: UserService
     let categoryService: CategoryService
-    let currencyService: CurrencyService
 
     beforeEach(async () => {
         expenseService = new ExpenseService(prisma)
         userService = new UserService(prisma)
         categoryService = new CategoryService(prisma)
-        currencyService = new CurrencyService(prisma)
 
         await resetTables(prisma)
 
         await jestRegister('bob', 'password123', userService)
         await categoryService.populate_categories()
-        await prisma.currency.createMany({
-            data: currencies
-        })
     })
 
     it('should return 3 expenses', async () => {

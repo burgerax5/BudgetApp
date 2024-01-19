@@ -2,16 +2,19 @@ import { PrismaClient } from "@prisma/client";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 import { CategoryService } from "../../src/services/categoryService";
 import { prisma } from "../../src/services/service_init";
-
+import { categories } from "../../src/constants/categories";
 
 describe('Test we can get the category object by the name and id', () => {
     let categoryService: CategoryService
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         categoryService = new CategoryService(prisma)
 
         await resetTables(prisma)
-        await categoryService.populate_categories()
+
+        await prisma.category.createMany({
+            data: categories
+        })
     })
 
     // FLAKY

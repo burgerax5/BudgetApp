@@ -31,10 +31,8 @@ function LoginForm() {
     const [error, setError] = useState<string | null>(null)
     const [submitted, setSubmitted] = useState(false)
 
-    const $isLoggedIn = useStore(isLoggedIn)
-
     useEffect(() => {
-        if ($isLoggedIn) location.replace('/')
+        if (isLoggedIn) location.replace('/')
     }, [])
 
     useEffect(() => {

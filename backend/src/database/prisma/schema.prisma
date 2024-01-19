@@ -30,21 +30,9 @@ model Category {
   Budget  Budget[]
 }
 
-// Define the Currency model
-model Currency {
-  id      Int       @id @default(autoincrement())
-  cc      String    @unique
-  symbol  String
-  name    String
-  Expense Expense[]
-  Budget  Budget[]
-}
-
 // Define the Expense model
 model Expense {
   id         Int      @id @default(autoincrement())
-  currency   Currency @relation(fields: [currencyId], references: [id])
-  currencyId Int
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
   user       User     @relation(fields: [userId], references: [id])
@@ -59,8 +47,6 @@ model Expense {
 // Define the Budget model
 model Budget {
   id         Int      @id @default(autoincrement())
-  currency   Currency @relation(fields: [currencyId], references: [id])
-  currencyId Int
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
   user       User     @relation(fields: [userId], references: [id])
