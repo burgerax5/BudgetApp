@@ -88,7 +88,6 @@ function CategoriesCard() {
                 setBudgetByCategory(b => {
                     return b.map((value, i) => ((i === categoryId) ? res.data.budgets[0].amount : 0))
                 })
-            console.log(res.data.budgets, categoryId)
         }
 
         getCategories()

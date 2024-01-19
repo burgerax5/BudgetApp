@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { DialogButton } from './Dialog'
+import { DialogButton } from '@/components/ExpenseDialog'
 
 function Budget() {
     return (

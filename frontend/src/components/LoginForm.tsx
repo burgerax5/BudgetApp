@@ -34,6 +34,10 @@ function LoginForm() {
     const $isLoggedIn = useStore(isLoggedIn)
 
     useEffect(() => {
+        if ($isLoggedIn) location.replace('/')
+    }, [])
+
+    useEffect(() => {
         checkUserExists(formState.username)
     }, [formState])
 

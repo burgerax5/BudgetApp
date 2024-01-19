@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/userStore";
@@ -76,7 +76,7 @@ function Navbar() {
                     <li className="hover:text-blue-600">
                         <a href="/">Dashboard</a>
                     </li>
-                    {isLoggedIn && <li className="hover:text-blue-600">
+                    {$isLoggedIn && <li className="hover:text-blue-600">
                         <a href="/expenses">Expenses</a>
                     </li>}
                 </ul>
@@ -84,27 +84,27 @@ function Navbar() {
                     {!toggled && <Menu />}
                     {toggled && <X />}
                 </div>
-                <ul className="list-none flex gap-3 ml-auto hidden sm:flex">
+                <div className="flex gap-3 ml-auto hidden sm:flex">
                     <ModeToggle />
                     <Input type="text" placeholder="Search..." />
-                    {isLoggedIn ?
+                    {$isLoggedIn ?
                         <Button onClick={handleLogout}>
                             Logout
                         </Button> :
                         <>
-                            <Button variant="outline" >
+                            <Button variant="outline" asChild>
                                 <a href="/login">Login</a>
                             </Button>
-                            <Button>
+                            <Button asChild>
                                 <a href="/register">Register</a>
                             </Button>
                         </>}
-                </ul>
+                </div>
             </nav>
             <div className={`absolute top-0 w-full grid bg-background border-b background duration-200 z-40 ${toggled ? "translate-y-11 opacity-1" : "-translate-y-full opacity-0"}`}>
                 <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
-                {isLoggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
-                {isLoggedIn ?
+                {$isLoggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
+                {$isLoggedIn ?
                     <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout}>Logout</a>
                     :
                     <>
