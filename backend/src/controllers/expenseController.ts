@@ -106,10 +106,10 @@ export class ExpenseController {
 
             // Update user_id in expense to match the user making the request
             expense.userId = user.id;
-            await this.expenseService.addExpense(expense);
+            const added_expense = await this.expenseService.addExpense(expense);
             res.status(200).json({
                 message: 'Successfully added expense',
-                expenses: this.expenseService.getAllExpenses(),
+                expense: added_expense,
             });
 
         } catch (error) {

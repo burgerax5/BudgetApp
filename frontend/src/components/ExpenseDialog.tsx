@@ -17,17 +17,66 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import axios from "@/api/axios"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar } from "./ui/calendar"
+import { useToast } from "./ui/use-toast"
 
 interface Category {
     id: number,
     name: string,
-    colour: string
+}
+
+interface Expense {
+    name: string,
+    categoryId: number,
+    price: number,
+    day: number,
+    month: number,
+    year: number
 }
 
 export function DialogButton() {
     const [categories, setCategories] = useState<Category[]>([])
+    const [date, setDate] = useState<Date | undefined>(new Date())
+    const [formData, setFormData] = useState<Expense>({
+        name: '',
+        categoryId: 1,
+        price: 0,
+        day: new Date().getDate(),
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear()
+    })
+    const { toast } = useToast()
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            [id]: value
+        }))
+    }
+
+    const addExpense = async () => {
+        console.log('Form Data: ', formData)
+        const res = await axios.post('/expense/add', formData, { withCredentials: true })
+        if (res.data)
+            toast({
+                title: "Successfully added expense",
+                description: `${formData.name} $${formData.price}`
+            })
+        else
+            toast({
+                title: "Failed to add expense",
+                description: `Bruh`
+            })
+    }
 
     useEffect(() => {
         const getCategories = async () => {
@@ -36,6 +85,16 @@ export function DialogButton() {
         }
         getCategories()
     }, [])
+
+    useEffect(() => {
+        if (date)
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                day: date?.getDate(),
+                month: date?.getMonth() + 1,
+                year: date?.getFullYear()
+            }))
+    }, [date])
 
     return (
         <Dialog>
@@ -46,7 +105,7 @@ export function DialogButton() {
                 <DialogHeader>
                     <DialogTitle>Add Expense</DialogTitle>
                     <DialogDescription>
-                        Provide information aobut the expense.
+                        Provide information about the expense.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -56,7 +115,8 @@ export function DialogButton() {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Cyberpunk 2077 - Phantom Liberty"
+                            onChange={handleInputChange}
+                            value={formData.name}
                             className="col-span-3"
                         />
                     </div>
@@ -64,30 +124,62 @@ export function DialogButton() {
                         <Label htmlFor="username" className="text-right">
                             Category
                         </Label>
-                        <Select>
+                        <Select onValueChange={(value) => {
+                            setFormData(prevFormData => (
+                                { ...prevFormData, category: value }
+                            ))
+                        }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Select Category" />
+                                <SelectValue placeholder="Food & Drink" />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map(category => {
-                                    return <SelectItem value={`${category.id}`}>{category.name}</SelectItem>
+                                    return <SelectItem onClick={() => console.log('hi')}
+                                        value={`${category.id}`}
+                                    >{category.name}</SelectItem>
                                 })}
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="username" className="text-right">
+                        <Label htmlFor="price" className="text-right">
                             Price
                         </Label>
                         <Input
-                            id="username"
-                            defaultValue="49.99"
+                            id="price"
+                            type="number"
+                            onChange={handleInputChange}
+                            value={formData.price}
                             className="col-span-3"
                         />
                     </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label className="text-right">
+                            Date
+                        </Label>
+                        <div>
+                            <Popover>
+                                <PopoverTrigger>
+                                    <Button variant="outline">
+                                        <div className="ml-2">
+                                            {date?.getDate()} {date?.toLocaleDateString('default', { month: 'short' })} {date?.getFullYear()}
+                                        </div>
+                                        <CalendarIcon className="ml-3.5" width="20" height="20" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={setDate}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                    </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" onClick={addExpense}>Submit</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

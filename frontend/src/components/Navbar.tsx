@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/userStore";
+import { readCookie, deleteCookie } from "@/util/cookies";
 
 function Navbar() {
     const [toggled, setToggled] = useState<boolean>(false)
@@ -24,25 +25,6 @@ function Navbar() {
         checkLoggedIn()
     }, [])
 
-    const readCookie = (cookieName: string) => {
-        const name = cookieName + '='
-        const decodedCookie = decodeURIComponent(document.cookie)
-        const cookieArray = decodedCookie.split(';')
-
-        for (let i = 0; i < cookieArray.length; i++) {
-            let cookie = cookieArray[i].trim();
-            if (cookie.indexOf(name) === 0) {
-                return cookie.substring(name.length, cookie.length);
-            }
-        }
-
-        return null; // Cookie not found
-    }
-
-    const deleteCookie = (cookieName: string) => {
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-    }
-
     const handleLogout = async () => {
         const res = await axios.post('/auth/logout', {}, { withCredentials: true })
         if (res.status === 200) {
@@ -54,12 +36,7 @@ function Navbar() {
         }
         // Token expired
         else if (res.status === 401) {
-            const res2 = await axios.post('/auth/refresh-token', { 'refresh-token': readCookie('refresh-token') })
-            if (res2.status === 200) {
-                handleLogout()
-            }
-            else
-                console.error(res2.statusText)
+            await axios.get('/auth/clear-cookies')
         }
     }
 
@@ -112,10 +89,10 @@ function Navbar() {
                         <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/register">Register</a>
                     </>
                 }
-                <ul className="list-none flex gap-3 mx-auto py-3">
+                <div className="flex gap-3 mx-auto py-3">
                     <Input type="text" placeholder="Search..." />
                     <ModeToggle />
-                </ul>
+                </div>
             </div>
             {toggled && <div className="absolute top-0 h-svh w-full bg-black opacity-20 z-30"
                 onClick={handleClick}></div>}

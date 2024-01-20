@@ -27,6 +27,10 @@ const getThemePreference = () => {
 const isDark = getThemePreference() === "dark";
 console.log(isDark);
 document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+
+import { useStore } from "@nanostores/react";
+import { isLoggedIn } from "@/userStore";
+const $isLoggedIn = useStore(isLoggedIn);
 </script>
 
 <html lang="en">

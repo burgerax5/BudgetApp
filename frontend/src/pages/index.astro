@@ -2,11 +2,13 @@
 import Layout from "../layouts/Layout.astro";
 import Dashboard from "@/components/Dashboard";
 import LandingPage from "@/components/LandingPage.astro";
-const cookies = Astro.request.headers.get("cookie");
+import { isLoggedIn } from "@/userStore";
+import Help from "@/components/Help";
 ---
 
-<Layout title={cookies ? "Dashboard" : "Budget App"}>
+<Layout title={isLoggedIn ? "Dashboard" : "Budget App"}>
+	<Help client:load mustBeAuthenticated={true} />
 	<main class="p-3 h-full max-w-screen-lg mx-auto">
-		{cookies ? <Dashboard /> : <LandingPage />}
+		{isLoggedIn ? <Dashboard client:load /> : <LandingPage />}
 	</main>
 </Layout>

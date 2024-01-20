@@ -11,6 +11,10 @@ router.get('/', authenticateToken, (req: Request, res: Response) => {
     authController.home(req, res)
 });
 
+router.get('/clear-cookies', (req: Request, res: Response) => {
+    authController.clearCookies(req, res)
+})
+
 router.post('/login', async (req: Request, res: Response) => {
     await authController.login(req, res);
 });

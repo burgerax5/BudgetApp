@@ -132,15 +132,7 @@ export class AuthController {
         if (!this.userService.refreshTokens.includes(token))
             return res.status(403).send('Invalid token')
 
-        res.cookie("access-token", "", {
-            maxAge: 0,
-            httpOnly: true
-        })
-
-        res.cookie("refresh-token", "", {
-            maxAge: 0,
-            httpOnly: true
-        })
+        this.clearCookies(req, res)
 
         this.removeRefreshToken(token)
         res.status(200).send('Successful logout.')
@@ -174,6 +166,18 @@ export class AuthController {
             console.error('Error occurred while checking refresh token', error)
             res.status(500).send('Internal Server Error')
         }
+    }
+
+    public clearCookies(req: Request, res: Response) {
+        res.cookie("access-token", "", {
+            maxAge: 0,
+            httpOnly: true
+        })
+
+        res.cookie("refresh-token", "", {
+            maxAge: 0,
+            httpOnly: true
+        })
     }
 
     public async getUsers(req: Request, res: Response): Promise<void> {
