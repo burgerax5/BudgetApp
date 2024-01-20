@@ -1,14 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Dashboard from "@/components/Dashboard";
-import LandingPage from "@/components/LandingPage.astro";
-import { isLoggedIn } from "@/userStore";
-import Help from "@/components/Help";
+import RenderHome from "@/components/RenderHome";
 ---
 
-<Layout title={isLoggedIn ? "Dashboard" : "Budget App"}>
-	<Help client:load mustBeAuthenticated={true} />
-	<main class="p-3 h-full max-w-screen-lg mx-auto">
-		{isLoggedIn ? <Dashboard client:load /> : <LandingPage />}
-	</main>
+<Layout title="Budget App">
+	<RenderHome client:load />
 </Layout>

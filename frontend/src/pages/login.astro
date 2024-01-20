@@ -3,11 +3,11 @@ import Layout from "@/layouts/Layout.astro";
 import LoginForm from "@/components/LoginForm";
 
 // Redirect to home if user is logged in
-import Help from "@/components/Help";
+import Protect from "@/components/Protect";
 ---
 
 <Layout title="Login">
-    <Help client:load mustBeAuthenticated={false} />
+    <Protect client:load mustBeAuthenticated={false} />
     <main class="flex flex-col items-center h-svh">
         <div class="mt-20 border p-10 rounded-md flex flex-col items-center">
             <h1 class="text-2xl font-bold py-3">Login</h1>
@@ -47,3 +47,4 @@ import Help from "@/components/Help";
         >
     </main> -->
 </Layout>
+ @/components/Protect

@@ -4,27 +4,23 @@ import { ExpenseService } from '../services/expenseService';
 import { UserService } from '../services/userService';
 import { CategoryService } from '../services/categoryService';
 import {
-    PrismaClient, User as PrismaUser, Currency as PrismaCurrency,
+    PrismaClient, User as PrismaUser,
     Expense as PrismaExpense
 } from '@prisma/client';
 
 interface User extends PrismaUser { }
-interface Currency extends PrismaCurrency { }
 interface Expense extends PrismaExpense { }
 
 import { prisma } from '../services/service_init';
-import { CurrencyService } from '../services/currencyService';
 
 export class ExpenseController {
     private expenseService: ExpenseService
     private userService: UserService
     private categoryService: CategoryService
-    private currencyService: CurrencyService
 
-    constructor(expenseService: ExpenseService, userService: UserService, currencyService: CurrencyService) {
+    constructor(expenseService: ExpenseService, userService: UserService) {
         this.expenseService = expenseService
         this.userService = userService
-        this.currencyService = currencyService
         this.categoryService = new CategoryService(prisma)
     }
 
@@ -34,10 +30,6 @@ export class ExpenseController {
             throw new Error(`No user with the details ${JSON.stringify(req.body.user)}`);
         }
         return user;
-    }
-
-    private async getCurrency(id: number): Promise<Currency | null> {
-        return await this.currencyService.getCurrencyById(id)
     }
 
     private async getUserFromParam(req: Request): Promise<User | null> {
@@ -52,20 +44,12 @@ export class ExpenseController {
         day: number,
         month: number,
         year: number,
-        currencyId: number,
         categoryId: number,
     }): Promise<void> {
-        // Validate currency
-        if (!expense.currencyId)
-            throw new Error('Expense currency is required')
-
-        const currency = await this.getCurrency(expense.currencyId)
-        if (!currency)
-            throw new Error(`No expense with the id ${expense.currencyId}`)
 
         // Ensure required fields are present in the expense object
         if (typeof expense.amount !== 'number')
-            throw new Error('Expense amount is required and must be a number.');
+            throw new Error(`Expense amount is required and must be a number. Amount received: ${JSON.stringify(expense)}`);
 
         // Ensure the date is valid
         const date = new Date(expense.year, expense.month - 1, expense.day)
@@ -185,7 +169,7 @@ export class ExpenseController {
     }
 
     async getExpenseByParams(req: Request, res: Response): Promise<void> {
-        const { search, month, year, category, currency } = req.query
+        const { search, month, year, category } = req.query
         const user = await this.getUserFromRequest(req)
 
         if (!user)
@@ -204,9 +188,6 @@ export class ExpenseController {
 
         if (!isNaN(parseInt(category as string, 10)))
             where.categoryId = parseInt(category as string, 10)
-
-        if (!isNaN(parseInt(currency as string, 10)))
-            where.currencyId = parseInt(currency as string, 10)
 
         const expenses = await this.expenseService.getExpenseByParams(where)
         res.json({ expenses })

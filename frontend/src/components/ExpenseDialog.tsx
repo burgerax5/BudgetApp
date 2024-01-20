@@ -36,7 +36,7 @@ interface Category {
 interface Expense {
     name: string,
     categoryId: number,
-    price: number,
+    amount: string,
     day: number,
     month: number,
     year: number
@@ -47,13 +47,20 @@ export function DialogButton() {
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [formData, setFormData] = useState<Expense>({
         name: '',
-        categoryId: 1,
-        price: 0,
+        categoryId: 0,
+        amount: '0',
         day: new Date().getDate(),
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear()
     })
+    const [error, setError] = useState<string | null>(null)
     const { toast } = useToast()
+
+    const verifyFormData = (): boolean => {
+        const { name, categoryId, amount, day, month, year } = formData
+        const date = new Date(year, month, day)
+        return !(!name || !categoryId || !amount || !date)
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
@@ -61,21 +68,29 @@ export function DialogButton() {
             ...prevFormData,
             [id]: value
         }))
+
     }
 
     const addExpense = async () => {
         console.log('Form Data: ', formData)
-        const res = await axios.post('/expense/add', formData, { withCredentials: true })
-        if (res.data)
-            toast({
-                title: "Successfully added expense",
-                description: `${formData.name} $${formData.price}`
-            })
-        else
-            toast({
-                title: "Failed to add expense",
-                description: `Bruh`
-            })
+        if (verifyFormData()) {
+            const res = await axios.post('/expense/add', { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
+            if (res.data) {
+                console.log('Added expense')
+                toast({
+                    title: "Successfully added expense",
+                    description: `${formData.name} $${formData.amount}`
+                })
+            }
+            else {
+                console.log('Failed to add expense')
+                toast({
+                    title: "Failed to add expense",
+                    description: `Bruh`
+                })
+            }
+        } else
+            setError('Missing or invalid form data')
     }
 
     useEffect(() => {
@@ -126,11 +141,11 @@ export function DialogButton() {
                         </Label>
                         <Select onValueChange={(value) => {
                             setFormData(prevFormData => (
-                                { ...prevFormData, category: value }
+                                { ...prevFormData, categoryId: parseInt(value) }
                             ))
                         }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Food & Drink" />
+                                <SelectValue placeholder="Select Category" />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map(category => {
@@ -146,10 +161,10 @@ export function DialogButton() {
                             Price
                         </Label>
                         <Input
-                            id="price"
+                            id="amount"
                             type="number"
                             onChange={handleInputChange}
-                            value={formData.price}
+                            value={formData.amount}
                             className="col-span-3"
                         />
                     </div>
@@ -179,6 +194,7 @@ export function DialogButton() {
                     </div>
                 </div>
                 <DialogFooter>
+                    {error && <span className="text-sm opacity 0.7">{error}</span>}
                     <Button type="submit" onClick={addExpense}>Submit</Button>
                 </DialogFooter>
             </DialogContent>

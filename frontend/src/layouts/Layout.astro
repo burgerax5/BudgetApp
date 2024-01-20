@@ -2,8 +2,7 @@
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import { ViewTransitions } from "astro:transitions";
-
-import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { Toaster } from "@/components/ui/toaster";
 
 interface Props {
 	title: string;
@@ -28,9 +27,8 @@ const isDark = getThemePreference() === "dark";
 console.log(isDark);
 document.documentElement.classList[isDark ? "add" : "remove"]("dark");
 
-import { useStore } from "@nanostores/react";
-import { isLoggedIn } from "@/userStore";
-const $isLoggedIn = useStore(isLoggedIn);
+import { checkAuth } from "@/util/CheckAuth";
+await checkAuth();
 </script>
 
 <html lang="en">
@@ -53,6 +51,7 @@ const $isLoggedIn = useStore(isLoggedIn);
 	<body>
 		<Navbar client:load />
 		<slot />
+		<Toaster />
 		<style>
 			body {
 				font-family: "Roboto", sans-serif;
