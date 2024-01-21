@@ -1,7 +1,7 @@
 import Dashboard from "@/components/Dashboard";
 import LandingPage from "@/components/LandingPage";
 import { useStore } from '@nanostores/react';
-import { isLoggedIn } from '@/userStore';
+import { isLoggedIn } from '@/store/userStore';
 
 function RenderHome() {
     const $isLoggedIn = useStore(isLoggedIn)

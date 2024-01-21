@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/card"
 import { DialogButton } from '@/components/ExpenseDialog'
 import axios from '@/api/axios'
+import EditBudget from './EditBudget'
+import { useStore } from '@nanostores/react'
+import { selectedDate } from '@/store/userStore'
 
 interface Budget {
     id: number,
@@ -34,10 +37,11 @@ interface Expense {
 function Budget() {
     const [budget, setBudget] = useState<Budget | null>(null)
     const [spent, setSpent] = useState<number>(0)
+    const $selectedDate = useStore(selectedDate)
 
     useEffect(() => {
         const getBudget = async () => {
-            const date = new Date()
+            const date = $selectedDate
             await axios.get(
                 `/budget/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
                 { withCredentials: true }
@@ -50,7 +54,7 @@ function Budget() {
         }
 
         const spentThisMonth = async () => {
-            const date = new Date()
+            const date = $selectedDate
             await axios.get<ExpenseResponse>(
                 `/expense/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
                 { withCredentials: true }
@@ -94,7 +98,7 @@ function Budget() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <DialogButton />
+                <EditBudget budget={budget} setBudget={setBudget} />
             </CardFooter>
         </Card>
     )

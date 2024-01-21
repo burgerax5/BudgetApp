@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import axios from '@/api/axios'
 import { readCookie, deleteCookie } from '@/util/cookies'
 import { useStore } from '@nanostores/react'
-import { isLoggedIn } from '@/userStore'
+import { isLoggedIn } from '@/store/userStore'
 
 const $isLoggedIn = useStore(isLoggedIn)
 

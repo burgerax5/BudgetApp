@@ -4,7 +4,7 @@ import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button';
 import axios from '@/api/axios';
 import { useStore } from '@nanostores/react';
-import { isLoggedIn } from '@/userStore';
+import { isLoggedIn } from '@/store/userStore';
 
 interface RegistrationFormState {
     username: string;

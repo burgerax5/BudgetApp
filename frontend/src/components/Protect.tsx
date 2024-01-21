@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '@nanostores/react'
-import { isLoggedIn } from '@/userStore'
+import { isLoggedIn } from '@/store/userStore'
 
 interface HelpProps {
     mustBeAuthenticated: boolean

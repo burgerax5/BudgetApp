@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
-import { isLoggedIn } from "@/userStore";
+import { isLoggedIn } from "@/store/userStore";
 import { readCookie, deleteCookie } from "@/util/cookies";
 
 function Navbar() {

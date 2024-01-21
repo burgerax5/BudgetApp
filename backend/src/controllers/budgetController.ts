@@ -51,7 +51,7 @@ export class BudgetController {
         try {
             const user_id = req.body.user.user_id
             const user = this.userService.getUserById(user_id)
-            const { categoryId, currencyId, amount, month, year } = req.body
+            const { categoryId, amount, month, year } = req.body
 
             if (!user)
                 throw new Error('User does not exist')
@@ -66,7 +66,6 @@ export class BudgetController {
                 const budget = await this.budgetService.addBudget({
                     userId: user_id,
                     categoryId,
-                    currencyId,
                     amount,
                     month,
                     year
@@ -110,7 +109,6 @@ export class BudgetController {
             await this.budgetService.editBudget(budget_id, {
                 userId: user_id,
                 categoryId: budget.categoryId,
-                currencyId: budget.currencyId,
                 amount: budget_amount,
                 month: budget.month ? budget.month : undefined,
                 year: budget.year
