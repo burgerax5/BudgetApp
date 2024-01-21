@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { DialogButton } from '@/components/ExpenseDialog'
 import axios from '@/api/axios'
-import EditBudget from './EditBudget'
+import BudgetButton from './BudgetButton'
 import { useStore } from '@nanostores/react'
 import { selectedDate } from '@/store/userStore'
 
@@ -74,6 +74,11 @@ function Budget() {
         spentThisMonth()
     }, [])
 
+
+    const getProgress = (progress: number) => {
+        return `radial-gradient(closest-side,transparent 79%,transparent 80% 100%), conic-gradient(hsl(var(--primary)) ${progress}%, hsl(var(--accent)) 0)`
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -82,9 +87,11 @@ function Budget() {
             </CardHeader>
             <CardContent>
                 <div className='rounded-full w-40 h-40 mx-auto relative'>
-                    <div className={`rounded-full border-8 border-accent w-full h-full absolute flex items-center justify-center`}>
+                    <div className={`rounded-full w-full h-full absolute flex items-center justify-center`}
+                        style={{ backgroundImage: getProgress(budget ? ((budget.amount - spent) / budget.amount) * 100 : 0) }}>
                         <div className='flex flex-col items-center justify-center'>
-                            <div className='font-bold text-2xl'>$
+                            <div className='bg-background w-36 h-36 absolute rounded-full'></div>
+                            <div className='font-bold text-2xl z-10'>$
                                 {budget?.amount && (budget?.amount - spent).toLocaleString('default', {
                                     minimumFractionDigits: 2
                                 })}
@@ -94,11 +101,11 @@ function Budget() {
                             })}</div>
                         </div>
                     </div>
-                    <div className='rounded-full border-8 border-primary w-full h-full absolute'></div>
+                    {/* <div className='rounded-full border-8 border-primary w-full h-full absolute background-image: conic'></div> */}
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <EditBudget budget={budget} setBudget={setBudget} />
+                <BudgetButton budget={budget} setBudget={setBudget} />
             </CardFooter>
         </Card>
     )

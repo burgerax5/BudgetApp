@@ -28,7 +28,7 @@ interface EditBudgetProps {
     setBudget: React.Dispatch<React.SetStateAction<Budget | null>>
 }
 
-const EditBudget: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
+const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     const $selectedDate = useStore(selectedDate)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,10 +61,8 @@ const EditBudget: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     }
 
     const handleOnSubmit = async () => {
-        if (budget && budget.id) // 
-            await editBudget()
-        else
-            await addBudget()
+        if (budget && budget.id) await editBudget()
+        else await addBudget()
     }
 
     useEffect(() => {
@@ -114,4 +112,4 @@ const EditBudget: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     )
 }
 
-export default EditBudget
+export default BudgetButton
