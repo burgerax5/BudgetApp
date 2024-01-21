@@ -59,18 +59,12 @@ function ExpensesTable() {
     }
 
     return (
-        // <div>
-        //     {expenses.map(expense => (
-        //         <div key={expense.id}>{expense.name}</div>
-        //     ))}
-        //     {token}
-        // </div>
         <Table>
             <TableCaption>A list of your recent spendings</TableCaption>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[100px]">Expense</TableHead>
-                    <TableHead>Category</TableHead>
+                    <TableHead>Expense</TableHead>
+                    <TableHead className="w-[150px]">Category</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
@@ -81,7 +75,9 @@ function ExpensesTable() {
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
                         <TableCell>{getDate(expense)}</TableCell>
-                        <TableCell className="text-right">${expense.amount}</TableCell>
+                        <TableCell className="text-right">${expense.amount.toLocaleString('default', {
+                            minimumFractionDigits: 2
+                        })}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

@@ -81,6 +81,7 @@ export function DialogButton() {
                     title: "Successfully added expense",
                     description: `${formData.name} $${formData.amount}`
                 })
+                location.replace('/')
             }
             else {
                 console.log('Failed to add expense')
@@ -149,7 +150,7 @@ export function DialogButton() {
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map(category => {
-                                    return <SelectItem onClick={() => console.log('hi')}
+                                    return <SelectItem key={category.id} onClick={() => console.log('hi')}
                                         value={`${category.id}`}
                                     >{category.name}</SelectItem>
                                 })}
