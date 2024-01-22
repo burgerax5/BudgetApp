@@ -17,8 +17,6 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent }) => {
     const remainingBudget = budget ? budget?.amount - spent : 0
     const remainingBudgetPercent = budget ? ((budget.amount - spent) / budget.amount) * 100 : 0
 
-
-
     const getProgress = (progress: number) => {
         return `radial-gradient(closest-side,transparent 79%,transparent 80% 100%), conic-gradient(hsl(var(--primary)) ${progress}%, hsl(var(--accent)) 0)`
     }
@@ -31,9 +29,11 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent }) => {
                 <div className='font-bold text-2xl z-10'>$
                     {budget ? (remainingBudget).toLocaleString('default', { minimumFractionDigits: 2 }) : (spent).toLocaleString('default', { minimumFractionDigits: 2 })}
                 </div>
-                {budget && <div className='text-sm opacity-70'>out of $
-                    {budget?.amount.toLocaleString('default', { minimumFractionDigits: 2 })}
-                </div>}
+                <div className='text-sm opacity-70'>
+                    {budget ?
+                        `out of ${budget?.amount.toLocaleString('default', { minimumFractionDigits: 2 })}`
+                        : 'spent this month'}
+                </div>
             </div>
         </div>
     )

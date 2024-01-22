@@ -25,7 +25,7 @@ export class BudgetService {
         })
     }
 
-    async checkBudgetEmpty(user_id: number, category_id: number, month: number | undefined, year: number): Promise<boolean> {
+    async checkBudgetEmpty(user_id: number, category_id: number | undefined, month: number | undefined, year: number): Promise<boolean> {
         // If there isn't already a budget set for the specified the category & date for the user
         const budget = await this.prisma.budget.findFirst({
             where: {
@@ -41,7 +41,7 @@ export class BudgetService {
 
     async addBudget(budget_details: {
         userId: number,
-        categoryId: number,
+        categoryId: number | undefined,
         amount: number,
         month: number | undefined,
         year: number
@@ -59,7 +59,7 @@ export class BudgetService {
 
     async editBudget(budget_id: number, budget_details: {
         userId: number,
-        categoryId: number,
+        categoryId: number | undefined,
         amount: number,
         month: number | undefined,
         year: number

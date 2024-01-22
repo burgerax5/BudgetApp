@@ -46,10 +46,10 @@ model Expense {
 
 // Define the Budget model
 model Budget {
-  id         Int      @id @default(autoincrement())
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  user       User     @relation(fields: [userId], references: [id])
+  id         Int       @id @default(autoincrement())
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  user       User      @relation(fields: [userId], references: [id])
   userId     Int
   amount     Float
   month      Int?

@@ -108,12 +108,12 @@ export class BudgetController {
 
             await this.budgetService.editBudget(budget_id, {
                 userId: user_id,
-                categoryId: budget.categoryId,
+                categoryId: budget.categoryId ? budget.categoryId : undefined,
                 amount: budget_amount,
                 month: budget.month ? budget.month : undefined,
                 year: budget.year
             })
-            res.status(200).send({ message: 'Succesfully edited budget.' })
+            res.status(200).send({ message: 'Successfully edited budget.' })
 
         } catch (error) {
             console.error('Error occured while editing budget', error)

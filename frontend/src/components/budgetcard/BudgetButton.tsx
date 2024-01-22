@@ -41,14 +41,14 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     }
 
     const addBudget = async () => {
-        await axios.put(
+        await axios.post(
             `/budget/add/`, {
             amount: newBudget,
             month: $selectedDate.getMonth() + 1,
             year: $selectedDate.getFullYear()
         }, { withCredentials: true }
         ).then(res => {
-            if (res.data.message === 'Succesfully added budget.')
+            if (res.data.message === 'Successfully added budget.')
                 location.replace('/')
         }).catch(err => {
             console.error('Failed to add budget:', err)
@@ -59,7 +59,7 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
         await axios.put(
             `/budget/edit/${budget?.id}`, { ...budget, amount: newBudget }, { withCredentials: true }
         ).then(res => {
-            if (res.data.message === 'Succesfully edited budget.')
+            if (res.data.message === 'Successfully edited budget.')
                 location.replace('/')
         }).catch(err => {
             console.error('Failed to edit budget:', err)
