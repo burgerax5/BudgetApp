@@ -1,7 +1,7 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import Calendar from "@/components/Calendar";
 
-import Budget from "@/components/Budget";
+import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/CategoriesCard";
 
 function Dashboard() {

@@ -30,19 +30,25 @@ interface EditBudgetProps {
 
 const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     const $selectedDate = useStore(selectedDate)
+    const [newBudget, setNewBudget] = useState<number>(0)
+
+    useEffect(() => {
+        setNewBudget(budget?.amount || 0)
+    }, [budget])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setBudget(prevBudget => {
-            if (prevBudget) return { ...prevBudget, amount: parseInt(e.target.value) }
-            else return prevBudget
-        })
+        setNewBudget(parseInt(e.target.value))
     }
 
     const addBudget = async () => {
         await axios.put(
-            `/budget/add/`, budget, { withCredentials: true }
+            `/budget/add/`, {
+            amount: newBudget,
+            month: $selectedDate.getMonth() + 1,
+            year: $selectedDate.getFullYear()
+        }, { withCredentials: true }
         ).then(res => {
-            if (res.data.message === 'Succesfully added budget')
+            if (res.data.message === 'Succesfully added budget.')
                 location.replace('/')
         }).catch(err => {
             console.error('Failed to add budget:', err)
@@ -51,37 +57,35 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
 
     const editBudget = async () => {
         await axios.put(
-            `/budget/edit/${budget?.id}`, budget, { withCredentials: true }
+            `/budget/edit/${budget?.id}`, { ...budget, amount: newBudget }, { withCredentials: true }
         ).then(res => {
-            if (res.statusText === 'Succesfully edited budget.')
+            if (res.data.message === 'Succesfully edited budget.')
                 location.replace('/')
         }).catch(err => {
             console.error('Failed to edit budget:', err)
         })
     }
 
-    const handleOnSubmit = async () => {
-        if (budget && budget.id) await editBudget()
-        else await addBudget()
+    const deleteBudget = async () => {
+        await axios.delete(
+            `/budget/delete/${budget?.id}`, { withCredentials: true }
+        ).then(res => {
+            if (res.data.message === 'Successfully deleted a budget.')
+                location.replace('/')
+        }).catch(err => {
+            console.error('Failed to delete budget:', err)
+        })
     }
 
-    useEffect(() => {
-        // const getBudgetForDate = async () => {
-        //     await axios.get(
-        //         `/budget/?month=${$selectedDate.getMonth() + 1}&year=${$selectedDate.getFullYear()}`,
-        //         { withCredentials: true }
-        //     ).then(res => {
-        //         if (res.data) setBudget(res.data.budgets[0])
-        //     }).catch(err => {
-        //         console.error('Error fetching budget details:', err)
-        //     })
-        // }
-    }, [])
+    const handleOnSubmit = async () => {
+        if (budget) await editBudget()
+        else await addBudget()
+    }
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Edit Budget</Button>
+                <Button variant="outline">{budget ? 'Edit Budget' : 'Add Budget'}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -99,7 +103,7 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
                             id="amount"
                             type="number"
                             className="col-span-3"
-                            value={budget ? budget.amount : 0}
+                            value={newBudget}
                             onChange={handleInputChange}
                         />
                     </div>

@@ -7,11 +7,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { DialogButton } from '@/components/ExpenseDialog'
 import axios from '@/api/axios'
-import BudgetButton from './BudgetButton'
+import BudgetButton from '@/components/budgetcard/BudgetButton'
 import { useStore } from '@nanostores/react'
 import { selectedDate } from '@/store/userStore'
+import BudgetCircularProgress from './BudgetCircularProgress'
 
 interface Budget {
     id: number,
@@ -61,9 +61,7 @@ function Budget() {
             ).then(res => {
                 const expenses: Expense[] = res.data.expenses
                 let sum = 0
-                expenses.map(expense => {
-                    sum += expense.amount
-                })
+                expenses.map(expense => sum += expense.amount)
                 setSpent(sum)
             }).catch(err => {
                 console.error('Error fetching expense data:', err)
@@ -74,34 +72,15 @@ function Budget() {
         spentThisMonth()
     }, [])
 
-
-    const getProgress = (progress: number) => {
-        return `radial-gradient(closest-side,transparent 79%,transparent 80% 100%), conic-gradient(hsl(var(--primary)) ${progress}%, hsl(var(--accent)) 0)`
-    }
-
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Budget</CardTitle>
-                <CardDescription>Your remaining budget this month</CardDescription>
+                <CardDescription>{budget ? 'Your remaining budget this month' : 'You do not have a budget set for this month.'}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className='rounded-full w-40 h-40 mx-auto relative'>
-                    <div className={`rounded-full w-full h-full absolute flex items-center justify-center`}
-                        style={{ backgroundImage: getProgress(budget ? ((budget.amount - spent) / budget.amount) * 100 : 0) }}>
-                        <div className='flex flex-col items-center justify-center'>
-                            <div className='bg-background w-36 h-36 absolute rounded-full'></div>
-                            <div className='font-bold text-2xl z-10'>$
-                                {budget?.amount && (budget?.amount - spent).toLocaleString('default', {
-                                    minimumFractionDigits: 2
-                                })}
-                            </div>
-                            <div className='text-sm opacity-70'>out of ${budget?.amount.toLocaleString('default', {
-                                minimumFractionDigits: 2
-                            })}</div>
-                        </div>
-                    </div>
-                    {/* <div className='rounded-full border-8 border-primary w-full h-full absolute background-image: conic'></div> */}
+                    <BudgetCircularProgress budget={budget} spent={spent} />
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>

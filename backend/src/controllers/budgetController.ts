@@ -73,7 +73,7 @@ export class BudgetController {
 
                 res.status(200).json({
                     'succcess': true,
-                    'message': 'Successfully added budget',
+                    'message': 'Successfully added budget.',
                     'budget': budget
                 })
             }
@@ -113,7 +113,7 @@ export class BudgetController {
                 month: budget.month ? budget.month : undefined,
                 year: budget.year
             })
-            res.status(200).send('Succesfully edited budget.')
+            res.status(200).send({ message: 'Succesfully edited budget.' })
 
         } catch (error) {
             console.error('Error occured while editing budget', error)
@@ -139,7 +139,7 @@ export class BudgetController {
                 throw new Error('User id does not match owner of budget id')
 
             await this.budgetService.deleteBudget(budget_id)
-            res.status(200).send('Successfully deleted a budget.')
+            res.status(200).send({ message: 'Successfully deleted a budget.' })
 
         } catch (error) {
             console.error('An error occurred while deleting a budget', error)
