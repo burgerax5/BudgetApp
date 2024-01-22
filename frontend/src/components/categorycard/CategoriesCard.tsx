@@ -10,12 +10,13 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useState, useEffect } from "react"
-import ProgressBar from "./ProgressBar"
+import ProgressBar from "../ProgressBar"
+import { Button } from "../ui/button"
+import { CategoryBudgetButton } from "./CategoryBudgetButton"
 
 interface Category {
     id: number,
-    name: string,
-    colour: string
+    name: string
 }
 
 interface Expense {
@@ -125,9 +126,9 @@ function CategoriesCard() {
                     })}
                 </div>
             </CardContent>
-            {/* <CardFooter className='justify-end'>
-                <DialogButton />
-            </CardFooter> */}
+            <CardFooter className='justify-end'>
+                <CategoryBudgetButton categories={categories} />
+            </CardFooter>
         </Card>
     )
 }

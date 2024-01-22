@@ -10,7 +10,7 @@ import {
 import axios from '@/api/axios'
 import BudgetButton from '@/components/budgetcard/BudgetButton'
 import { useStore } from '@nanostores/react'
-import { selectedDate } from '@/store/userStore'
+import { selectedDate, budgetByDate } from '@/store/userStore'
 import BudgetCircularProgress from './BudgetCircularProgress'
 
 interface Budget {
@@ -38,6 +38,7 @@ function Budget() {
     const [budget, setBudget] = useState<Budget | null>(null)
     const [spent, setSpent] = useState<number>(0)
     const $selectedDate = useStore(selectedDate)
+    const $budgetByDate = useStore(budgetByDate)
 
     useEffect(() => {
         const getBudget = async () => {
@@ -46,8 +47,10 @@ function Budget() {
                 `/budget/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
                 { withCredentials: true }
             ).then(res => {
-                if (res.data)
+                if (res.data) {
                     setBudget(res.data.budgets[0])
+                    budgetByDate.set(res.data.budgets[0])
+                }
             }).catch(err => {
                 console.error('Error fetching budget data:', err)
             })
