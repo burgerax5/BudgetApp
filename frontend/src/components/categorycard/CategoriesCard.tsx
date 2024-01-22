@@ -127,7 +127,7 @@ function CategoriesCard() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <CategoryBudgetButton categories={categories} />
+                <CategoryBudgetButton categories={categories} budgetByCategory={budgetByCategory} />
             </CardFooter>
         </Card>
     )
