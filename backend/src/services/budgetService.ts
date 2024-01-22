@@ -9,6 +9,49 @@ export class BudgetService {
         this.prisma = prisma
     }
 
+    async checkMonthBudgetSums(user_id: number, amount: number, month: number | undefined, year: number): Promise<boolean> {
+        const budgets = await this.prisma.budget.findMany({
+            where: { userId: user_id, month, year }
+        })
+
+        let monthsBudgetSums = { categories: 0, total: 0 }
+
+        budgets.map(budget => {
+            if (budget.month && !budget.categoryId) // Month total budget
+                monthsBudgetSums.total = budget.amount
+
+            if (budget.month && budget.categoryId) // Months budget for a category
+                monthsBudgetSums.categories += budget.amount
+        })
+
+        return monthsBudgetSums.categories + amount <= monthsBudgetSums.total
+    }
+
+    async checkYearBudgetSums(user_id: number, amount: number, month: number | undefined, year: number) {
+        const budgets = await this.prisma.budget.findMany({
+            where: { userId: user_id, year }
+        })
+
+        let yearBudgetSums = { categories: 0, months: 0, total: 0 }
+
+        budgets.map(budget => {
+            if (!budget.month && !budget.categoryId) // Year total budget
+                yearBudgetSums.total = budget.amount
+
+            if (!budget.month && budget.categoryId) // Years budget for a category
+                yearBudgetSums.categories += budget.amount
+
+            if (budget.month && !budget.categoryId) // Years budget for a month
+                yearBudgetSums.months += budget.amount
+        })
+
+        if (month) yearBudgetSums.months += amount
+        else yearBudgetSums.categories += amount
+
+        if (month) return yearBudgetSums.months <= yearBudgetSums.total // If we're adding a monthly budget
+        return yearBudgetSums.categories <= yearBudgetSums.total // If we're adding a category budget
+    }
+
     async getAllBudgets(): Promise<Budget[]> {
         return await this.prisma.budget.findMany()
     }
@@ -50,6 +93,9 @@ export class BudgetService {
 
         // Make sure there isn't a budget for the user with the same date & category
         const budgetExists = await this.checkBudgetEmpty(userId, categoryId, month, year)
+        // Make sure that the sum of the budget categories of the month doesn't exceed the budget for the month
+        // const withinBudget = await this.checkMonthBudgetSums(userId, amount, month, year)
+
         if (!budgetExists) {
             return await this.prisma.budget.create({
                 data: budget_details

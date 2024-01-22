@@ -56,6 +56,73 @@ describe('Test adding budgets', () => {
     afterAll(async () => cleanUp(prisma))
 })
 
+describe('if the sum exceeds the monthly or yearly budget return false', () => {
+    let userService: UserService
+    let categoryService: CategoryService
+    let budgetService: BudgetService
+
+    beforeEach(async () => {
+        userService = new UserService(prisma)
+        categoryService = new CategoryService(prisma)
+        budgetService = new BudgetService(prisma)
+
+        await resetTables(prisma)
+
+        await jestRegister('bob', 'password123', userService)
+        await categoryService.populate_categories()
+    })
+
+    it('should return false if the months category budget will be exceed the monthly budget', async () => {
+        // Get Jan 2024 total budget to be $50
+        await budgetService.addBudget({ userId: 1, categoryId: undefined, amount: 50, month: 1, year: 2024 })
+
+        // If we want to add a budget for a category that exceeds $50 then it should return false
+        const withinBudget = await budgetService.checkMonthBudgetSums(1, 50.50, 1, 2024)
+        expect(withinBudget).toBeFalsy()
+    })
+
+    it('should correctly sum up the budgets of the category then compare with the monthly budget', async () => {
+        // Get Jan 2024 total budget to be $50
+        await budgetService.addBudget({ userId: 1, categoryId: undefined, amount: 60, month: 1, year: 2024 })
+
+        // Entertainment budget of $49.99
+        await budgetService.addBudget(budget_details)
+
+        // It should allow for another budget of $0.01
+        const withinBudget = await budgetService.checkMonthBudgetSums(1, 0.01, 1, 2024)
+        expect(withinBudget).toBeTruthy()
+        await budgetService.addBudget({ ...budget_details, categoryId: 1, amount: 0.01 })
+
+        // It should not allow anymore budgets to be added as it will exceed the monthly budget
+        const withinBudget2 = await budgetService.checkMonthBudgetSums(1, 0.01, 3, 2024)
+        expect(withinBudget2).toBeFalsy()
+    })
+
+    it('should return false if the montlhy budgets exceeds the yearly budget', async () => {
+        // Get 2024 total budget to be $50
+        await budgetService.addBudget({ userId: 1, categoryId: undefined, amount: 50, month: undefined, year: 2024 })
+
+        // January budget to be $51
+        const withinBudget = await budgetService.checkYearBudgetSums(1, 51, 1, 2024)
+        expect(withinBudget).toBeFalsy()
+    })
+
+    it('Yearly category budgets', async () => {
+        // Get 2024 budget to be $50
+        await budgetService.addBudget({ userId: 1, categoryId: undefined, amount: 50, month: undefined, year: 2024 })
+
+        // Add 2024 entertainment budget
+        await budgetService.addBudget({ userId: 1, categoryId: 2, amount: 25, month: undefined, year: 2024 })
+
+        // Add 2024 food & drink budget
+        const withinBudget1 = await budgetService.checkYearBudgetSums(1, 26, undefined, 2024)
+        expect(withinBudget1).toBeFalsy()
+
+        const withinBudget2 = await budgetService.checkYearBudgetSums(1, 25, undefined, 2024)
+        expect(withinBudget2).toBeTruthy()
+    })
+})
+
 describe('Test editing & deleting budgets for a user', () => {
     let userService: UserService
     let categoryService: CategoryService
