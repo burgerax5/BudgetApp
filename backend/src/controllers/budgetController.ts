@@ -71,6 +71,9 @@ export class BudgetController {
                     year
                 })
 
+                if (!budget)
+                    return res.status(400).send('Failed to add budget due to parent budget being exceeded.')
+
                 res.status(200).json({
                     'succcess': true,
                     'message': 'Successfully added budget.',
