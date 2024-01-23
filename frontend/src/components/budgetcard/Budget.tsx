@@ -43,13 +43,20 @@ function Budget() {
     useEffect(() => {
         const getBudget = async () => {
             const date = $selectedDate
+            const month = date.getMonth() + 1
+            const year = date.getFullYear()
+
             await axios.get(
-                `/budget/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
+                `/budget/?month=${month}&year=${year}`,
                 { withCredentials: true }
             ).then(res => {
                 if (res.data) {
-                    setBudget(res.data.budgets[0])
-                    budgetByDate.set(res.data.budgets[0])
+                    res.data.budgets.map(b => {
+                        if (b.month === month && b.year === year && !b.categoryId) {
+                            setBudget(b)
+                            budgetByDate.set(b)
+                        }
+                    })
                 }
             }).catch(err => {
                 console.error('Error fetching budget data:', err)

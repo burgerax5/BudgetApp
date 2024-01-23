@@ -38,7 +38,7 @@ interface Budget {
 
 interface Props {
     categories: Category[],
-    budgetByCategory: number[]
+    budgetByCategory: number[],
 }
 
 export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCategory }) => {
@@ -47,8 +47,8 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const [newBudgetByCategory, setNewBudgetByCategory] = useState(budgetByCategory)
     const [error, setError] = useState<string | null>(null)
     const [remaining, setRemaining] = useState<number>($budgetByDate ?
-        $budgetByDate.amount - budgetByCategory.reduce((prev, curr) => prev + curr)
-        : 0)
+        $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0
+    )
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,9 +67,12 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     }, [remaining])
 
     useEffect(() => {
+        setNewBudgetByCategory(budgetByCategory)
+    }, [budgetByCategory])
+
+    useEffect(() => {
         setRemaining($budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0)
     }, [newBudgetByCategory, $budgetByDate])
-
 
     const getCategoryBudget = async (index: number): Promise<Budget | null> => {
         const res = await axios.get(
@@ -118,6 +121,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         }
     }
 
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -144,7 +148,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                             setSelectedCategory(parseInt(value))
                         }}>
                             <SelectTrigger className="w-[180px] col-span-3">
-                                <SelectValue placeholder="Select Category" />
+                                <SelectValue placeholder={selectedCategory ? categories[selectedCategory].name : "Select Category"} />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((category, i) => (
