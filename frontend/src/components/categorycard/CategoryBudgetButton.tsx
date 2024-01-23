@@ -27,6 +27,15 @@ interface Category {
     name: string
 }
 
+interface Budget {
+    id: number,
+    userId: number,
+    categoryId: number,
+    amount: number,
+    month: number,
+    year: number
+}
+
 interface Props {
     categories: Category[],
     budgetByCategory: number[]
@@ -63,10 +72,51 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         setRemaining($budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0)
     }, [newBudgetByCategory, $budgetByDate])
 
-    const handleOnSubmit = async () => {
+
+    const getCategoryBudget = async (index: number): Promise<Budget | null> => {
+        const res = await axios.get(
+            `/budget/?month=${$selectedDate.getMonth() + 1}&year=${$selectedDate.getFullYear()}&categoryId=${index + 1}`,
+            { withCredentials: true }
+        )
+        return res.data.budgets[0]
+    }
+
+    const editCategoryBudget = async (index: number) => {
+        const budget = await getCategoryBudget(index)
+        if (budget) {
+            await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: newBudgetByCategory[index] }, { withCredentials: true })
+                .then(res => {
+                    if (res.data.message === 'Successfully edited budget.')
+                        location.replace('/')
+                }).catch(err => {
+                    console.error('Failed to edit category budget:', err)
+                })
+        }
+    }
+
+    const addCategoryBudget = async (index: number) => {
+        await axios.post('/budget/add/', {
+            month: $selectedDate.getMonth() + 1,
+            year: $selectedDate.getFullYear(),
+            categoryId: index + 1,
+            amount: newBudgetByCategory[index]
+        }, { withCredentials: true })
+            .then(res => {
+                if (res.data.message === 'Successfully added budget.')
+                    location.replace('/')
+            }).catch(err => {
+                console.error('Failed to add category expense:', err)
+            })
+    }
+
+    const handleOnSubmit = () => {
         if (!error) {
-            console.log('UPDATED!')
-            // await axios.post('/budget/add', )
+            for (let i = 0; i < budgetByCategory.length; i++) {
+                if (budgetByCategory[i] && newBudgetByCategory[i])
+                    editCategoryBudget(i)
+                else if (!budgetByCategory[i] && newBudgetByCategory[i])
+                    addCategoryBudget(i)
+            }
         }
     }
 
@@ -100,9 +150,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((category, i) => (
-                                    <>
-                                        <SelectItem value={i.toString()}>{category.name}</SelectItem>
-                                    </>
+                                    <SelectItem key={`select-item-${i}`} value={i.toString()}>{category.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -122,7 +170,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                             </>}
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter key={crypto.randomUUID()}>
                     <Button onClick={handleOnSubmit} type="submit">Save changes</Button>
                 </DialogFooter>
             </DialogContent>

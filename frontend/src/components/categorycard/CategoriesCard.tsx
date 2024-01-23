@@ -9,6 +9,8 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { selectedDate } from "@/store/userStore"
+import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
 import ProgressBar from "../ProgressBar"
 import { Button } from "../ui/button"
@@ -28,32 +30,14 @@ interface Expense {
     amount: number
 }
 
-interface expenseCategory {
+interface keyNumber {
     [key: string]: number
-    // 'FoodDrink': number,
-    // 'Entertianment': number,
-    // "Transportation": number,
-    // "Health": number,
-    // "Education": number,
-    // "Housing": number,
-    // "Utilities": number,
-    // "Insurance": number,
-    // "DebtRepayment": number,
-    // "Clothing": number,
-    // "Miscellaneous": number,
 }
 
 function CategoriesCard() {
-    let defaultThing: number[] = []
-    for (let i = 0; i < 12; i++) {
-        defaultThing.push(0)
-    }
-
-    const [categories, setCategories] = useState<Category[]>([])
-    const [expenses, setExpenses] = useState<Expense[]>([])
-    const [expensesByCategory, setExpensesByCategory] = useState<expenseCategory>({
+    const defaultCategoryValue: keyNumber = {
         'Food & Drink': 0,
-        'Entertianment': 0,
+        'Entertainment': 0,
         "Transportation": 0,
         "Health": 0,
         "Education": 0,
@@ -63,10 +47,23 @@ function CategoriesCard() {
         "Debt Repayment": 0,
         "Clothing": 0,
         "Miscellaneous": 0,
-    })
+    }
+
+    let defaultThing: number[] = []
+    for (let i = 0; i < 12; i++) {
+        defaultThing.push(0)
+    }
+    const $selectedDate = useStore(selectedDate)
+    const [categories, setCategories] = useState<Category[]>([])
+    const [expenses, setExpenses] = useState<Expense[]>([])
+    const [expensesByCategory, setExpensesByCategory] = useState<keyNumber>(defaultCategoryValue)
     const [budgetByCategory, setBudgetByCategory] = useState(defaultThing)
 
-
+    const getCategoryNameFromId = (id: number) => {
+        return categories.find(category => {
+            if (category.id === id) return category
+        })
+    }
 
     useEffect(() => {
         const getCategories = async () => {
@@ -76,8 +73,8 @@ function CategoriesCard() {
         }
 
         const getExpenses = async () => {
-            const res = await axios.get('/expense/', { withCredentials: true })
-            if (res.data)
+            const res = await axios.get(`/expense/?month=${$selectedDate.getMonth() + 1}&year=${$selectedDate.getFullYear()}`, { withCredentials: true })
+            if (res.data.expenses)
                 setExpenses(res.data.expenses)
         }
 
@@ -85,10 +82,14 @@ function CategoriesCard() {
             const month = new Date().getMonth() + 1
             const year = new Date().getFullYear()
             const res = await axios.get(`/budget/?month=${month}&year=${year}&categoryId=${categoryId}`, { withCredentials: true })
-            if (res.data.budgets[0])
-                setBudgetByCategory(b => {
-                    return b.map((value, i) => ((i === categoryId) ? res.data.budgets[0].amount : 0))
-                })
+
+            if (!res.data.budgets[0]) return
+
+            setBudgetByCategory(b => {
+                return b.map((value, i) =>
+                    (i === categoryId - 1) ? res.data.budgets[0].amount : value
+                )
+            })
         }
 
         getCategories()
@@ -99,13 +100,18 @@ function CategoriesCard() {
     }, [])
 
     useEffect(() => {
-        let newExpenseByCategory: Record<string, number> = expensesByCategory
-        Object.entries(expensesByCategory).forEach(([key, index]: [string, number]) => {
+        setExpensesByCategory(prevExpenseByCategory => {
+            let defaultExpenses = defaultCategoryValue
             expenses.map(exp => {
-                exp.categoryId === index ? newExpenseByCategory[key] + exp.amount : 0
+                const category = getCategoryNameFromId(exp.categoryId)
+                if (category)
+                    defaultExpenses[category.name] += exp.amount
             })
+            return defaultExpenses
         })
     }, [expenses])
+
+    console.log(budgetByCategory)
 
     return (
         <Card className='h-full'>
@@ -116,12 +122,20 @@ function CategoriesCard() {
             <CardContent>
                 <div className="grid items-center gap-3">
                     {categories.map((category, i) => {
+                        const progress = budgetByCategory[i] ? (expensesByCategory[category.name] / budgetByCategory[i]) * 100 : 0
+                        console.log(progress)
+
                         return <div key={category.id} className='text-sm'>
                             <div className='flex justify-between items-center'>
                                 <div>{category.name}</div>
-                                <div className='opacity-70'>{budgetByCategory[i]}</div>
+                                <div className='opacity-70'>
+                                    ${expensesByCategory[category.name].toFixed(2)}
+                                    <span className="text-slate-50">
+                                        {budgetByCategory[i] && ` / $${(budgetByCategory[i]).toFixed(2)}`}
+                                    </span>
+                                </div>
                             </div>
-                            <ProgressBar percentage={budgetByCategory[i] > 0 ? expensesByCategory[category.name] : 0} />
+                            <ProgressBar percentage={progress} />
                         </div>
                     })}
                 </div>

@@ -9,6 +9,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ percentage }) => {
     const [progress, setProgress] = useState(0)
 
     useEffect(() => {
+        console.log(percentage)
         const timer = setTimeout(() => setProgress(percentage), 500)
         return () => clearTimeout(timer)
     }, [])

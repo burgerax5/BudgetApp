@@ -8,9 +8,7 @@ function Dashboard() {
     return (
         <>
             {/* <!-- Top --> */}
-            <div
-                className="flex items-center mt-3 flex-col justify-center gap-3 sm:flex-row sm:justify-between"
-            >
+            <div className="flex items-center mt-3 flex-col justify-center gap-3 sm:flex-row sm:justify-between">
                 <h1 className="text-center sm:text-left text-2xl font-bold">
                     Dashboard
                 </h1>
@@ -28,7 +26,7 @@ function Dashboard() {
                 </div>
 
                 {/* <!-- Right side --> */}
-                <div></div>
+                {/* <div></div> */}
             </div>
         </>
     )
