@@ -61,8 +61,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         })
     }
 
-    console.log(selectedCategory)
-
     useEffect(() => {
         if (remaining < 0) setError("Exceeded this month's budget")
         else setError(null)

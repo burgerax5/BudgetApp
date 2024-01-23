@@ -111,8 +111,6 @@ function CategoriesCard() {
         })
     }, [expenses])
 
-    console.log(budgetByCategory)
-
     return (
         <Card className='h-full'>
             <CardHeader>
@@ -123,7 +121,6 @@ function CategoriesCard() {
                 <div className="grid items-center gap-3">
                     {categories.map((category, i) => {
                         const progress = budgetByCategory[i] ? (expensesByCategory[category.name] / budgetByCategory[i]) * 100 : 0
-                        console.log(progress)
 
                         return <div key={category.id} className='text-sm'>
                             <div className='flex justify-between items-center'>
