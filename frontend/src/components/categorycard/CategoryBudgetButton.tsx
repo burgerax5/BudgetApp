@@ -14,6 +14,13 @@ import { Label } from "@/components/ui/label"
 import { useStore } from '@nanostores/react'
 import { selectedDate, budgetByDate } from '@/store/userStore'
 import axios from '@/api/axios'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface Category {
     id: number,
@@ -33,14 +40,19 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const [remaining, setRemaining] = useState<number>($budgetByDate ?
         $budgetByDate.amount - budgetByCategory.reduce((prev, curr) => prev + curr)
         : 0)
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
+
         setNewBudgetByCategory(prevBudgetByCategory => {
             const index = parseInt(id)
-            return prevBudgetByCategory.slice(0, index).concat(parseInt(value)).concat(prevBudgetByCategory.slice(index + 1))
+            const amount = parseFloat(value) || 0
+            return prevBudgetByCategory.slice(0, index).concat(amount).concat(prevBudgetByCategory.slice(index + 1))
         })
     }
+
+    console.log(selectedCategory)
 
     useEffect(() => {
         if (remaining < 0) setError("Exceeded this month's budget")
@@ -51,8 +63,11 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         setRemaining($budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0)
     }, [newBudgetByCategory, $budgetByDate])
 
-    const handleOnSubmit = () => {
-        if (!error) console.log(newBudgetByCategory)
+    const handleOnSubmit = async () => {
+        if (!error) {
+            console.log('UPDATED!')
+            // await axios.post('/budget/add', )
+        }
     }
 
     return (
@@ -74,20 +89,37 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                 </div>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
-                        {categories.map((category, i) => (
+                        <Label className="text-right">
+                            Category
+                        </Label>
+                        <Select onValueChange={(value) => {
+                            setSelectedCategory(parseInt(value))
+                        }}>
+                            <SelectTrigger className="w-[180px] col-span-3">
+                                <SelectValue placeholder="Select Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories.map((category, i) => (
+                                    <>
+                                        <SelectItem value={i.toString()}>{category.name}</SelectItem>
+                                    </>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {selectedCategory !== null &&
                             <>
-                                <Label htmlFor="name" className="text-right">
-                                    {category.name}
+                                <Label className="text-right">
+                                    Amount
                                 </Label>
                                 <Input
-                                    id={i.toString()}
+                                    id={selectedCategory.toString()}
                                     type="number"
                                     className="col-span-3"
-                                    value={newBudgetByCategory[i]}
+                                    value={newBudgetByCategory[selectedCategory].toString()}
+                                    placeholder="0"
                                     onChange={handleInputChange}
                                 />
-                            </>
-                        ))}
+                            </>}
                     </div>
                 </div>
                 <DialogFooter>
