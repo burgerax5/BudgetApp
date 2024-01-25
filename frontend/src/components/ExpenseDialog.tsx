@@ -27,6 +27,8 @@ import {
 import { Calendar as CalendarIcon } from "lucide-react"
 import { Calendar } from "./ui/calendar"
 import { useToast } from "./ui/use-toast"
+import { expenses } from "@/store/userStore"
+import { useStore } from "@nanostores/react"
 
 interface Category {
     id: number,
@@ -54,6 +56,7 @@ export function DialogButton() {
         year: new Date().getFullYear()
     })
     const [error, setError] = useState<string | null>(null)
+    const $expenses = useStore(expenses)
     const { toast } = useToast()
 
     const verifyFormData = (): boolean => {
@@ -75,8 +78,7 @@ export function DialogButton() {
         console.log('Form Data: ', formData)
         if (verifyFormData()) {
             const res = await axios.post('/expense/add', { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
-            if (res.data) {
-                console.log('Added expense')
+            if (res.data.expense) {
                 toast({
                     title: "Successfully added expense",
                     description: `${formData.name} $${formData.amount}`
@@ -84,7 +86,6 @@ export function DialogButton() {
                 location.replace('/')
             }
             else {
-                console.log('Failed to add expense')
                 toast({
                     title: "Failed to add expense",
                     description: `Bruh`

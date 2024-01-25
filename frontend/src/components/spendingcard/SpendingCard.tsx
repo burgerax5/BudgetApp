@@ -2,9 +2,9 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
+    CardFooter
 } from "@/components/ui/card"
 import ExpensesTable from '../ExpensesTable'
 import { Button } from "../ui/button"
@@ -14,19 +14,18 @@ const SpendingCard = () => {
         <Card>
             <CardHeader>
                 <CardTitle>
-                    <div className="flex items-center justify-between">
-                        Spendings
-                        <Button variant="outline" className="font-bold" asChild>
-                            <a href="/expenses">View More...</a>
-                        </Button>
-                    </div>
+                    Spendings
                 </CardTitle>
                 <CardDescription>Your recent expenses</CardDescription>
             </CardHeader>
             <CardContent>
                 <ExpensesTable take={5} />
             </CardContent>
-
+            <CardFooter>
+                <Button variant="outline" className="ml-auto font-bold" asChild>
+                    <a href="/expenses">View More...</a>
+                </Button>
+            </CardFooter>
         </Card>
     )
 }

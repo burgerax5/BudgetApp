@@ -13,7 +13,6 @@ import { selectedDate } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
 import ProgressBar from "../ProgressBar"
-import { Button } from "../ui/button"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
 
 interface Category {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
 import { Menu, X } from "lucide-react";
-import { Button, buttonVariants } from "./ui/button";
+import { Button } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/store/userStore";
@@ -32,7 +32,6 @@ function Navbar() {
             deleteCookie('username')
             deleteCookie('user_id')
             deleteCookie('refresh-token')
-            location.replace('/')
         }
         // Token expired
         else if (res.status === 401) {
@@ -66,7 +65,7 @@ function Navbar() {
                     <Input type="text" placeholder="Search..." />
                     {$isLoggedIn ?
                         <Button onClick={handleLogout}>
-                            Logout
+                            <a href="/">Logout</a>
                         </Button> :
                         <>
                             <Button variant="outline" asChild>
@@ -82,7 +81,7 @@ function Navbar() {
                 <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
                 {$isLoggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
                 {$isLoggedIn ?
-                    <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout}>Logout</a>
+                    <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout} href="/">Logout</a>
                     :
                     <>
                         <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/login">Login</a>

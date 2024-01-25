@@ -189,7 +189,9 @@ export class ExpenseController {
         if (!isNaN(parseInt(category as string, 10)))
             where.categoryId = parseInt(category as string, 10)
 
-        const expenses = await this.expenseService.getExpenseByParams(where, take ? parseInt(take as string, 10) : undefined)
+        const expenses = await this.expenseService.getExpenseByParams(
+            where,
+            take ? parseInt(take as string, 10) : undefined)
         res.json({ expenses })
     }
 }

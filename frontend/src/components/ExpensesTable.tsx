@@ -5,7 +5,6 @@ import { expenses } from '@/store/userStore'
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -46,6 +45,8 @@ const ExpensesTable: React.FC<Props> = ({ take }) => {
         getExpenses()
     }, [])
 
+    console.log($expenses)
+
     const getExpenses = async () => {
         const res = await axios.get(`/expense/${take ? `?take=${take}` : ``}`, { withCredentials: true })
         if (res.data) expenses.set(res.data.expenses)
@@ -68,7 +69,7 @@ const ExpensesTable: React.FC<Props> = ({ take }) => {
             </TableHeader>
             <TableBody>
                 {$expenses.map(expense => (
-                    <TableRow>
+                    <TableRow key={crypto.randomUUID()}>
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
                         <TableCell>{getDate(expense)}</TableCell>
