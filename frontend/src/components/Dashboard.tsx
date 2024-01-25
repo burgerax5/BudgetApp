@@ -1,18 +1,12 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import DatePicker from "@/components/datepicker/DatePicker";
-import { useStore } from "@nanostores/react";
-import { selectedDate } from "@/store/userStore";
-import { useEffect } from "react";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
+import OverviewCard from "./overviewcard/OverviewCard";
+import SpendingCard from "./spendingcard/SpendingCard";
 
 function Dashboard() {
-    const $selectedDate = useStore(selectedDate)
-    useEffect(() => {
-        console.log($selectedDate)
-    }, [$selectedDate])
-
     return (
         <>
             {/* <!-- Top --> */}
@@ -26,15 +20,18 @@ function Dashboard() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row mt-5">
+            <div className="flex flex-col sm:flex-row mt-5 gap-3.5">
                 {/* <!-- Left side --> */}
-                <div className="flex flex-col gap-3.5 w-96">
+                <div className="flex flex-col gap-3.5 max-w-96 w-full mx-auto">
                     <Budget />
                     <CategoriesCard />
                 </div>
 
                 {/* <!-- Right side --> */}
-                {/* <div></div> */}
+                <div className="flex flex-col gap-3.5 w-full">
+                    <OverviewCard />
+                    <SpendingCard />
+                </div>
             </div>
         </>
     )

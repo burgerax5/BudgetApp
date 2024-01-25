@@ -34,9 +34,10 @@ export class ExpenseService {
         month?: number,
         year?: number,
         categoryId?: number,
-    }): Promise<Expense[]> {
+    }, take: number | undefined): Promise<Expense[]> {
         return this.prisma.expense.findMany({
-            where
+            where,
+            take
         })
     }
 

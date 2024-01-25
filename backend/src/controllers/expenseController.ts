@@ -169,7 +169,7 @@ export class ExpenseController {
     }
 
     async getExpenseByParams(req: Request, res: Response): Promise<void> {
-        const { search, month, year, category } = req.query
+        const { search, month, year, category, take } = req.query
         const user = await this.getUserFromRequest(req)
 
         if (!user)
@@ -189,7 +189,7 @@ export class ExpenseController {
         if (!isNaN(parseInt(category as string, 10)))
             where.categoryId = parseInt(category as string, 10)
 
-        const expenses = await this.expenseService.getExpenseByParams(where)
+        const expenses = await this.expenseService.getExpenseByParams(where, take ? parseInt(take as string, 10) : undefined)
         res.json({ expenses })
     }
 }

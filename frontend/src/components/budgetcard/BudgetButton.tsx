@@ -33,10 +33,6 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
     const [newBudget, setNewBudget] = useState<number>(0)
 
     useEffect(() => {
-        console.log($selectedDate)
-    }, [$selectedDate])
-
-    useEffect(() => {
         setNewBudget(budget?.amount || 0)
     }, [budget])
 

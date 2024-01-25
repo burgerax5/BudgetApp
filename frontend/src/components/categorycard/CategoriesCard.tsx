@@ -125,14 +125,14 @@ function CategoriesCard() {
                         return <div key={category.id} className='text-sm'>
                             <div className='flex justify-between items-center'>
                                 <div>{category.name}</div>
-                                <div className='opacity-70'>
+                                <div>
                                     ${expensesByCategory[category.name].toFixed(2)}
-                                    <span className="text-slate-50">
-                                        {budgetByCategory[i] && ` / $${(budgetByCategory[i]).toFixed(2)}`}
-                                    </span>
+                                    {budgetByCategory[i] && <span className="opacity-70">
+                                        {` out of $${(budgetByCategory[i]).toFixed(2)}`}
+                                    </span>}
                                 </div>
                             </div>
-                            <ProgressBar percentage={progress} />
+                            <ProgressBar percentage={progress >= 0 && progress <= 100 ? progress : 100} />
                         </div>
                     })}
                 </div>

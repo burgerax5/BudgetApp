@@ -12,3 +12,4 @@ interface Budget {
 export const isLoggedIn = atom(false)
 export const selectedDate = atom(new Date())
 export const budgetByDate = atom<Budget | null>(null)
+export const expenses = atom([])
