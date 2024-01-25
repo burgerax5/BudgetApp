@@ -12,7 +12,6 @@ const Protect: React.FC<HelpProps> = ({ mustBeAuthenticated }) => {
     useEffect(() => {
         if ($isLoggedIn && !mustBeAuthenticated) location.replace('/')
         if (!$isLoggedIn && mustBeAuthenticated) location.replace('/login')
-        console.log($isLoggedIn)
     }, [])
 
     return (

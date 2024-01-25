@@ -1,5 +1,5 @@
 import { DialogButton } from "@/components/ExpenseDialog";
-import Calendar from "@/components/Calendar";
+import DatePicker from "@/components/datepicker/DatePicker";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
@@ -13,7 +13,7 @@ function Dashboard() {
                     Dashboard
                 </h1>
                 <div className="flex items-center gap-3.5">
-                    <Calendar />
+                    <DatePicker />
                     <DialogButton />
                 </div>
             </div>

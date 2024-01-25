@@ -86,10 +86,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         const budget = await getCategoryBudget(index)
         if (budget) {
             await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: newBudgetByCategory[index] }, { withCredentials: true })
-                .then(res => {
-                    if (res.data.message === 'Successfully edited budget.')
-                        location.replace('/')
-                }).catch(err => {
+                .catch(err => {
                     console.error('Failed to edit category budget:', err)
                 })
         }
@@ -102,10 +99,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
             categoryId: index + 1,
             amount: newBudgetByCategory[index]
         }, { withCredentials: true })
-            .then(res => {
-                if (res.data.message === 'Successfully added budget.')
-                    location.replace('/')
-            }).catch(err => {
+            .catch(err => {
                 console.error('Failed to add category expense:', err)
             })
     }
@@ -113,11 +107,14 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const handleOnSubmit = () => {
         if (!error) {
             for (let i = 0; i < budgetByCategory.length; i++) {
+                console.log(budgetByCategory[i], newBudgetByCategory[i])
                 if (budgetByCategory[i] && newBudgetByCategory[i])
                     editCategoryBudget(i)
                 else if (!budgetByCategory[i] && newBudgetByCategory[i])
                     addCategoryBudget(i)
             }
+
+            location.replace('/')
         }
     }
 
