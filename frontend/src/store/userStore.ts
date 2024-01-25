@@ -9,7 +9,16 @@ interface Budget {
     year: number
 }
 
+interface Expense {
+    name: string,
+    categoryId: number,
+    amount: number,
+    day: number,
+    month: number,
+    year: number
+}
+
 export const isLoggedIn = atom(false)
 export const selectedDate = atom(new Date())
 export const budgetByDate = atom<Budget | null>(null)
-export const expenses = atom([])
+export const expenses = atom<Expense[]>([])

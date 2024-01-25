@@ -1,5 +1,7 @@
 import axios from '@/api/axios'
 import { useState, useEffect } from 'react'
+import { useStore } from '@nanostores/react'
+import { expenses } from '@/store/userStore'
 import {
     Table,
     TableBody,
@@ -19,38 +21,34 @@ interface expenseDetails {
     year: number
 }
 
-interface resDetails {
-    username: string,
-    user_id: number,
-    refreshToken: string
+enum Category {
+    "Food & Drink" = 1,
+    Entertainment,
+    Transportation,
+    Health,
+    Education,
+    Housing,
+    Utilities,
+    Insurance,
+    "Debt Repayment",
+    Clothing,
+    Miscellaneous
 }
 
-function ExpensesTable() {
-    const [expenses, setExpenses] = useState<expenseDetails[]>([])
-    enum Category {
-        "Food & Drink" = 1,
-        Entertainment,
-        Transportation,
-        Health,
-        Education,
-        Housing,
-        Utilities,
-        Insurance,
-        "Debt Repayment",
-        Clothing,
-        Miscellaneous
-    }
+interface Props {
+    take: number | undefined
+}
+
+const ExpensesTable: React.FC<Props> = ({ take }) => {
+    const $expenses = useStore(expenses)
 
     useEffect(() => {
         getExpenses()
     }, [])
 
     const getExpenses = async () => {
-        const res = await axios.get('/expense/', { withCredentials: true })
-        if (!res.data)
-            console.log('No expenses')
-        else
-            setExpenses(res.data.expenses)
+        const res = await axios.get(`/expense/${take ? `?take=${take}` : ``}`, { withCredentials: true })
+        if (res.data) expenses.set(res.data.expenses)
     }
 
     const getDate = (expense: expenseDetails) => {
@@ -60,7 +58,6 @@ function ExpensesTable() {
 
     return (
         <Table>
-            <TableCaption>A list of your recent spendings</TableCaption>
             <TableHeader>
                 <TableRow>
                     <TableHead>Expense</TableHead>
@@ -70,7 +67,7 @@ function ExpensesTable() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {expenses.map(expense => (
+                {$expenses.map(expense => (
                     <TableRow>
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
