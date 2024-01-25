@@ -97,7 +97,7 @@ function CategoriesCard() {
 
         for (let i = 1; i < 13; i++)
             getCategoryBudgets(i)
-    }, [])
+    }, [$selectedDate])
 
     useEffect(() => {
         setExpensesByCategory(prevExpenseByCategory => {

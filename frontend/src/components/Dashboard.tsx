@@ -1,10 +1,18 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import DatePicker from "@/components/datepicker/DatePicker";
+import { useStore } from "@nanostores/react";
+import { selectedDate } from "@/store/userStore";
+import { useEffect } from "react";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
 
 function Dashboard() {
+    const $selectedDate = useStore(selectedDate)
+    useEffect(() => {
+        console.log($selectedDate)
+    }, [$selectedDate])
+
     return (
         <>
             {/* <!-- Top --> */}

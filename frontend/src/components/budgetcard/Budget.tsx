@@ -80,7 +80,7 @@ function Budget() {
 
         getBudget()
         spentThisMonth()
-    }, [])
+    }, [$selectedDate])
 
     return (
         <Card>
