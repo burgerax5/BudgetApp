@@ -39,9 +39,9 @@ export class ExpenseService {
             where,
             take,
             orderBy: [
-                { day: 'desc' },
+                { year: 'desc' },
                 { month: 'desc' },
-                { year: 'desc' }
+                { day: 'desc' },
             ]
         })
     }
