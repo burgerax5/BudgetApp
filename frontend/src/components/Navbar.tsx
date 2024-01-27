@@ -17,25 +17,18 @@ function Navbar() {
     useEffect(() => {
         const checkAuthenticated = async () => await checkAuth()
         checkAuthenticated()
-        console.log($isLoggedIn)
     }, [$isLoggedIn])
 
     const clearAllCookies = async () => {
         isLoggedIn.set(false)
         deleteCookie('username')
         deleteCookie('user_id')
-        deleteCookie('refresh-token')
         await axios.get('/auth/clear-cookies')
     }
 
     const handleLogout = async () => {
         await axios.post('/auth/logout', {}, { withCredentials: true })
-            .then(res => {
-                clearAllCookies()
-            })
-            .catch(err => {
-                clearAllCookies()
-            })
+        clearAllCookies()
     }
 
     return (

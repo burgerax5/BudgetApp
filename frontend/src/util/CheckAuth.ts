@@ -4,8 +4,6 @@ import { readCookie, deleteCookie } from '@/util/cookies'
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from '@/store/userStore'
 
-const $isLoggedIn = useStore(isLoggedIn)
-
 const checkLoggedIn = async (): Promise<boolean> => {
     const res = await axios.get('/auth/', { withCredentials: true })
     return res.data ? true : false
@@ -17,7 +15,7 @@ const refreshAccessToken = async (): Promise<boolean> => {
 }
 
 const clearCookies = async () => {
-    const res = await axios.get('/auth/clear-cookies')
+    await axios.get('/auth/clear-cookies')
 }
 
 export const checkAuth = async () => {
