@@ -12,8 +12,7 @@ const checkLoggedIn = async (): Promise<boolean> => {
 }
 
 const refreshAccessToken = async (): Promise<boolean> => {
-    const refreshToken = readCookie("refreshToken")
-    const res = await axios.post('/auth/refresh-token', { refreshToken })
+    const res = await axios.post('/auth/refresh-token', {}, { withCredentials: true })
     return res.status === 200 ? true : false
 }
 
@@ -22,15 +21,8 @@ const clearCookies = async () => {
 }
 
 export const checkAuth = async () => {
-    const loggedIn = await checkLoggedIn()
-    if (!loggedIn && readCookie('refresh-token')) {
-        await refreshAccessToken() ? isLoggedIn.set(true) : isLoggedIn.set(false)
-    } else if (!loggedIn && !readCookie('refresh-token')) {
-        await clearCookies()
+    await refreshAccessToken() ? isLoggedIn.set(true) : () => {
         isLoggedIn.set(false)
-    } else if (loggedIn) {
-        isLoggedIn.set(true)
+        clearCookies()
     }
-
-    return $isLoggedIn
 }
