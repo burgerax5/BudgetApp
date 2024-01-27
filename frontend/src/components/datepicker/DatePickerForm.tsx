@@ -53,7 +53,6 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
     }, [$selectedDate])
 
     const handleSubmit = () => {
-        console.log(date)
         selectedDate.set(new Date(date.year, date.month ? date.month - 1 : $selectedDate.getMonth() - 1, 1))
     }
 

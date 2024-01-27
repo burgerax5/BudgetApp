@@ -17,17 +17,15 @@ export class AuthController {
     public home(req: Request, res: Response) {
         res.cookie('username', req.body.user.username)
         res.cookie('user_id', req.body.user_id)
-        res.cookie('refresh-token', req.cookies['refresh-token'])
 
         res.status(200).json({
             username: req.body.user.username,
             user_id: req.body.user.user_id,
-            refreshToken: req.cookies['refresh-token']
         })
     }
 
     private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {
-        return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '15m' });
+        return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '10s' });
     }
 
     private addRefreshToken(refreshToken: string) {
@@ -78,11 +76,13 @@ export class AuthController {
 
                 res.cookie("access-token", accessToken, {
                     maxAge: 2.592e+9, // 1 month
-                    httpOnly: true
+                    httpOnly: true,
+                    secure: true
                 })
 
                 res.cookie("refresh-token", refreshToken, {
-                    httpOnly: true
+                    httpOnly: true,
+                    secure: true
                 })
 
                 res.status(200).json({
@@ -140,7 +140,9 @@ export class AuthController {
 
     public token(req: Request, res: Response) {
         try {
-            const refreshToken = req.body.refreshToken
+            const refreshToken = req.cookies['refresh-token']
+            console.log(refreshToken)
+            console.log(this.userService.refreshTokens)
             if (!refreshToken) return res.status(401).send('Missing refresh token')
 
             if (!this.verifyRefreshToken(refreshToken))
@@ -160,6 +162,13 @@ export class AuthController {
                 if (!user) return res.sendStatus(403)
 
                 const accessToken = this.generateAccessToken(accessSecret, user)
+
+                res.cookie('access-token', accessToken, {
+                    maxAge: 2.592e+9,
+                    httpOnly: true,
+                    secure: true
+                })
+
                 res.status(200).send(accessToken)
             })
         } catch (error) {
@@ -171,12 +180,14 @@ export class AuthController {
     public clearCookies(req: Request, res: Response) {
         res.cookie("access-token", "", {
             maxAge: 0,
-            httpOnly: true
+            httpOnly: true,
+            secure: true
         })
 
         res.cookie("refresh-token", "", {
             maxAge: 0,
-            httpOnly: true
+            httpOnly: true,
+            secure: true
         })
     }
 

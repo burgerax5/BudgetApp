@@ -7,6 +7,7 @@ import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/store/userStore";
 import { readCookie, deleteCookie } from "@/util/cookies";
+import { checkAuth } from "@/util/CheckAuth";
 
 function Navbar() {
     const [toggled, setToggled] = useState<boolean>(false)
@@ -14,29 +15,27 @@ function Navbar() {
     const $isLoggedIn = useStore(isLoggedIn)
 
     useEffect(() => {
-        const checkLoggedIn = async () => {
-            const res = await axios.get('/auth/', { withCredentials: true })
-            if (res.data)
-                isLoggedIn.set(true)
-            else
-                isLoggedIn.set(false)
-        }
+        const checkAuthenticated = async () => await checkAuth()
+        checkAuthenticated()
+        console.log($isLoggedIn)
+    }, [$isLoggedIn])
 
-        checkLoggedIn()
-    }, [])
+    const clearAllCookies = async () => {
+        isLoggedIn.set(false)
+        deleteCookie('username')
+        deleteCookie('user_id')
+        deleteCookie('refresh-token')
+        await axios.get('/auth/clear-cookies')
+    }
 
     const handleLogout = async () => {
-        const res = await axios.post('/auth/logout', {}, { withCredentials: true })
-        if (res.status === 200) {
-            isLoggedIn.set(false)
-            deleteCookie('username')
-            deleteCookie('user_id')
-            deleteCookie('refresh-token')
-        }
-        // Token expired
-        else if (res.status === 401) {
-            await axios.get('/auth/clear-cookies')
-        }
+        await axios.post('/auth/logout', {}, { withCredentials: true })
+            .then(res => {
+                clearAllCookies()
+            })
+            .catch(err => {
+                clearAllCookies()
+            })
     }
 
     return (
@@ -98,5 +97,6 @@ function Navbar() {
         </header >
     )
 }
+
 
 export default Navbar

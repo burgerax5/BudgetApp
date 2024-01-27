@@ -45,8 +45,6 @@ const ExpensesTable: React.FC<Props> = ({ take }) => {
         getExpenses()
     }, [])
 
-    console.log($expenses)
-
     const getExpenses = async () => {
         const res = await axios.get(`/expense/${take ? `?take=${take}` : ``}`, { withCredentials: true })
         if (res.data) expenses.set(res.data.expenses)
