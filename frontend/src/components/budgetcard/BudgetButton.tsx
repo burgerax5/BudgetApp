@@ -25,10 +25,11 @@ interface Budget {
 
 interface EditBudgetProps {
     budget: Budget | null,
-    setBudget: React.Dispatch<React.SetStateAction<Budget | null>>
+    setBudget: React.Dispatch<React.SetStateAction<Budget | null>>,
+    period: string
 }
 
-const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
+const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget, period }) => {
     const $selectedDate = useStore(selectedDate)
     const [newBudget, setNewBudget] = useState<number>(0)
 
@@ -44,8 +45,8 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
         await axios.post(
             `/budget/add/`, {
             amount: newBudget,
-            month: $selectedDate.getMonth() + 1,
-            year: $selectedDate.getFullYear()
+            month: $selectedDate.yearOnly ? undefined : $selectedDate.date.getMonth() + 1,
+            year: $selectedDate.date.getFullYear()
         }, { withCredentials: true }
         ).then(res => {
             if (res.data.message === 'Successfully added budget.')
@@ -91,7 +92,7 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget }) => {
                 <DialogHeader>
                     <DialogTitle>Edit Budget</DialogTitle>
                     <DialogDescription>
-                        Adjust your budget for the month.
+                        Adjust your budget for the {period}.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

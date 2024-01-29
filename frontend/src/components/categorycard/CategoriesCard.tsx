@@ -72,7 +72,10 @@ function CategoriesCard() {
         }
 
         const getExpenses = async () => {
-            const res = await axios.get(`/expense/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}`, { withCredentials: true })
+            const url = $selectedDate.yearOnly ? `/expense/?year=${$selectedDate.date.getFullYear()}` :
+                `/expense/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}`
+
+            const res = await axios.get(url, { withCredentials: true })
             if (res.data.expenses)
                 setExpenses(res.data.expenses)
         }
@@ -80,7 +83,10 @@ function CategoriesCard() {
         const getCategoryBudgets = async (categoryId: number) => {
             const month = new Date().getMonth() + 1
             const year = new Date().getFullYear()
-            const res = await axios.get(`/budget/?month=${month}&year=${year}&categoryId=${categoryId}`, { withCredentials: true })
+            const url = $selectedDate.yearOnly ? `/budget/?year=${year}&categoryId=${categoryId}` :
+                `/budget/?month=${month}&year=${year}&categoryId=${categoryId}`
+
+            const res = await axios.get(url, { withCredentials: true })
 
             if (!res.data.budgets[0]) return
 

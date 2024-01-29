@@ -7,15 +7,14 @@ interface Budget {
     year: number
 }
 
-
 interface Props {
     budget: Budget | null,
-    spent: number
+    spent: number,
+    period: string
 }
 
-const BudgetCircularProgress: React.FC<Props> = ({ budget, spent }) => {
+const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
     const remainingBudget = budget ? budget?.amount - spent : 0
-    const remainingBudgetPercent = budget ? ((budget.amount - spent) / budget.amount) * 100 : 0
     const [progress, setProgress] = useState<number>(0)
 
     useEffect(() => {
@@ -38,7 +37,7 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent }) => {
                 <div className='text-sm opacity-70'>
                     {budget ?
                         `out of ${budget?.amount.toLocaleString('default', { minimumFractionDigits: 2 })}`
-                        : 'spent this month'}
+                        : `spent this ${period}`}
                 </div>
             </div>
         </div>

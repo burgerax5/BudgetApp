@@ -73,17 +73,18 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
                     disabled={yearOnly}
                     onValueChange={(value) => {
                         const month = parseInt(value)
-                        console.log(month)
                         if (!month) setDate(prevDate => ({ ...prevDate, month: null }))
                         else setDate(prevDate => ({ ...prevDate, month }))
                     }}>
                     <SelectTrigger className="w-[252px]">
-                        <SelectValue placeholder={Month[date?.month || 0]} />
+                        <SelectValue placeholder={Month[date?.month || 1]} />
                     </SelectTrigger>
                     <SelectContent>
-                        {monthsArray.map((month, i) => (
-                            <SelectItem value={`${i}`}>{Month[i]}</SelectItem>
-                        )
+                        {monthsArray.map((month, i) => {
+                            if (i > 0) {
+                                return <SelectItem value={`${i}`}>{Month[i]}</SelectItem>
+                            }
+                        }
                         )}
                     </SelectContent>
                 </Select>
@@ -107,8 +108,9 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
             <div className="flex items-center gap-3.5">
                 <Checkbox
                     id="yearOnly"
+                    checked={yearOnly}
                     onCheckedChange={() => {
-                        setYearOnly(!yearOnly)
+                        setYearOnly(prev => !prev)
                     }} />
                 <label
                     htmlFor="yearOnly"

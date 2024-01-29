@@ -45,28 +45,37 @@ function Budget() {
             const month = date.getMonth() + 1
             const year = date.getFullYear()
 
-            await axios.get(
-                `/budget/?month=${month}&year=${year}`,
-                { withCredentials: true }
-            ).then(res => {
-                if (res.data) {
-                    res.data.budgets.map(b => {
-                        if (b.month === month && b.year === year && !b.categoryId) {
-                            setBudget(b)
-                            budgetByDate.set(b)
-                        }
-                    })
-                }
-            }).catch(err => {
-                console.error('Error fetching budget data:', err)
-            })
+            const url = $selectedDate.yearOnly ? `/budget/?year=${year}` : `/budget/?month=${month}&year=${year}`
+
+            await axios.get(url, { withCredentials: true })
+                .then(res => {
+                    if (res.data.budgets.length) {
+                        res.data.budgets.map(b => {
+                            if ($selectedDate.yearOnly && !b.month && b.year === year && !b.categoryId) {
+                                setBudget(b)
+                                budgetByDate.set(b)
+                            } else if (!$selectedDate.yearOnly && b.month === month && b.year === year && !b.categoryId) {
+                                setBudget(b)
+                                budgetByDate.set(b)
+                            }
+                        })
+                    } else {
+                        setBudget(null)
+                        budgetByDate.set(null)
+                    }
+                }).catch(err => {
+                    console.error('Error fetching budget data:', err)
+                })
         }
 
-        const spentThisMonth = async () => {
+        const spentThisPeriod = async () => {
             const date = $selectedDate.date
+
+            const url = $selectedDate.yearOnly ?
+                `/expense/?year=${date.getFullYear()}` : `/expense/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`
+
             await axios.get<ExpenseResponse>(
-                `/expense/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
-                { withCredentials: true }
+                url, { withCredentials: true }
             ).then(res => {
                 const expenses: Expense[] = res.data.expenses
                 let sum = 0
@@ -78,22 +87,23 @@ function Budget() {
         }
 
         getBudget()
-        spentThisMonth()
+        spentThisPeriod()
     }, [$selectedDate])
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Budget</CardTitle>
-                <CardDescription>{budget ? 'Your remaining budget this month' : 'You do not have a budget set for this month.'}</CardDescription>
+                <CardDescription>{budget ? `Your remaining budget this ${$selectedDate.yearOnly ? "year" : "month"}`
+                    : `You do not have a budget set for this ${$selectedDate.yearOnly ? "year" : "month"}.`}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className='rounded-full w-40 h-40 mx-auto relative'>
-                    <BudgetCircularProgress budget={budget} spent={spent} />
+                    <BudgetCircularProgress budget={budget} spent={spent} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <BudgetButton budget={budget} setBudget={setBudget} />
+                <BudgetButton budget={budget} setBudget={setBudget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
             </CardFooter>
         </Card>
     )
