@@ -9,11 +9,15 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Button } from '../ui/button'
+import { Checkbox } from "@/components/ui/checkbox"
 import { useStore } from '@nanostores/react'
 import { selectedDate } from '@/store/userStore'
 
 interface Props {
-    prevSelected: Date
+    prevSelected: {
+        date: Date,
+        yearOnly: boolean
+    }
 }
 
 interface DateEntries {
@@ -22,8 +26,7 @@ interface DateEntries {
 }
 
 enum Month {
-    Null,
-    January,
+    January = 1,
     February,
     March,
     April,
@@ -40,8 +43,9 @@ enum Month {
 const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
     const monthsArray = Object.keys(Month).filter(key => !isNaN(Number(key)))
     const [date, setDate] = useState<DateEntries>({
-        month: prevSelected.getMonth() + 1, year: prevSelected.getFullYear()
+        month: prevSelected.date.getMonth() + 1, year: prevSelected.date.getFullYear()
     })
+    const [yearOnly, setYearOnly] = useState<boolean>(prevSelected.yearOnly)
     const $selectedDate = useStore(selectedDate)
 
     useEffect(() => {
@@ -49,11 +53,14 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
     }, [prevSelected])
 
     useEffect(() => {
-        console.log($selectedDate.getMonth() + 1, $selectedDate.getFullYear())
+        console.log($selectedDate)
     }, [$selectedDate])
 
     const handleSubmit = () => {
-        selectedDate.set(new Date(date.year, date.month ? date.month - 1 : $selectedDate.getMonth() - 1, 1))
+        selectedDate.set({
+            date: new Date(date.year, date.month ? date.month - 1 : $selectedDate?.date.getMonth() - 1, 1),
+            yearOnly
+        })
     }
 
     return (
@@ -62,10 +69,14 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
                 <Label className="text-right">
                     Month
                 </Label>
-                <Select onValueChange={(value) => {
-                    const month = parseInt(value)
-                    setDate(prevDate => ({ ...prevDate, month }))
-                }}>
+                <Select
+                    disabled={yearOnly}
+                    onValueChange={(value) => {
+                        const month = parseInt(value)
+                        console.log(month)
+                        if (!month) setDate(prevDate => ({ ...prevDate, month: null }))
+                        else setDate(prevDate => ({ ...prevDate, month }))
+                    }}>
                     <SelectTrigger className="w-[252px]">
                         <SelectValue placeholder={Month[date?.month || 0]} />
                     </SelectTrigger>
@@ -92,6 +103,18 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
                         setDate(prevDate => ({ ...prevDate, year }))
                     }}
                 />
+            </div>
+            <div className="flex items-center gap-3.5">
+                <Checkbox
+                    id="yearOnly"
+                    onCheckedChange={() => {
+                        setYearOnly(!yearOnly)
+                    }} />
+                <label
+                    htmlFor="yearOnly"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Budget for the whole year
+                </label>
             </div>
             <Button className="ml-auto" onClick={handleSubmit}>Submit</Button>
         </div>

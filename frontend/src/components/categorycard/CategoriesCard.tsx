@@ -72,7 +72,7 @@ function CategoriesCard() {
         }
 
         const getExpenses = async () => {
-            const res = await axios.get(`/expense/?month=${$selectedDate.getMonth() + 1}&year=${$selectedDate.getFullYear()}`, { withCredentials: true })
+            const res = await axios.get(`/expense/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}`, { withCredentials: true })
             if (res.data.expenses)
                 setExpenses(res.data.expenses)
         }

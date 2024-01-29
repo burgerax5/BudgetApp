@@ -128,7 +128,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                 <DialogHeader>
                     <DialogTitle>Category Budgets</DialogTitle>
                     <DialogDescription>
-                        {`Manage the budgets for ${$selectedDate.toLocaleDateString('default', { month: 'short' })} ${$selectedDate.getFullYear()}`}
+                        {`Manage the budgets for ${$selectedDate.date.toLocaleDateString('default', { month: 'short' })} ${$selectedDate.date.getFullYear()}`}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="mx-auto flex flex-col items-center">

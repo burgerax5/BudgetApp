@@ -25,7 +25,7 @@ export class AuthController {
     }
 
     private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {
-        return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '10s' });
+        return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '10m' });
     }
 
     private addRefreshToken(refreshToken: string) {

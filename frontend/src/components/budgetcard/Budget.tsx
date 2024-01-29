@@ -38,11 +38,10 @@ function Budget() {
     const [budget, setBudget] = useState<Budget | null>(null)
     const [spent, setSpent] = useState<number>(0)
     const $selectedDate = useStore(selectedDate)
-    const $budgetByDate = useStore(budgetByDate)
 
     useEffect(() => {
         const getBudget = async () => {
-            const date = $selectedDate
+            const date = $selectedDate.date
             const month = date.getMonth() + 1
             const year = date.getFullYear()
 
@@ -64,7 +63,7 @@ function Budget() {
         }
 
         const spentThisMonth = async () => {
-            const date = $selectedDate
+            const date = $selectedDate.date
             await axios.get<ExpenseResponse>(
                 `/expense/?month=${date.getMonth() + 1}&year=${date.getFullYear()}`,
                 { withCredentials: true }

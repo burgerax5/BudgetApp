@@ -18,7 +18,12 @@ interface Expense {
     year: number
 }
 
+interface SelectedDate {
+    date: Date,
+    yearOnly: boolean
+}
+
 export const isLoggedIn = atom(false)
-export const selectedDate = atom(new Date())
+export const selectedDate = atom({ date: new Date(), yearOnly: false })
 export const budgetByDate = atom<Budget | null>(null)
 export const expenses = atom<Expense[]>([])

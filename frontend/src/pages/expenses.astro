@@ -2,13 +2,11 @@
 import Layout from "@/layouts/Layout.astro";
 import ExpenseFilters from "@/components/expensefilters/ExpenseFilters";
 import ExpensesTable from "@/components/ExpensesTable";
-
-// Redirect to login if user is not logged in
-const cookie = Astro.request.headers.get("cookie");
-if (!cookie) return Astro.redirect("/login");
+import Protect from "@/components/Protect";
 ---
 
 <Layout title="Dashboard">
+    <Protect mustBeAuthenticated={true} client:load />
     <main class="p-3 h-full max-w-screen-lg mx-auto">
         <ExpenseFilters />
         <ExpensesTable take={undefined} client:load />

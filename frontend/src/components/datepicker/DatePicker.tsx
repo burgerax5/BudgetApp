@@ -12,13 +12,17 @@ import DatePickerForm from './DatePickerForm'
 
 function DatePicker() {
     const $selectedDate = useStore(selectedDate)
+    const monthShort: string = $selectedDate?.date.toLocaleDateString('default', { month: 'short' })
 
     return (
         <Popover>
             <PopoverTrigger>
                 <Button variant="outline">
                     <CalendarIcon width="20" height="20" />
-                    <div className="ml-2">{$selectedDate?.toLocaleDateString('default', { month: 'short' })} {$selectedDate?.getFullYear()}</div>
+                    <div className="ml-2 flex gap-1">
+                        {$selectedDate.yearOnly ? "All" : monthShort}
+                        <div>{$selectedDate?.date.getFullYear()}</div>
+                    </div>
                 </Button>
             </PopoverTrigger>
             <PopoverContent>
