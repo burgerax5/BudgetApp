@@ -34,21 +34,6 @@ interface ExpenseData {
     datasets: Dataset[],
 }
 
-enum Month {
-    January = 1,
-    February,
-    March,
-    April,
-    May,
-    June,
-    July,
-    August,
-    September,
-    October,
-    November,
-    December
-}
-
 const OverviewCard = () => {
     const $selectedDate = useStore(selectedDate)
     const [labels, setLabels] = useState<number[]>([])
@@ -129,7 +114,7 @@ const OverviewCard = () => {
                 <CardTitle>Overview</CardTitle>
                 <CardDescription>Your spendings this {$selectedDate.yearOnly ? "year" : "month"}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
                 <BarChart expenseData={expenseData} />
             </CardContent>
         </Card>
