@@ -20,6 +20,15 @@ interface Category {
     name: string
 }
 
+interface Budget {
+    id: number,
+    userId: number,
+    categoryId: number | null,
+    month: number | null,
+    year: number,
+    amount: number
+}
+
 interface Expense {
     id: number,
     userId: number,
@@ -48,15 +57,15 @@ function CategoriesCard() {
         "Miscellaneous": 0,
     }
 
-    let defaultThing: number[] = []
+    let defaultBudgetsByCategory: number[] = []
     for (let i = 0; i < 12; i++) {
-        defaultThing.push(0)
+        defaultBudgetsByCategory.push(0)
     }
     const $selectedDate = useStore(selectedDate)
     const [categories, setCategories] = useState<Category[]>([])
     const [expenses, setExpenses] = useState<Expense[]>([])
     const [expensesByCategory, setExpensesByCategory] = useState<keyNumber>(defaultCategoryValue)
-    const [budgetByCategory, setBudgetByCategory] = useState(defaultThing)
+    const [budgetByCategory, setBudgetByCategory] = useState(defaultBudgetsByCategory)
 
     const getCategoryNameFromId = (id: number) => {
         return categories.find(category => {
@@ -81,18 +90,24 @@ function CategoriesCard() {
         }
 
         const getCategoryBudgets = async (categoryId: number) => {
-            const month = new Date().getMonth() + 1
-            const year = new Date().getFullYear()
+            const month = $selectedDate.date.getMonth() + 1
+            const year = $selectedDate.date.getFullYear()
+            const yearOnly = $selectedDate.yearOnly
             const url = $selectedDate.yearOnly ? `/budget/?year=${year}&categoryId=${categoryId}` :
                 `/budget/?month=${month}&year=${year}&categoryId=${categoryId}`
 
             const res = await axios.get(url, { withCredentials: true })
+            const budgets: Budget[] = res.data.budgets
 
-            if (!res.data.budgets[0]) return
+            if (!budgets.length) return
+            const budget = budgets.find(b => {
+                if (yearOnly && b.year === year && !b.month) return b
+                else if (!yearOnly && b.year === year && b.month === month) return b
+            })
 
             setBudgetByCategory(b => {
                 return b.map((value, i) =>
-                    (i === categoryId - 1) ? res.data.budgets[0].amount : value
+                    (i === categoryId - 1) ? budget?.amount : value
                 )
             })
         }

@@ -54,9 +54,11 @@ function Budget() {
                             if ($selectedDate.yearOnly && !b.month && b.year === year && !b.categoryId) {
                                 setBudget(b)
                                 budgetByDate.set(b)
+                                return
                             } else if (!$selectedDate.yearOnly && b.month === month && b.year === year && !b.categoryId) {
                                 setBudget(b)
                                 budgetByDate.set(b)
+                                return
                             }
                         })
                     } else {

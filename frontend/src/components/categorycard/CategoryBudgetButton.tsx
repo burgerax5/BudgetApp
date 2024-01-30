@@ -44,7 +44,7 @@ interface Props {
 export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCategory }) => {
     const $selectedDate = useStore(selectedDate)
     const $budgetByDate = useStore(budgetByDate)
-    const [newBudgetByCategory, setNewBudgetByCategory] = useState(budgetByCategory)
+    const [newBudgetByCategory, setNewBudgetByCategory] = useState<number[]>(budgetByCategory)
     const [error, setError] = useState<string | null>(null)
     const [remaining, setRemaining] = useState<number>($budgetByDate ?
         $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0
@@ -71,12 +71,23 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     }, [budgetByCategory])
 
     useEffect(() => {
-        setRemaining($budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0)
+        console.log()
+        setRemaining(prev => {
+            if ($budgetByDate && newBudgetByCategory.reduce((prev, curr) => prev + curr)) {
+                return $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr)
+            } else if ($budgetByDate) {
+                return $budgetByDate.amount
+            } else {
+                return 0
+            }
+
+            // $budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0   
+        })
     }, [newBudgetByCategory, $budgetByDate])
 
     const getCategoryBudget = async (index: number): Promise<Budget | null> => {
         const res = await axios.get(
-            `/budget/?month=${$selectedDate.getMonth() + 1}&year=${$selectedDate.getFullYear()}&categoryId=${index + 1}`,
+            `/budget/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}`,
             { withCredentials: true }
         )
         return res.data.budgets[0]
@@ -92,13 +103,25 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         }
     }
 
+    console.log(newBudgetByCategory)
+
     const addCategoryBudget = async (index: number) => {
-        await axios.post('/budget/add/', {
-            month: $selectedDate.getMonth() + 1,
-            year: $selectedDate.getFullYear(),
-            categoryId: index + 1,
-            amount: newBudgetByCategory[index]
-        }, { withCredentials: true })
+
+        const budgetData = $selectedDate.yearOnly ?
+            {
+                month: null,
+                year: $selectedDate.date.getFullYear(),
+                categoryId: index + 1,
+                amount: newBudgetByCategory[index]
+            }
+            : {
+                month: $selectedDate.date.getMonth() + 1,
+                year: $selectedDate.date.getFullYear(),
+                categoryId: index + 1,
+                amount: newBudgetByCategory[index]
+            }
+
+        await axios.post('/budget/add/', budgetData, { withCredentials: true })
             .catch(err => {
                 console.error('Failed to add category expense:', err)
             })
@@ -107,7 +130,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const handleOnSubmit = () => {
         if (!error) {
             for (let i = 0; i < budgetByCategory.length; i++) {
-                console.log(budgetByCategory[i], newBudgetByCategory[i])
                 if (budgetByCategory[i] && newBudgetByCategory[i])
                     editCategoryBudget(i)
                 else if (!budgetByCategory[i] && newBudgetByCategory[i])
@@ -117,7 +139,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
             location.replace('/')
         }
     }
-
 
     return (
         <Dialog>
@@ -162,7 +183,10 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                                     id={selectedCategory.toString()}
                                     type="number"
                                     className="col-span-3"
-                                    value={newBudgetByCategory[selectedCategory].toString()}
+                                    value={
+                                        newBudgetByCategory[selectedCategory] ?
+                                            newBudgetByCategory[selectedCategory].toString() : 0
+                                    }
                                     placeholder="0"
                                     onChange={handleInputChange}
                                 />
