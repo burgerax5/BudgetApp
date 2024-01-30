@@ -17,8 +17,6 @@ interface Props {
 }
 
 const BarChart: React.FC<Props> = ({ expenseData }) => {
-    console.log(expenseData)
-
     return (
         <div className="flex flex-col gap-1">
             {expenseData.labels.length && <Bar data={expenseData} />}

@@ -23,7 +23,10 @@ interface Expense {
     categoryId: number,
     currencyId: number,
     name: string,
-    amount: number
+    amount: number,
+    day: number,
+    month: number,
+    year: number
 }
 
 interface ExpenseData {
@@ -55,7 +58,7 @@ const OverviewCard = () => {
         datasets: [{
             label: "Amount spent",
             data: data,
-            backgroundColor: "hsl(222.2, 47.4%, 11.2%)"
+            backgroundColor: "hsl(221.2 83.2% 53.3%)"
         }]
     })
 
@@ -64,14 +67,30 @@ const OverviewCard = () => {
         return lastDayOfMonth.getDate()
     }
 
+    const aggregateExpenses = (expenses: Expense[], daysOrMonths: number) => {
+        let spentInPeriod: number[] = []
+        for (let i = 0; i < daysOrMonths; i++)
+            spentInPeriod.push(0)
+
+        expenses.map(exp => {
+            if (!$selectedDate.yearOnly) {
+                spentInPeriod[exp.day - 1] += exp.amount
+            } else {
+                spentInPeriod[exp.month - 1] += exp.amount
+            }
+        })
+
+        return spentInPeriod
+    }
+
     useEffect(() => {
         const getExpenses = async () => {
             const month = $selectedDate.date.getMonth() + 1
             const year = $selectedDate.date.getFullYear()
-            const numberOfDays = daysInMonth(year, month)
+            const numberOfDays = $selectedDate.yearOnly ? 12 : daysInMonth(year, month)
             let days: number[] = []
 
-            for (let i = 1; i <= ($selectedDate.yearOnly ? 12 : numberOfDays); i++)
+            for (let i = 1; i <= numberOfDays; i++)
                 days.push(i)
 
             const url = $selectedDate.yearOnly ? `/expense/?year=${year}` : `/expense/?month=${month}&year=${year}`
@@ -80,7 +99,9 @@ const OverviewCard = () => {
                 .then(res => {
                     const expenses: Expense[] = res.data.expenses
                     setLabels(days)
-                    setData(expenses.map(expense => expense.amount))
+
+                    const data = aggregateExpenses(expenses, numberOfDays)
+                    setData(data)
                 })
                 .catch(err => {
                     console.error('Error occurred while getting expenses for the month:', err)
@@ -91,23 +112,22 @@ const OverviewCard = () => {
     }, [$selectedDate])
 
     useEffect(() => {
-        setExpenseData({
+        setExpenseData(prevData => ({
             labels: labels,
             datasets: [{
+                ...prevData.datasets[0],
                 label: "Amount spent",
                 data: data
             }]
-        })
+        }))
 
     }, [labels, data])
-
-    console.log(expenseData)
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Overview</CardTitle>
-                <CardDescription>Your spendings this year</CardDescription>
+                <CardDescription>Your spendings this {$selectedDate.yearOnly ? "year" : "month"}</CardDescription>
             </CardHeader>
             <CardContent>
                 <BarChart expenseData={expenseData} />

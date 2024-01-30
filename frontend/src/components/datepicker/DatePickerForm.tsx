@@ -52,10 +52,6 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
         setDate(date)
     }, [prevSelected])
 
-    useEffect(() => {
-        console.log($selectedDate)
-    }, [$selectedDate])
-
     const handleSubmit = () => {
         selectedDate.set({
             date: new Date(date.year, date.month ? date.month - 1 : $selectedDate?.date.getMonth() - 1, 1),
