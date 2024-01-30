@@ -80,17 +80,28 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
             } else {
                 return 0
             }
-
-            // $budgetByDate ? $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0   
         })
     }, [newBudgetByCategory, $budgetByDate])
 
     const getCategoryBudget = async (index: number): Promise<Budget | null> => {
-        const res = await axios.get(
-            `/budget/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}`,
-            { withCredentials: true }
-        )
-        return res.data.budgets[0]
+
+        const url = $selectedDate.yearOnly ?
+            `/budget/?year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}` :
+            `/budget/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}`
+
+        const res = await axios.get(url, { withCredentials: true })
+
+        if (!$selectedDate.yearOnly) return res.data.budgets[0]
+
+        for (let i = 0; i < res.data.budgets.length; i++) {
+            const budget = res.data.budgets[i]
+            if (!budget.month &&
+                budget.year === $selectedDate.date.getFullYear() &&
+                selectedCategory !== null &&
+                budget.categoryId === selectedCategory + 1) {
+                return budget
+            }
+        } return null
     }
 
     const editCategoryBudget = async (index: number) => {
@@ -102,8 +113,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                 })
         }
     }
-
-    console.log(newBudgetByCategory)
 
     const addCategoryBudget = async (index: number) => {
 
@@ -129,13 +138,13 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
 
     const handleOnSubmit = () => {
         if (!error) {
-            for (let i = 0; i < budgetByCategory.length; i++) {
-                if (budgetByCategory[i] && newBudgetByCategory[i])
+            if (selectedCategory !== null) {
+                const i = selectedCategory
+                if (budgetByCategory[i] && budgetByCategory[i] !== newBudgetByCategory[i])
                     editCategoryBudget(i)
                 else if (!budgetByCategory[i] && newBudgetByCategory[i])
                     addCategoryBudget(i)
             }
-
             location.replace('/')
         }
     }
