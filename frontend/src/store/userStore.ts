@@ -27,3 +27,11 @@ export const isLoggedIn = atom(false)
 export const selectedDate = atom({ date: new Date(), yearOnly: false })
 export const budgetByDate = atom<Budget | null>(null)
 export const expenses = atom<Expense[]>([])
+// export const expenseFilters = atom({
+//     search: "",
+//     category: [],
+//     dateRange: [new Date(), new Date()],
+//     sorting: {
+
+//     }
+// })

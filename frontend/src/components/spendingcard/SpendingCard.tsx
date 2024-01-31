@@ -19,7 +19,7 @@ const SpendingCard = () => {
                 <CardDescription>Your recent expenses</CardDescription>
             </CardHeader>
             <CardContent>
-                <ExpensesTable take={5} />
+                <ExpensesTable take={5} showCheckbox={false} />
             </CardContent>
             <CardFooter>
                 <Button variant="outline" className="ml-auto font-bold" asChild>

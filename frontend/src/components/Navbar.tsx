@@ -54,7 +54,6 @@ function Navbar() {
                 </div>
                 <div className="flex gap-3 ml-auto hidden sm:flex">
                     <ModeToggle />
-                    <Input type="text" placeholder="Search..." />
                     {$isLoggedIn ?
                         <Button onClick={handleLogout}>
                             <a href="/">Logout</a>
@@ -81,7 +80,6 @@ function Navbar() {
                     </>
                 }
                 <div className="flex gap-3 mx-auto py-3">
-                    <Input type="text" placeholder="Search..." />
                     <ModeToggle />
                 </div>
             </div>

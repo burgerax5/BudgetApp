@@ -6,9 +6,8 @@ import Protect from "@/components/Protect";
 ---
 
 <Layout title="Dashboard">
-    <Protect mustBeAuthenticated={true} client:load />
-    <main class="p-3 h-full max-w-screen-lg mx-auto">
-        <ExpenseFilters />
-        <ExpensesTable take={undefined} client:load />
+    <main class="p-3 h-full max-w-screen-lg mx-auto w-full">
+        <ExpenseFilters client:load />
+        <ExpensesTable take={undefined} showCheckbox={true} client:load />
     </main>
 </Layout>

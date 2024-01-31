@@ -10,6 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { Checkbox } from './ui/checkbox'
+import { ArrowUp, ArrowDown } from 'lucide-react'
 
 interface expenseDetails {
     name: string,
@@ -35,10 +37,11 @@ enum Category {
 }
 
 interface Props {
-    take: number | undefined
+    take: number | undefined,
+    showCheckbox: boolean
 }
 
-const ExpensesTable: React.FC<Props> = ({ take }) => {
+const ExpensesTable: React.FC<Props> = ({ take, showCheckbox }) => {
     const $expenses = useStore(expenses)
 
     useEffect(() => {
@@ -59,15 +62,32 @@ const ExpensesTable: React.FC<Props> = ({ take }) => {
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Expense</TableHead>
-                    <TableHead className="w-[150px]">Category</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
+                    {showCheckbox && <TableHead></TableHead>}
+                    <TableHead
+                        className="cursor-pointer">
+                        <div className="flex gap-3">
+                            Expense
+                            <ArrowDown />
+                        </div>
+                    </TableHead>
+                    <TableHead
+                        className="w-[150px] cursor-pointer">
+                        Category
+                    </TableHead>
+                    <TableHead
+                        className="cursor-pointer">
+                        Date
+                    </TableHead>
+                    <TableHead
+                        className="text-right cursor-pointer">
+                        Amount
+                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {$expenses.map(expense => (
                     <TableRow key={crypto.randomUUID()}>
+                        {showCheckbox && <TableCell><Checkbox /></TableCell>}
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
                         <TableCell>{getDate(expense)}</TableCell>

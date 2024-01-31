@@ -20,33 +20,6 @@ interface Props {
 const BarChart: React.FC<Props> = ({ expenseData }) => {
     const chartRef = useRef<any>(null)
 
-    // const handleResize = (chart: any, size: {
-    //     width: number;
-    //     height: number;
-    // }) => {
-
-    //     console.log("SHIT")
-    // };
-
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         // Access the Chart.js instance and update its size
-
-    //         console.log("RESIZED")
-    //         if (chartInstance) {
-    //             chartInstance.resize();
-    //         }
-    //     };
-
-    //     // Attach the resize event listener
-    //     window.addEventListener('resize', handleResize);
-
-    //     // Clean up the event listener on component unmount
-    //     return () => {
-    //         window.removeEventListener('resize', handleResize);
-    //     };
-    // }, [])
-
     return (
         <div className="flex flex-col gap-1 w-full relative h-36 sm:h-60">
             {expenseData.labels.length &&
