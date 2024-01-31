@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import {
     Select,
     SelectContent,
@@ -9,23 +9,48 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Label } from '../ui/label'
+import axios from '@/api/axios'
+import { useStore } from '@nanostores/react'
+import { expenseFilters } from '@/store/userStore'
+
+interface Category {
+    name: string,
+    id: number,
+}
 
 const ExpenseCategorySelect = () => {
+    const [categories, setCategories] = useState<Category[]>([])
+    const $expenseFilters = useStore(expenseFilters)
+
+    useEffect(() => {
+        const getCategories = async () => {
+            const res = await axios.get('/category/')
+            if (res.data)
+                setCategories(res.data.categories)
+        }
+
+        getCategories()
+    }, [])
+
+    const getCategory = (name: string) => {
+        categories.map(cat => {
+            if (cat.name === name)
+                expenseFilters.set({ ...$expenseFilters, category: cat.name })
+        })
+    }
+
     return (
-        <div className="flex items-center gap-3.5">
+        <div>
             <Label className="col-span-1">Category</Label>
-            <Select>
+            <Select onValueChange={(value) => getCategory(value)}>
                 <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a fruit" />
+                    <SelectValue placeholder={$expenseFilters.category ? $expenseFilters.category : "Select a category"} />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        <SelectLabel>Fruits</SelectLabel>
-                        <SelectItem value="apple">Apple</SelectItem>
-                        <SelectItem value="banana">Banana</SelectItem>
-                        <SelectItem value="blueberry">Blueberry</SelectItem>
-                        <SelectItem value="grapes">Grapes</SelectItem>
-                        <SelectItem value="pineapple">Pineapple</SelectItem>
+                        {categories.map(cat => (
+                            <SelectItem value={cat.name}>{cat.name}</SelectItem>
+                        ))}
                     </SelectGroup>
                 </SelectContent>
             </Select>
