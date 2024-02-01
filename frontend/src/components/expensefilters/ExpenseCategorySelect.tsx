@@ -49,7 +49,7 @@ const ExpenseCategorySelect = () => {
                 <SelectContent>
                     <SelectGroup>
                         {categories.map(cat => (
-                            <SelectItem value={cat.name}>{cat.name}</SelectItem>
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                         ))}
                     </SelectGroup>
                 </SelectContent>

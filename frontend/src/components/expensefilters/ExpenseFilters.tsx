@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useStore } from '@nanostores/react'
-import { expenseFilters } from '@/store/userStore'
+import { expenseFilters, filteredExpenses, expenses } from '@/store/userStore'
 import { SlidersHorizontal } from 'lucide-react'
 import {
     Popover,
@@ -13,15 +13,61 @@ import ExpenseCategorySelect from './ExpenseCategorySelect'
 import ExpenseDateRange from './ExpenseDateRange'
 import ExpensePriceRange from './ExpensePriceRange'
 
+interface CategoryIndex {
+    'Food & Drink': number;
+    Entertainment: number;
+    Transportation: number;
+    Health: number;
+    Education: number;
+    Housing: number;
+    Utilities: number;
+    Insurance: number;
+    "Debt Repayment": number;
+    Clothing: number;
+    Miscellaneous: number;
+}
+
+const Categories: CategoryIndex = {
+    'Food & Drink': 1,
+    'Entertainment': 2,
+    "Transportation": 3,
+    "Health": 4,
+    "Education": 5,
+    "Housing": 6,
+    "Utilities": 7,
+    "Insurance": 8,
+    "Debt Repayment": 9,
+    "Clothing": 10,
+    "Miscellaneous": 11,
+}
+
 const ExpenseFilters = () => {
-    const [search, setSearch] = useState<string>("")
     const $expenseFilters = useStore(expenseFilters)
+    const [search, setSearch] = useState<string>($expenseFilters.search)
+    const $filteredExpenses = useStore(filteredExpenses)
+    const $expenses = useStore(expenses)
 
     useEffect(() => {
         expenseFilters.set({ ...$expenseFilters, search })
     }, [search])
 
-    console.log($expenseFilters)
+    const applyFilters = () => {
+        let newFilteredExpenses = $expenses
+        const { search, category, dateRange, maxPrice } = $expenseFilters
+
+        $expenses.map(exp => {
+            // Apply search filter
+            newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
+
+            // Apply category filter
+            newFilteredExpenses.filter(exp => (category && exp.categoryId === Categories[category as keyof CategoryIndex]))
+
+            // Apply price filter
+            newFilteredExpenses.filter(exp => exp.amount <= maxPrice)
+        })
+
+        filteredExpenses.set(newFilteredExpenses)
+    }
 
     return (
         <div>
@@ -36,11 +82,13 @@ const ExpenseFilters = () => {
                         <div className="p-3.5 flex flex-col gap-3">
                             <h2 className="font-bold text-lg">Filters</h2>
                             <ExpenseCategorySelect />
-                            {/* <ExpenseDateRange /> */}
+                            <ExpenseDateRange />
                             <ExpensePriceRange />
                         </div>
                     </PopoverContent>
                 </Popover>
+
+                <Button onClick={applyFilters}>Search</Button>
             </div>
         </div>
     )
