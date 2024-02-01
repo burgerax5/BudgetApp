@@ -1,7 +1,7 @@
 import axios from '@/api/axios'
 import { useState, useEffect } from 'react'
 import { useStore } from '@nanostores/react'
-import { expenses } from '@/store/userStore'
+import { expenses, filteredExpenses } from '@/store/userStore'
 import {
     Table,
     TableBody,
@@ -36,12 +36,22 @@ enum Category {
     Miscellaneous
 }
 
-interface Props {
-    take: number | undefined,
-    showCheckbox: boolean
+interface Expense {
+    name: string,
+    categoryId: number,
+    amount: number,
+    day: number,
+    month: number,
+    year: number
 }
 
-const ExpensesTable: React.FC<Props> = ({ take, showCheckbox }) => {
+interface Props {
+    take: number | undefined,
+    showCheckbox: boolean,
+    filteredExpenses?: Expense[]
+}
+
+const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }) => {
     const $expenses = useStore(expenses)
 
     useEffect(() => {
@@ -85,7 +95,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox }) => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {$expenses.map(expense => (
+                {filteredExpenses && filteredExpenses.map(expense => (
                     <TableRow key={crypto.randomUUID()}>
                         {showCheckbox && <TableCell><Checkbox /></TableCell>}
                         <TableCell className="font-medium">{expense.name}</TableCell>

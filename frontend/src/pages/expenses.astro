@@ -1,13 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import ExpenseFilters from "@/components/expensefilters/ExpenseFilters";
-import ExpensesTable from "@/components/ExpensesTable";
+import ExpensePage from "@/components/expensefilters/ExpensePage";
 import Protect from "@/components/Protect";
 ---
 
 <Layout title="Dashboard">
     <main class="p-3 h-full max-w-screen-lg mx-auto w-full">
-        <ExpenseFilters client:load />
-        <ExpensesTable take={undefined} showCheckbox={true} client:load />
+        <ExpensePage client:load />
+        <!-- <ExpenseFilters client:load />
+        <ExpensesTable take={undefined} showCheckbox={true} filteredExpenses={$filteredExpenses} client:load /> -->
     </main>
 </Layout>

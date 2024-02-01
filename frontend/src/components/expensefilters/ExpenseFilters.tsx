@@ -12,6 +12,7 @@ import {
 import ExpenseCategorySelect from './ExpenseCategorySelect'
 import ExpenseDateRange from './ExpenseDateRange'
 import ExpensePriceRange from './ExpensePriceRange'
+import axios from '@/api/axios';
 
 interface CategoryIndex {
     'Food & Drink': number;
@@ -46,13 +47,19 @@ const ExpenseFilters = () => {
     const [search, setSearch] = useState<string>($expenseFilters.search)
     const $filteredExpenses = useStore(filteredExpenses)
     const $expenses = useStore(expenses)
+
     const [maxPrice, setMaxPrice] = useState<number>(0)
 
     useEffect(() => {
-        expenseFilters.set({ ...$expenseFilters, search })
-    }, [search])
+        const getExpenses = async () => {
+            await axios.get('/expense', { withCredentials: true })
+                .then(res => {
+                    if (res.data.expenses && !$expenses.length)
+                        expenses.set(res.data.expenses)
+                })
+        }
+        getExpenses()
 
-    useEffect(() => {
         let highest = 0
         $expenses.map(exp => {
             if (exp.amount > highest) highest = exp.amount
@@ -62,11 +69,19 @@ const ExpenseFilters = () => {
     }, [])
 
     useEffect(() => {
+        filteredExpenses.set($expenses)
+    }, [$expenses])
+
+    useEffect(() => {
         expenseFilters.set({ ...$expenseFilters, maxPrice })
     }, [maxPrice])
 
+    useEffect(() => {
+        expenseFilters.set({ ...$expenseFilters, search })
+    }, [search])
+
     const applyFilters = () => {
-        let newFilteredExpenses = $expenses
+        let newFilteredExpenses = $expenses.slice()
         const { search, category, dateRange, maxPrice } = $expenseFilters
 
         $expenses.map(exp => {
@@ -74,14 +89,12 @@ const ExpenseFilters = () => {
             newFilteredExpenses = newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
 
             // // Apply category filter
-            newFilteredExpenses = newFilteredExpenses.filter(exp => (category && exp.categoryId === Categories[category as keyof CategoryIndex]))
+            if (category)
+                newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.categoryId === Categories[category as keyof CategoryIndex]))
 
             // // Apply price filter
             newFilteredExpenses = newFilteredExpenses.filter(exp => (maxPrice && exp.amount <= maxPrice))
         })
-
-        console.log($expenseFilters)
-        console.log(newFilteredExpenses)
 
         filteredExpenses.set(newFilteredExpenses)
     }
