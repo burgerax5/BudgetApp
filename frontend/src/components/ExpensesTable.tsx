@@ -11,7 +11,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from './ui/checkbox'
-import { ArrowUp, ArrowDown } from 'lucide-react'
 
 interface expenseDetails {
     name: string,
@@ -77,7 +76,6 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                         className="cursor-pointer">
                         <div className="flex gap-3">
                             Expense
-                            <ArrowDown />
                         </div>
                     </TableHead>
                     <TableHead
