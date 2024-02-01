@@ -4,21 +4,13 @@ import { Label } from '../ui/label'
 import { useStore } from '@nanostores/react'
 import { expenseFilters, expenses } from '@/store/userStore'
 
-const ExpensePriceRange = () => {
-    const [price, setPrice] = useState<number[]>([100])
-    const [maxPrice, setMaxPrice] = useState<number>(0)
+interface Props {
+    maxPrice: number
+}
+
+const ExpensePriceRange: React.FC<Props> = ({ maxPrice }) => {
     const $expenseFilters = useStore(expenseFilters)
-    const $expenses = useStore(expenses)
-
-    useEffect(() => {
-        let highest = 0
-        $expenses.map(exp => {
-            if (exp.amount > highest) highest = exp.amount
-        })
-
-        setMaxPrice(highest)
-        console.log(highest)
-    }, [])
+    const [price, setPrice] = useState<number[]>([$expenseFilters.maxPrice])
 
     useEffect(() => {
         expenseFilters.set({ ...$expenseFilters, maxPrice: price[0] })
@@ -28,7 +20,7 @@ const ExpensePriceRange = () => {
         <>
             <Label>Max Price</Label>
             <Slider
-                defaultValue={price}
+                value={price}
                 max={maxPrice}
                 step={1}
                 onValueChange={setPrice} />

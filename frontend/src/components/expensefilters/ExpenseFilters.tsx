@@ -46,10 +46,24 @@ const ExpenseFilters = () => {
     const [search, setSearch] = useState<string>($expenseFilters.search)
     const $filteredExpenses = useStore(filteredExpenses)
     const $expenses = useStore(expenses)
+    const [maxPrice, setMaxPrice] = useState<number>(0)
 
     useEffect(() => {
         expenseFilters.set({ ...$expenseFilters, search })
     }, [search])
+
+    useEffect(() => {
+        let highest = 0
+        $expenses.map(exp => {
+            if (exp.amount > highest) highest = exp.amount
+        })
+
+        setMaxPrice(highest)
+    }, [])
+
+    useEffect(() => {
+        expenseFilters.set({ ...$expenseFilters, maxPrice })
+    }, [maxPrice])
 
     const applyFilters = () => {
         let newFilteredExpenses = $expenses
@@ -57,17 +71,24 @@ const ExpenseFilters = () => {
 
         $expenses.map(exp => {
             // Apply search filter
-            newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
+            newFilteredExpenses = newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
 
-            // Apply category filter
-            newFilteredExpenses.filter(exp => (category && exp.categoryId === Categories[category as keyof CategoryIndex]))
+            // // Apply category filter
+            newFilteredExpenses = newFilteredExpenses.filter(exp => (category && exp.categoryId === Categories[category as keyof CategoryIndex]))
 
-            // Apply price filter
-            newFilteredExpenses.filter(exp => exp.amount <= maxPrice)
+            // // Apply price filter
+            newFilteredExpenses = newFilteredExpenses.filter(exp => (maxPrice && exp.amount <= maxPrice))
         })
+
+        console.log($expenseFilters)
+        console.log(newFilteredExpenses)
 
         filteredExpenses.set(newFilteredExpenses)
     }
+
+    useEffect(() => {
+        console.log($filteredExpenses)
+    }, [$filteredExpenses, expenses])
 
     return (
         <div>
@@ -83,7 +104,7 @@ const ExpenseFilters = () => {
                             <h2 className="font-bold text-lg">Filters</h2>
                             <ExpenseCategorySelect />
                             <ExpenseDateRange />
-                            <ExpensePriceRange />
+                            <ExpensePriceRange maxPrice={maxPrice} />
                         </div>
                     </PopoverContent>
                 </Popover>
