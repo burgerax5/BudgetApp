@@ -13,6 +13,7 @@ import ExpenseCategorySelect from './ExpenseCategorySelect'
 import ExpenseDateRange from './ExpenseDateRange'
 import ExpensePriceRange from './ExpensePriceRange'
 import axios from '@/api/axios';
+import ExpenseChip from './ExpenseChip'
 
 interface CategoryIndex {
     'Food & Drink': number;
@@ -47,6 +48,7 @@ const ExpenseFilters = () => {
     const [search, setSearch] = useState<string>($expenseFilters.search)
     const $filteredExpenses = useStore(filteredExpenses)
     const $expenses = useStore(expenses)
+    const [submitted, setSubmitted] = useState(false)
 
     const [maxPrice, setMaxPrice] = useState<number>(0)
 
@@ -93,9 +95,11 @@ const ExpenseFilters = () => {
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.categoryId === Categories[category as keyof CategoryIndex]))
 
             // // Apply price filter
-            newFilteredExpenses = newFilteredExpenses.filter(exp => (maxPrice && exp.amount <= maxPrice))
+            if (maxPrice)
+                newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.amount <= maxPrice))
         })
 
+        setSubmitted(true)
         filteredExpenses.set(newFilteredExpenses)
     }
 
@@ -123,6 +127,14 @@ const ExpenseFilters = () => {
                 </Popover>
 
                 <Button onClick={applyFilters}>Search</Button>
+            </div>
+            <div className="flex gap-3">
+                {(submitted && $expenseFilters.search) &&
+                    <ExpenseChip name={"search"} value={$expenseFilters.search} />}
+                {(submitted && $expenseFilters.maxPrice) &&
+                    <ExpenseChip name={"maxPrice"} value={$expenseFilters.maxPrice} maxPrice={maxPrice} />}
+                {(submitted && $expenseFilters.category) &&
+                    <ExpenseChip name={"category"} value={$expenseFilters.category} />}
             </div>
         </div>
     )

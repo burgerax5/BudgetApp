@@ -50,8 +50,18 @@ interface Props {
     filteredExpenses?: Expense[]
 }
 
+interface Expense {
+    name: string,
+    categoryId: number,
+    amount: number,
+    day: number,
+    month: number,
+    year: number
+}
+
 const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }) => {
     const $expenses = useStore(expenses)
+    const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
 
     useEffect(() => {
         getExpenses()
@@ -67,11 +77,33 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
         return `${date.getDate()} ${date?.toLocaleDateString('default', { month: 'short' })} ${date.getFullYear()}`
     }
 
+    const handleCheckboxChange = (expense: Expense) => {
+        if (!selectedExpenses.includes(expense))
+            setSelectedExpenses([...selectedExpenses, expense])
+        else
+            setSelectedExpenses(prevSelected => prevSelected.filter(prev => prev !== expense))
+    }
+
+    const checkAllCheckboxes = () => {
+        if (selectedExpenses.length)
+            setSelectedExpenses([])
+        else
+            setSelectedExpenses($expenses)
+    }
+
+    useEffect(() => {
+        console.log(selectedExpenses)
+    }, [selectedExpenses])
+
     return (
         <Table>
             <TableHeader>
                 <TableRow>
-                    {showCheckbox && <TableHead></TableHead>}
+                    {showCheckbox && <TableHead>
+                        <Checkbox
+                            checked={selectedExpenses.length === $expenses.length}
+                            onCheckedChange={checkAllCheckboxes} />
+                    </TableHead>}
                     <TableHead
                         className="cursor-pointer">
                         <div className="flex gap-3">
@@ -95,7 +127,11 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
             <TableBody>
                 {filteredExpenses && filteredExpenses.map(expense => (
                     <TableRow key={crypto.randomUUID()}>
-                        {showCheckbox && <TableCell><Checkbox /></TableCell>}
+                        {showCheckbox && <TableCell>
+                            <Checkbox
+                                checked={selectedExpenses.includes(expense)}
+                                onCheckedChange={() => handleCheckboxChange(expense)} />
+                        </TableCell>}
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
                         <TableCell>{getDate(expense)}</TableCell>
