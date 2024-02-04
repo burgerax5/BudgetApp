@@ -11,14 +11,17 @@ import RegisterForm from "@/components/RegisterForm";
 
 <Layout title="Register">
     <main class="flex flex-col items-center h-svh">
-        <div class="mt-20 border p-10 rounded-md flex flex-col items-center">
+        <div
+            class="mt-20 border w-auto p-8 rounded-md flex flex-col items-center"
+        >
             <h1 class="text-2xl font-bold py-3">Register</h1>
             <RegisterForm client:only="react" />
             <a
-                class="mt-3 text-sm text-muted-foreground hover:text-foreground"
+                class="mt-3 text-sm text-muted-foreground hover:opacity-100 opacity-70"
                 href="/login"
             >
-                Already have an account?</a
+                Already have an account? <span class="text-primary">Login</span
+                ></a
             >
         </div>
     </main>

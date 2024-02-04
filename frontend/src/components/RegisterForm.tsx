@@ -133,7 +133,7 @@ function RegisterForm() {
     };
 
     return (
-        <form className="w-96 p-3 flex flex-col gap-3" onSubmit={handleSubmit}>
+        <form className="w-full flex flex-col gap-3" onSubmit={handleSubmit}>
             {submitted && (!formState.username || !formState.password || !formState.confirmPassword) &&
                 <span>Please fill in all fields</span>}
             <div>
@@ -156,6 +156,8 @@ function RegisterForm() {
                     Password:
                 </label>
                 <PasswordInput
+                    formState={formState}
+                    setFormState={setFormState}
                     name="password"
                     value={formState.password}
                     onChange={handleChange}
@@ -168,6 +170,9 @@ function RegisterForm() {
                     Confirm Password:
                 </label>
                 <PasswordInput
+                    formState={formState}
+                    setFormState={setFormState}
+                    formMode={"Register"}
                     name="confirmPassword"
                     value={formState.confirmPassword}
                     onChange={handleChange}

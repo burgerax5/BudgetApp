@@ -5,12 +5,28 @@ import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { XCircle } from "lucide-react"
+
+interface RegistrationFormState {
+    username: string,
+    password: string,
+    confirmPassword?: string,
+    errors: {
+        username: string,
+        password: string,
+        confirmPassword?: string
+    },
+}
 
 interface InputProps
-    extends React.InputHTMLAttributes<HTMLInputElement> { }
+    extends React.InputHTMLAttributes<HTMLInputElement> {
+    formState: RegistrationFormState,
+    setFormState: React.Dispatch<React.SetStateAction<RegistrationFormState>>,
+    formMode?: string
+}
 
 const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, ...props }, ref) => {
+    ({ className, formState, setFormState, formMode, ...props }, ref) => {
         const [showPassword, setShowPassword] = useState(false)
         const disabled = props.value === "" || props.value === undefined || props.disabled
 
@@ -22,6 +38,26 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
                     ref={ref}
                     {...props}
                 />
+                {formMode && formState.confirmPassword && <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-7 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setFormState(prevState => ({ ...prevState, confirmPassword: '' }))
+                    }
+                >
+                    <XCircle className="h-4 w-4 cursor-pointer text-muted-foreground  hover:text-foreground" />
+                </Button>}
+                {!formMode && formState.password && <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-7 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setFormState(prevState => ({ ...prevState, password: '' }))
+                    }
+                >
+                    <XCircle className="h-4 w-4 cursor-pointer text-muted-foreground  hover:text-foreground" />
+                </Button>}
                 <Button
                     type="button"
                     variant="ghost"
@@ -32,12 +68,12 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
                 >
                     {showPassword && !disabled ? (
                         <EyeIcon
-                            className="h-4 w-4"
+                            className="h-4 w-4  hover:text-foreground"
                             aria-hidden="true"
                         />
                     ) : (
                         <EyeOffIcon
-                            className="h-4 w-4"
+                            className="h-4 w-4  hover:text-foreground"
                             aria-hidden="true"
                         />
                     )}

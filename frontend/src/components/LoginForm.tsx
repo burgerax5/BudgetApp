@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import axios from '@/api/axios';
 import { useStore } from '@nanostores/react';
 import { isLoggedIn } from '@/store/userStore';
+import { UsernameInput } from './ui/username-input';
 
 interface RegistrationFormState {
     username: string;
@@ -100,8 +101,6 @@ function LoginForm() {
 
             await checkUserExists(userData.username)
             await loginUser(userData)
-        } else {
-            console.log('Form has errors. Cannot submit.');
         }
     };
 
@@ -117,8 +116,9 @@ function LoginForm() {
             },
         }));
     };
+
     return (
-        <form className="w-96 p-3 flex flex-col gap-3" onSubmit={handleSubmit}>
+        <form className="w-full flex flex-col gap-3 sm:min-w-64 !" onSubmit={handleSubmit}>
             {submitted && (!formState.username || !formState.password) &&
                 <span>Please fill in all fields</span>}
             <div>
@@ -126,12 +126,13 @@ function LoginForm() {
                     htmlFor="username">
                     Username:
                 </label>
-                <Input
+                <UsernameInput
+                    formState={formState}
+                    setFormState={setFormState}
+                    onChange={handleChange}
                     type="text"
                     name="username"
-                    value={formState.username}
-                    onChange={handleChange}
-                />
+                    value={formState.username} />
                 {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
             </div>
             <div>
@@ -140,6 +141,8 @@ function LoginForm() {
                     Password:
                 </label>
                 <PasswordInput
+                    formState={formState}
+                    setFormState={setFormState}
                     name="password"
                     value={formState.password}
                     onChange={handleChange}
@@ -147,7 +150,10 @@ function LoginForm() {
                 {formState.errors.password && <span className="text-sm">{formState.errors.password}</span>}
             </div>
             {submitted && error && <span className="text-sm">{error}</span>}
-            <Button type="submit">Sign In</Button>
+            <Button
+                disabled={!formState.password.length || !formState.username.length}
+                type="submit"
+            >Sign In</Button>
         </form>
     )
 }
