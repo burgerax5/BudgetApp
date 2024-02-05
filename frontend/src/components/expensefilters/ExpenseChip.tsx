@@ -29,7 +29,6 @@ const ExpenseChip: React.FC<Props> = ({ name, value, maxPrice }) => {
 
     return (
         <Button className="flex gap-2" onClick={removeFilter}>
-            {value}
             <X size={16} />
         </Button>
     )
