@@ -42,6 +42,7 @@ export class ExpenseService {
                 { year: 'desc' },
                 { month: 'desc' },
                 { day: 'desc' },
+                { createdAt: 'desc' }
             ]
         })
     }
