@@ -44,17 +44,19 @@ interface Expense {
     year: number
 }
 
+const defaultFormState = {
+    name: '',
+    categoryId: 0,
+    amount: '0',
+    day: new Date().getDate(),
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear()
+}
+
 export function DialogButton() {
     const [categories, setCategories] = useState<Category[]>([])
     const [date, setDate] = useState<Date | undefined>(new Date())
-    const [formData, setFormData] = useState<Expense>({
-        name: '',
-        categoryId: 0,
-        amount: '0',
-        day: new Date().getDate(),
-        month: new Date().getMonth() + 1,
-        year: new Date().getFullYear()
-    })
+    const [formData, setFormData] = useState<Expense>(defaultFormState)
     const [error, setError] = useState<string | null>(null)
     const $expenses = useStore(expenses)
     const { toast } = useToast()
@@ -83,7 +85,13 @@ export function DialogButton() {
                     title: "Successfully added expense",
                     description: `${formData.name} $${formData.amount}`
                 })
-                location.replace('/')
+                setFormData({
+                    ...defaultFormState,
+                    day: new Date().getDate(),
+                    month: new Date().getMonth() + 1,
+                    year: new Date().getFullYear()
+                })
+                location.reload()
             }
             else {
                 toast({

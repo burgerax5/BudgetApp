@@ -3,7 +3,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useStore } from '@nanostores/react'
 import { expenseFilters, filteredExpenses, expenses } from '@/store/userStore'
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal, Plus, Search } from 'lucide-react'
 import {
     Popover,
     PopoverContent,
@@ -14,6 +14,7 @@ import ExpenseDateRange from './ExpenseDateRange'
 import ExpensePriceRange from './ExpensePriceRange'
 import axios from '@/api/axios';
 import ExpenseChip from './ExpenseChip'
+import { DialogButton } from '../ExpenseDialog'
 
 interface CategoryIndex {
     'Food & Drink': number;
@@ -112,10 +113,18 @@ const ExpenseFilters = () => {
             <div className="flex w-full mb-3.5 gap-3">
                 <Input className="w-full sm:w-72" placeholder="Search expense..." onChange={(e) => {
                     setSearch(e.target.value)
-                }} />
-
+                }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter")
+                            applyFilters()
+                    }}
+                />
                 <Popover>
-                    <PopoverTrigger className="bg-primary px-2 rounded"><SlidersHorizontal className="h-4 text-slate-300" /></PopoverTrigger>
+                    <PopoverTrigger className="bg-primary px-2 rounded">
+                        <div className="text-background">
+                            <SlidersHorizontal className="h-4" />
+                        </div>
+                    </PopoverTrigger>
                     <PopoverContent>
                         <div className="p-3.5 flex flex-col gap-3">
                             <h2 className="font-bold text-lg">Filters</h2>
@@ -126,15 +135,16 @@ const ExpenseFilters = () => {
                     </PopoverContent>
                 </Popover>
 
-                <Button onClick={applyFilters}>Search</Button>
+                <Button onClick={applyFilters}><Search className="h-4" /></Button>
+                <DialogButton />
             </div>
             <div className="flex gap-3">
-                {(submitted && $expenseFilters.search) &&
+                {/* {(submitted && $expenseFilters.search) &&
                     <ExpenseChip name={"search"} value={$expenseFilters.search} />}
                 {(submitted && $expenseFilters.maxPrice) &&
                     <ExpenseChip name={"maxPrice"} value={$expenseFilters.maxPrice} maxPrice={maxPrice} />}
                 {(submitted && $expenseFilters.category) &&
-                    <ExpenseChip name={"category"} value={$expenseFilters.category} />}
+                    <ExpenseChip name={"category"} value={$expenseFilters.category} />} */}
             </div>
         </div>
     )

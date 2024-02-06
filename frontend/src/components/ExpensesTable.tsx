@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from './ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
+import { ChevronsUp, ChevronsDown } from 'lucide-react'
 
 interface expenseDetails {
     name: string,
@@ -114,7 +115,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                 <TableRow>
                     {showCheckbox && <TableHead>
                         <Checkbox
-                            checked={selectedExpenses.length === $expenses.length}
+                            checked={selectedExpenses.length > 0 && selectedExpenses.length === $expenses.length}
                             onCheckedChange={checkAllCheckboxes} />
                     </TableHead>}
                     {headers.map((header, i) => (
@@ -129,39 +130,12 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                                 }
                             }}
                         >
-                            {header.name}
+                            <div className="flex items-center gap-2">
+                                {header.name}
+                                {header.reverse ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
+                            </div>
                         </TableHead>
                     ))}
-                    {/* <TableHead
-                        onClick={() => {
-                            if (filteredExpenses)
-                                console.log(mergeSort(filteredExpenses, "name"))
-                        }}
-                        className="cursor-pointer">
-                        <div className="flex gap-3">
-                            Expense
-                        </div>
-                    </TableHead>
-                    <TableHead
-                        onClick={() => {
-                            if (filteredExpenses)
-                                console.log(mergeSort(filteredExpenses, "categoryId"))
-                        }}
-                        className="w-[150px] cursor-pointer">
-                        Category
-                    </TableHead>
-                    <TableHead
-                        className="cursor-pointer">
-                        Date
-                    </TableHead>
-                    <TableHead
-                        onClick={() => {
-                            if (filteredExpenses)
-                                filteredExpensesStore.set(mergeSort(filteredExpenses, "amount"))
-                        }}
-                        className="text-right cursor-pointer">
-                        Amount
-                    </TableHead> */}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -175,7 +149,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                         <TableCell className="font-medium">{expense.name}</TableCell>
                         <TableCell>{Category[expense.categoryId]}</TableCell>
                         <TableCell>{getDate(expense)}</TableCell>
-                        <TableCell className="text-right">${expense.amount.toLocaleString('default', {
+                        <TableCell>${expense.amount.toLocaleString('default', {
                             minimumFractionDigits: 2
                         })}</TableCell>
                     </TableRow>
