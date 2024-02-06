@@ -44,7 +44,7 @@ const ExpenseCategorySelect = () => {
             <Label className="col-span-1">Category</Label>
             <Select onValueChange={(value) => getCategory(value)}>
                 <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={$expenseFilters.category ? $expenseFilters.category : "Select a category"} />
+                    <SelectValue placeholder={$expenseFilters.category ? $expenseFilters.category : "Any category"} />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>

@@ -10,7 +10,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import ExpenseCategorySelect from './ExpenseCategorySelect'
-import ExpenseDateRange from './ExpenseDateRange'
+import ExpenseDatePicker from './ExpenseDatePicker'
 import ExpensePriceRange from './ExpensePriceRange'
 import axios from '@/api/axios';
 import ExpenseChip from './ExpenseChip'
@@ -43,6 +43,13 @@ const Categories: CategoryIndex = {
     "Clothing": 10,
     "Miscellaneous": 11,
 }
+
+const months = [
+    'January', 'February', 'March',
+    'April', 'May', 'June',
+    'July', 'August', 'September',
+    'October', 'November', 'December'
+];
 
 const ExpenseFilters = () => {
     const $expenseFilters = useStore(expenseFilters)
@@ -85,7 +92,7 @@ const ExpenseFilters = () => {
 
     const applyFilters = () => {
         let newFilteredExpenses = $expenses.slice()
-        const { search, category, dateRange, maxPrice } = $expenseFilters
+        const { search, category, date, maxPrice } = $expenseFilters
 
         $expenses.map(exp => {
             // Apply search filter
@@ -103,10 +110,6 @@ const ExpenseFilters = () => {
         setSubmitted(true)
         filteredExpenses.set(newFilteredExpenses)
     }
-
-    useEffect(() => {
-        console.log($filteredExpenses)
-    }, [$filteredExpenses, expenses])
 
     return (
         <div>
@@ -126,15 +129,17 @@ const ExpenseFilters = () => {
                                 <SlidersHorizontal className="h-4" />
                             </div>
                         </PopoverTrigger>
-                        <PopoverContent>
+                        <PopoverContent className="w-72 sm:w-96">
                             <div className="p-3.5 flex flex-col gap-3">
                                 <h2 className="font-bold text-lg">Filters</h2>
                                 <ExpenseCategorySelect />
-                                <ExpenseDateRange />
+                                <ExpenseDatePicker />
                                 <ExpensePriceRange maxPrice={maxPrice} />
                                 <div className="flex gap-3">
                                     {$expenseFilters.category &&
                                         <ExpenseChip name={"category"} value={$expenseFilters.category} />}
+                                    {$expenseFilters.date.month &&
+                                        <ExpenseChip name={"month"} value={months[$expenseFilters.date.month - 1]} />}
                                 </div>
                                 <Button onClick={applyFilters}>Apply</Button>
                             </div>

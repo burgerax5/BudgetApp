@@ -1,4 +1,5 @@
 interface Expense {
+    id: number,
     name: string,
     categoryId: number,
     amount: number,

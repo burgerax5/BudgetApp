@@ -10,6 +10,7 @@ interface Budget {
 }
 
 interface Expense {
+    id: number,
     name: string,
     categoryId: number,
     amount: number,
@@ -18,17 +19,12 @@ interface Expense {
     year: number
 }
 
-interface SelectedDate {
-    date: Date,
-    yearOnly: boolean
-}
-
 interface ExpenseFilters {
     search: string,
     category: string | null,
-    dateRange: {
-        startDate: Date | null,
-        endDate: Date | null
+    date: {
+        month: number | null,
+        year: number | null
     },
     maxPrice: number,
     sorting: {
@@ -48,9 +44,9 @@ export const filteredExpenses = atom<Expense[]>([])
 export const expenseFilters = atom<ExpenseFilters>({
     search: "",
     category: null,
-    dateRange: {
-        startDate: null,
-        endDate: null
+    date: {
+        month: null,
+        year: null
     },
     maxPrice: 0,
     sorting: {

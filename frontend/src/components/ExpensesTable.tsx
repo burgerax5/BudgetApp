@@ -14,15 +14,6 @@ import { Checkbox } from './ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
 import { ChevronsUp, ChevronsDown } from 'lucide-react'
 
-interface expenseDetails {
-    name: string,
-    categoryId: number,
-    amount: number,
-    day: number,
-    month: number,
-    year: number
-}
-
 enum Category {
     "Food & Drink" = 1,
     Entertainment,
@@ -38,6 +29,7 @@ enum Category {
 }
 
 interface Expense {
+    id: number,
     name: string,
     categoryId: number,
     amount: number,
@@ -86,7 +78,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
         if (res.data) expenses.set(res.data.expenses)
     }
 
-    const getDate = (expense: expenseDetails) => {
+    const getDate = (expense: Expense) => {
         const date = new Date(expense.year, expense.month - 1, expense.day)
         return `${date.getDate()} ${date?.toLocaleDateString('default', { month: 'short' })} ${date.getFullYear()}`
     }
@@ -120,6 +112,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                     </TableHead>}
                     {headers.map((header, i) => (
                         <TableHead
+                            key={header.name}
                             onClick={() => {
                                 if (filteredExpenses) {
                                     setHeaders(prevHeaders => {

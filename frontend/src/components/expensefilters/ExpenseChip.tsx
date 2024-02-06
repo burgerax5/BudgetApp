@@ -7,10 +7,9 @@ import { expenseFilters } from '@/store/userStore'
 interface Props {
     name: string,
     value: unknown,
-    maxPrice?: number
 }
 
-const ExpenseChip: React.FC<Props> = ({ name, value, maxPrice }) => {
+const ExpenseChip: React.FC<Props> = ({ name, value }) => {
     const $expenseFilters = useStore(expenseFilters)
 
     const removeFilter = () => {
@@ -18,9 +17,22 @@ const ExpenseChip: React.FC<Props> = ({ name, value, maxPrice }) => {
             case "category":
                 expenseFilters.set({ ...$expenseFilters, category: null })
                 break
-            // case "maxPrice":
-            //     expenseFilters.set({ ...$expenseFilters, maxPrice: null })
-            //     break
+            case "month":
+                expenseFilters.set({
+                    ...$expenseFilters, date: {
+                        month: null,
+                        year: $expenseFilters.date.year
+                    }
+                })
+                break
+            case "year":
+                expenseFilters.set({
+                    ...$expenseFilters, date: {
+                        month: $expenseFilters.date.month,
+                        year: null
+                    }
+                })
+                break
         }
     }
 

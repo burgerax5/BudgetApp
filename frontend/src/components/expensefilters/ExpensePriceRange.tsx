@@ -25,7 +25,7 @@ const ExpensePriceRange: React.FC<Props> = ({ maxPrice }) => {
                 max={maxPrice}
                 step={1}
                 onValueChange={setPrice} />
-            <Input className="w-24" disabled value={`$${price[0]}`} />
+            <span>${price[0]}</span>
         </>
     )
 }
