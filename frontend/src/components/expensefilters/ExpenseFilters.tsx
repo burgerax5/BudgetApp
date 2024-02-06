@@ -110,41 +110,42 @@ const ExpenseFilters = () => {
 
     return (
         <div>
-            <div className="flex w-full mb-3.5 gap-3">
-                <Input className="w-full sm:w-72" placeholder="Search expense..." onChange={(e) => {
-                    setSearch(e.target.value)
-                }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter")
-                            applyFilters()
+            <div className="flex flex-col w-full mb-3.5 gap-3 sm:flex-row">
+                <div className="flex gap-3">
+                    <Input className="w-full sm:w-72" placeholder="Search expense..." onChange={(e) => {
+                        setSearch(e.target.value)
                     }}
-                />
-                <Popover>
-                    <PopoverTrigger className="bg-primary px-2 rounded">
-                        <div className="text-background">
-                            <SlidersHorizontal className="h-4" />
-                        </div>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                        <div className="p-3.5 flex flex-col gap-3">
-                            <h2 className="font-bold text-lg">Filters</h2>
-                            <ExpenseCategorySelect />
-                            <ExpenseDateRange />
-                            <ExpensePriceRange maxPrice={maxPrice} />
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter")
+                                applyFilters()
+                        }}
+                    />
+                    <Popover>
+                        <PopoverTrigger className="bg-primary px-2 rounded">
+                            <div className="text-background">
+                                <SlidersHorizontal className="h-4" />
+                            </div>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                            <div className="p-3.5 flex flex-col gap-3">
+                                <h2 className="font-bold text-lg">Filters</h2>
+                                <ExpenseCategorySelect />
+                                <ExpenseDateRange />
+                                <ExpensePriceRange maxPrice={maxPrice} />
+                                <div className="flex gap-3">
+                                    {$expenseFilters.category &&
+                                        <ExpenseChip name={"category"} value={$expenseFilters.category} />}
+                                </div>
+                                <Button onClick={applyFilters}>Apply</Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                </div>
 
-                <Button onClick={applyFilters}><Search className="h-4" /></Button>
-                <DialogButton />
-            </div>
-            <div className="flex gap-3">
-                {/* {(submitted && $expenseFilters.search) &&
-                    <ExpenseChip name={"search"} value={$expenseFilters.search} />}
-                {(submitted && $expenseFilters.maxPrice) &&
-                    <ExpenseChip name={"maxPrice"} value={$expenseFilters.maxPrice} maxPrice={maxPrice} />}
-                {(submitted && $expenseFilters.category) &&
-                    <ExpenseChip name={"category"} value={$expenseFilters.category} />} */}
+                <div className="flex gap-3">
+                    <Button onClick={applyFilters}><Search className="h-4 flex item-center" /> Search</Button>
+                    <DialogButton />
+                </div>
             </div>
         </div>
     )

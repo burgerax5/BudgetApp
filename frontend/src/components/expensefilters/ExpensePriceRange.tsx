@@ -3,6 +3,7 @@ import { Slider } from "@/components/ui/slider"
 import { Label } from '../ui/label'
 import { useStore } from '@nanostores/react'
 import { expenseFilters, expenses } from '@/store/userStore'
+import { Input } from '../ui/input'
 
 interface Props {
     maxPrice: number
@@ -24,7 +25,7 @@ const ExpensePriceRange: React.FC<Props> = ({ maxPrice }) => {
                 max={maxPrice}
                 step={1}
                 onValueChange={setPrice} />
-            <span>${price}</span>
+            <Input className="w-24" disabled value={`$${price[0]}`} />
         </>
     )
 }

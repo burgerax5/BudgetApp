@@ -18,18 +18,18 @@ const ExpenseChip: React.FC<Props> = ({ name, value, maxPrice }) => {
             case "category":
                 expenseFilters.set({ ...$expenseFilters, category: null })
                 break
-            case "search":
-                expenseFilters.set({ ...$expenseFilters, search: "" })
-                break
-            case "maxPrice":
-                expenseFilters.set({ ...$expenseFilters, maxPrice: null })
-                break
+            // case "maxPrice":
+            //     expenseFilters.set({ ...$expenseFilters, maxPrice: null })
+            //     break
         }
     }
 
     return (
-        <Button className="flex gap-2" onClick={removeFilter}>
-            <X size={16} />
+        <Button variant="outline" className="flex gap-2" onClick={removeFilter}>
+            <div className="flex items-center gap-2">
+                {value}
+                <X size={16} />
+            </div>
         </Button>
     )
 }
