@@ -98,11 +98,18 @@ const ExpenseFilters = () => {
             // Apply search filter
             newFilteredExpenses = newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
 
-            // // Apply category filter
+            // Apply category filter
             if (category)
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.categoryId === Categories[category as keyof CategoryIndex]))
 
-            // // Apply price filter
+            // Apply year filter
+            if (date.year && !date.month)
+                newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.year === date.year))
+
+            if (date.year && date.month)
+                newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.year === date.year && exp.month === date.month))
+
+            // Apply price filter
             if (maxPrice)
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.amount <= maxPrice))
         })
@@ -148,7 +155,7 @@ const ExpenseFilters = () => {
                 </div>
 
                 <div className="flex gap-3">
-                    <Button onClick={applyFilters}><Search className="h-4 flex item-center" /> Search</Button>
+                    <Button onClick={applyFilters}><Search className="h-4 flex item-center" />Search</Button>
                     <DialogButton />
                 </div>
             </div>

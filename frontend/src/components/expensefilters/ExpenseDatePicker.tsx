@@ -38,7 +38,13 @@ export default function ExpenseDatePicker() {
     const [selectedDate, setSelectedDate] = useState<{
         month: number | null,
         year: number | null
-    }>($expenseFilters.date)
+    }>(
+        {
+            month: $expenseFilters.date.month,
+            year: $expenseFilters.date.year ? $expenseFilters.date.year : new Date().getFullYear()
+        }
+    )
+
     const [checked, setChecked] = useState(selectedDate.year !== null)
 
     useEffect(() => {
@@ -52,6 +58,10 @@ export default function ExpenseDatePicker() {
         else
             expenseFilters.set({ ...$expenseFilters, date: selectedDate })
     }, [checked])
+
+    useEffect(() => {
+        console.log($expenseFilters.date)
+    }, [$expenseFilters])
 
     return (
         <>
@@ -82,7 +92,7 @@ export default function ExpenseDatePicker() {
                 </Select>
                 <Input className="w-[80px]" type="number"
                     disabled={!checked}
-                    value={`${selectedDate.year ? selectedDate.year : new Date().getFullYear()}`}
+                    value={`${selectedDate.year}`}
                     onChange={(e) => {
                         const newYear = e.target.value
                         setSelectedDate((prevDate) => ({ ...prevDate, year: parseInt(newYear) }))
