@@ -13,6 +13,7 @@ import {
 import { Checkbox } from './ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
 import { ChevronsUp, ChevronsDown } from 'lucide-react'
+import ExpenseToolbar from './expensefilters/ExpenseToolbar'
 
 enum Category {
     "Food & Drink" = 1,
@@ -106,55 +107,60 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
     }
 
     return (
-        <Table>
-            <TableHeader className="text-white">
-                <TableRow>
-                    {showCheckbox && <TableHead>
-                        <Checkbox
-                            checked={selectedExpenses.length > 0 && selectedExpenses.length === $expenses.length}
-                            onCheckedChange={checkAllCheckboxes} />
-                    </TableHead>}
-                    {headers.map((header, i) => (
-                        <TableHead
-                            key={header.name}
-                            onClick={() => {
-                                if (filteredExpenses) {
-                                    setHeaders((prevHeaders) => {
-                                        const newHeaderState = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
-                                        filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))
-                                        return defaultHeaders.slice(0, i).concat(newHeaderState).concat(defaultHeaders.slice(i + 1))
-                                    })
-                                }
-                            }}
-                        >
-                            <div className="flex items-center gap-2">
-                                {header.name}
-                                {header.mode === "none" && <div className="h-4 w-4"></div>}
-                                {header.mode === "asc" && <ChevronsUp className="h-4 w-4" />}
-                                {header.mode === "desc" && <ChevronsDown className="h-4 w-4" />}
-                            </div>
-                        </TableHead>
-                    ))}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {filteredExpenses && filteredExpenses.map(expense => (
-                    <TableRow key={crypto.randomUUID()}>
-                        {showCheckbox && <TableCell>
+        <>
+            <ExpenseToolbar
+                selectedExpenses={selectedExpenses}
+                setSelectedExpenses={setSelectedExpenses} />
+            <Table>
+                <TableHeader className="text-white">
+                    <TableRow>
+                        {showCheckbox && <TableHead>
                             <Checkbox
-                                checked={selectedExpenses.includes(expense)}
-                                onCheckedChange={() => handleCheckboxChange(expense)} />
-                        </TableCell>}
-                        <TableCell className="font-medium">{expense.name}</TableCell>
-                        <TableCell>{Category[expense.categoryId]}</TableCell>
-                        <TableCell>{getDate(expense)}</TableCell>
-                        <TableCell>${expense.amount.toLocaleString('default', {
-                            minimumFractionDigits: 2
-                        })}</TableCell>
+                                checked={selectedExpenses.length > 0 && selectedExpenses.length === $expenses.length}
+                                onCheckedChange={checkAllCheckboxes} />
+                        </TableHead>}
+                        {headers.map((header, i) => (
+                            <TableHead
+                                key={header.name}
+                                onClick={() => {
+                                    if (filteredExpenses) {
+                                        setHeaders((prevHeaders) => {
+                                            const newHeaderState = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
+                                            filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))
+                                            return defaultHeaders.slice(0, i).concat(newHeaderState).concat(defaultHeaders.slice(i + 1))
+                                        })
+                                    }
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {header.name}
+                                    {header.mode === "none" && <div className="h-4 w-4"></div>}
+                                    {header.mode === "asc" && <ChevronsUp className="h-4 w-4" />}
+                                    {header.mode === "desc" && <ChevronsDown className="h-4 w-4" />}
+                                </div>
+                            </TableHead>
+                        ))}
                     </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+                </TableHeader>
+                <TableBody>
+                    {filteredExpenses && filteredExpenses.map(expense => (
+                        <TableRow key={crypto.randomUUID()}>
+                            {showCheckbox && <TableCell>
+                                <Checkbox
+                                    checked={selectedExpenses.includes(expense)}
+                                    onCheckedChange={() => handleCheckboxChange(expense)} />
+                            </TableCell>}
+                            <TableCell className="font-medium">{expense.name}</TableCell>
+                            <TableCell>{Category[expense.categoryId]}</TableCell>
+                            <TableCell>{getDate(expense)}</TableCell>
+                            <TableCell>${expense.amount.toLocaleString('default', {
+                                minimumFractionDigits: 2
+                            })}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </>
     )
 }
 

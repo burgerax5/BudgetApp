@@ -2,10 +2,10 @@ import express, { Router, Response, Request } from 'express';
 
 import { ExpenseController } from '../controllers/expenseController';
 import { authenticateToken } from '../middlewares/authenticationMiddleware';
-import { expenseService, userService, currencyService } from '../services/service_init';
+import { expenseService, userService } from '../services/service_init';
 
 const router: Router = express.Router();
-const expenseController: ExpenseController = new ExpenseController(expenseService, userService, currencyService)
+const expenseController: ExpenseController = new ExpenseController(expenseService, userService)
 
 router.get('/', authenticateToken, (req: Request, res: Response) => {
     expenseController.getExpenseByParams(req, res)
