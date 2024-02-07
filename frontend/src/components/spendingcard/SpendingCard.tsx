@@ -40,7 +40,7 @@ const SpendingCard = () => {
             </CardHeader>
             <CardContent>
                 {$expenses.length ?
-                    <ExpensesTable take={5} showCheckbox={false} filteredExpenses={$expenses} />
+                    <ExpensesTable take={5} showCheckboxAndToolbar={false} filteredExpenses={$expenses} />
                     : <div>You have not added any expenses.</div>}
             </CardContent>
             <CardFooter>

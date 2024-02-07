@@ -17,7 +17,7 @@ const ExpensePage = () => {
         <>
             <ExpenseFilters />
             {/* <ExpenseToolbar /> */}
-            <ExpensesTable take={undefined} showCheckbox={true} filteredExpenses={$filteredExpenses} />
+            <ExpensesTable take={undefined} showCheckboxAndToolbar={true} filteredExpenses={$filteredExpenses} />
         </>
     )
 }

@@ -41,7 +41,7 @@ interface Expense {
 
 interface Props {
     take: number | undefined,
-    showCheckbox: boolean,
+    showCheckboxAndToolbar: boolean,
     filteredExpenses?: Expense[]
 }
 
@@ -67,7 +67,7 @@ const defaultHeaders: Header[] = [
     { name: "Amount", keys: ["amount"], mode: "none" },
 ]
 
-const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }) => {
+const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filteredExpenses }) => {
     const $expenses = useStore(expenses)
     const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
     const [headers, setHeaders] = useState<Header[]>(defaultHeaders)
@@ -110,11 +110,12 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
         <>
             <ExpenseToolbar
                 selectedExpenses={selectedExpenses}
-                setSelectedExpenses={setSelectedExpenses} />
+                setSelectedExpenses={setSelectedExpenses}
+                show={showCheckboxAndToolbar} />
             <Table>
                 <TableHeader className="text-white">
-                    <TableRow>
-                        {showCheckbox && <TableHead>
+                    <TableRow className="bg-slate-100/50 dark:bg-slate-800/50">
+                        {showCheckboxAndToolbar && <TableHead>
                             <Checkbox
                                 checked={selectedExpenses.length > 0 && selectedExpenses.length === $expenses.length}
                                 onCheckedChange={checkAllCheckboxes} />
@@ -145,15 +146,15 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                 <TableBody>
                     {filteredExpenses && filteredExpenses.map(expense => (
                         <TableRow key={crypto.randomUUID()}>
-                            {showCheckbox && <TableCell>
+                            {showCheckboxAndToolbar && <TableCell>
                                 <Checkbox
                                     checked={selectedExpenses.includes(expense)}
                                     onCheckedChange={() => handleCheckboxChange(expense)} />
                             </TableCell>}
-                            <TableCell className="font-medium">{expense.name}</TableCell>
-                            <TableCell>{Category[expense.categoryId]}</TableCell>
-                            <TableCell>{getDate(expense)}</TableCell>
-                            <TableCell>${expense.amount.toLocaleString('default', {
+                            <TableCell className={`${headers[0].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{expense.name}</TableCell>
+                            <TableCell className={`${headers[1].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{Category[expense.categoryId]}</TableCell>
+                            <TableCell className={`${headers[2].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{getDate(expense)}</TableCell>
+                            <TableCell className={`${headers[3].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>${expense.amount.toLocaleString('default', {
                                 minimumFractionDigits: 2
                             })}</TableCell>
                         </TableRow>
