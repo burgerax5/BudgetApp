@@ -21,6 +21,8 @@ interface Category {
 const ExpenseCategorySelect = () => {
     const [categories, setCategories] = useState<Category[]>([])
     const $expenseFilters = useStore(expenseFilters)
+    const [selectedCategory, setSelectedCategory] = useState<string>
+        ($expenseFilters.category ? $expenseFilters.category : "Any category")
 
     useEffect(() => {
         const getCategories = async () => {
@@ -39,12 +41,16 @@ const ExpenseCategorySelect = () => {
         })
     }
 
+    useEffect(() => {
+        setSelectedCategory($expenseFilters.category ? $expenseFilters.category : "Any category")
+    }, [$expenseFilters.category])
+
     return (
         <div>
             <Label className="col-span-1">Category</Label>
             <Select onValueChange={(value) => getCategory(value)}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={$expenseFilters.category ? $expenseFilters.category : "Any category"} />
+                <SelectTrigger className="w-[180px]" value={selectedCategory}>
+                    {selectedCategory}
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>

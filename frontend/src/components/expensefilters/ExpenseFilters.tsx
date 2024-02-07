@@ -103,10 +103,10 @@ const ExpenseFilters = () => {
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.categoryId === Categories[category as keyof CategoryIndex]))
 
             // Apply year filter
-            if (date.year && !date.month)
+            if (date.year && !date.month && date.checked)
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.year === date.year))
 
-            if (date.year && date.month)
+            if (date.year && date.month && date.checked)
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.year === date.year && exp.month === date.month))
 
             // Apply price filter
@@ -145,8 +145,14 @@ const ExpenseFilters = () => {
                                 <div className="flex gap-3">
                                     {$expenseFilters.category &&
                                         <ExpenseChip name={"category"} value={$expenseFilters.category} />}
-                                    {$expenseFilters.date.month &&
-                                        <ExpenseChip name={"month"} value={months[$expenseFilters.date.month - 1]} />}
+                                    {($expenseFilters.date.checked) &&
+                                        <ExpenseChip
+                                            name={"date"}
+                                            value={
+                                                $expenseFilters.date.month ?
+                                                    `${months[$expenseFilters.date.month - 1]} ${$expenseFilters.date.year}` :
+                                                    `${$expenseFilters.date.year}`
+                                            } />}
                                 </div>
                                 <Button onClick={applyFilters}>Apply</Button>
                             </div>

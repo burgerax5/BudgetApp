@@ -17,19 +17,11 @@ const ExpenseChip: React.FC<Props> = ({ name, value }) => {
             case "category":
                 expenseFilters.set({ ...$expenseFilters, category: null })
                 break
-            case "month":
+            case "date":
                 expenseFilters.set({
                     ...$expenseFilters, date: {
-                        month: null,
-                        year: $expenseFilters.date.year
-                    }
-                })
-                break
-            case "year":
-                expenseFilters.set({
-                    ...$expenseFilters, date: {
-                        month: $expenseFilters.date.month,
-                        year: null
+                        ...$expenseFilters.date,
+                        checked: false
                     }
                 })
                 break

@@ -35,52 +35,28 @@ export default function ExpenseDatePicker() {
         'July', 'August', 'September',
         'October', 'November', 'December'
     ]
-    const [selectedDate, setSelectedDate] = useState<{
-        month: number | null,
-        year: number | null
-    }>(
-        {
-            month: $expenseFilters.date.month,
-            year: $expenseFilters.date.year ? $expenseFilters.date.year : new Date().getFullYear()
-        }
-    )
-
-    const [checked, setChecked] = useState(selectedDate.year !== null)
-
-    useEffect(() => {
-        if (!checked)
-            expenseFilters.set({
-                ...$expenseFilters, date: {
-                    month: null,
-                    year: null
-                }
-            })
-        else
-            expenseFilters.set({ ...$expenseFilters, date: selectedDate })
-    }, [checked])
-
-    useEffect(() => {
-        console.log($expenseFilters.date)
-    }, [$expenseFilters])
 
     return (
         <>
             <Label>Date</Label>
             <div className="flex gap-3 item-center">
                 <Checkbox className="my-auto"
-                    checked={checked}
+                    checked={$expenseFilters.date.checked}
                     onCheckedChange={() => {
-                        setChecked(prev => !prev)
+                        expenseFilters.set({
+                            ...$expenseFilters,
+                            date: { ...$expenseFilters.date, checked: !$expenseFilters.date.checked }
+                        })
                     }} />
 
                 <Select
-                    disabled={!checked}
+                    disabled={!$expenseFilters.date.checked}
                     onValueChange={(value) => {
                         console.log(parseInt(value) + 1)
-                        expenseFilters.set({ ...$expenseFilters, date: { ...selectedDate, month: parseInt(value) + 1 } })
+                        expenseFilters.set({ ...$expenseFilters, date: { ...$expenseFilters.date, month: parseInt(value) + 1 } })
                     }}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={selectedDate.month ? selectedDate.month : "Any month"} />
+                        <SelectValue placeholder={$expenseFilters.date.month ? $expenseFilters.date.month : "Any month"} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
@@ -91,11 +67,18 @@ export default function ExpenseDatePicker() {
                     </SelectContent>
                 </Select>
                 <Input className="w-[80px]" type="number"
-                    disabled={!checked}
-                    value={`${selectedDate.year}`}
+                    disabled={!$expenseFilters.date.checked}
+                    value={`${$expenseFilters.date.year}`}
                     onChange={(e) => {
                         const newYear = e.target.value
-                        setSelectedDate((prevDate) => ({ ...prevDate, year: parseInt(newYear) }))
+                        expenseFilters.set({
+                            ...$expenseFilters,
+                            date: {
+                                ...$expenseFilters.date,
+                                year: parseInt(newYear)
+                            }
+                        })
+                        // setSelectedDate((prevDate) => ({ ...prevDate, year: parseInt(newYear) }))
                     }} />
             </div>
         </>

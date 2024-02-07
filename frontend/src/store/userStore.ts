@@ -24,7 +24,8 @@ interface ExpenseFilters {
     category: string | null,
     date: {
         month: number | null,
-        year: number | null
+        year: number,
+        checked: boolean
     },
     maxPrice: number,
     sorting: {
@@ -46,7 +47,8 @@ export const expenseFilters = atom<ExpenseFilters>({
     category: null,
     date: {
         month: null,
-        year: null
+        year: new Date().getFullYear(),
+        checked: false
     },
     maxPrice: 0,
     sorting: {
