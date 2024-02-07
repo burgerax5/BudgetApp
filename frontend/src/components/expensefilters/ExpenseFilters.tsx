@@ -54,9 +54,7 @@ const months = [
 const ExpenseFilters = () => {
     const $expenseFilters = useStore(expenseFilters)
     const [search, setSearch] = useState<string>($expenseFilters.search)
-    const $filteredExpenses = useStore(filteredExpenses)
     const $expenses = useStore(expenses)
-    const [submitted, setSubmitted] = useState(false)
 
     const [maxPrice, setMaxPrice] = useState<number>(0)
 
@@ -76,7 +74,7 @@ const ExpenseFilters = () => {
         })
 
         setMaxPrice(highest)
-    }, [])
+    }, [$expenses])
 
     useEffect(() => {
         filteredExpenses.set($expenses)
@@ -114,7 +112,6 @@ const ExpenseFilters = () => {
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.amount <= maxPrice))
         })
 
-        setSubmitted(true)
         filteredExpenses.set(newFilteredExpenses)
     }
 

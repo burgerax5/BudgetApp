@@ -56,7 +56,7 @@ export default function ExpenseDatePicker() {
                         expenseFilters.set({ ...$expenseFilters, date: { ...$expenseFilters.date, month: parseInt(value) + 1 } })
                     }}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={$expenseFilters.date.month ? $expenseFilters.date.month : "Any month"} />
+                        {$expenseFilters.date.month ? months[$expenseFilters.date.month - 1] : "Any month"}
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>

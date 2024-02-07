@@ -56,14 +56,14 @@ interface Expense {
 interface Header {
     name: string,
     keys: (keyof Expense)[],
-    reverse: boolean
+    mode: "none" | "asc" | "desc"
 }
 
 const defaultHeaders: Header[] = [
-    { name: "Expense", keys: ["name"], reverse: false },
-    { name: "Category", keys: ["categoryId"], reverse: false },
-    { name: "Date", keys: ["year", "month", "day"], reverse: false },
-    { name: "Amount", keys: ["amount"], reverse: false },
+    { name: "Expense", keys: ["name"], mode: "none" },
+    { name: "Category", keys: ["categoryId"], mode: "none" },
+    { name: "Date", keys: ["year", "month", "day"], mode: "none" },
+    { name: "Amount", keys: ["amount"], mode: "none" },
 ]
 
 const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }) => {
@@ -74,6 +74,12 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
     useEffect(() => {
         getExpenses()
     }, [])
+
+    const shiftMode = (currMode: string) => {
+        const cycle = ["none", "asc", "desc"]
+        const index = cycle.findIndex((el) => el === currMode)
+        return cycle[(index + 1) % 3]
+    }
 
     const getExpenses = async () => {
         const res = await axios.get(`/expense/${take ? `?take=${take}` : ``}`, { withCredentials: true })
@@ -99,10 +105,6 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
             setSelectedExpenses($expenses)
     }
 
-    useEffect(() => {
-
-    }, [filteredExpenses])
-
     return (
         <Table>
             <TableHeader className="text-white">
@@ -118,8 +120,8 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                             onClick={() => {
                                 if (filteredExpenses) {
                                     setHeaders((prevHeaders) => {
-                                        const newHeaderState = { ...defaultHeaders[i], reverse: !prevHeaders[i].reverse }
-                                        filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.reverse))
+                                        const newHeaderState = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
+                                        filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))
                                         return defaultHeaders.slice(0, i).concat(newHeaderState).concat(defaultHeaders.slice(i + 1))
                                     })
                                 }
@@ -127,7 +129,9 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                         >
                             <div className="flex items-center gap-2">
                                 {header.name}
-                                {header.reverse ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
+                                {header.mode === "none" && <div className="h-4 w-4"></div>}
+                                {header.mode === "asc" && <ChevronsUp className="h-4 w-4" />}
+                                {header.mode === "desc" && <ChevronsDown className="h-4 w-4" />}
                             </div>
                         </TableHead>
                     ))}

@@ -9,7 +9,7 @@ interface Expense {
 }
 
 
-export function mergeSort(expenses: Expense[], fields: (keyof Expense)[], reverse: boolean = false): Expense[] {
+export function mergeSort(expenses: Expense[], fields: (keyof Expense)[], mode: string): Expense[] {
     if (expenses.length <= 1) {
         return expenses;
     }
@@ -19,30 +19,42 @@ export function mergeSort(expenses: Expense[], fields: (keyof Expense)[], revers
     const right = expenses.slice(middle);
 
     return merge(
-        mergeSort(left, fields, reverse),
-        mergeSort(right, fields, reverse),
+        mergeSort(left, fields, mode),
+        mergeSort(right, fields, mode),
         fields,
-        reverse
+        mode
     );
 }
 
-function merge(left: Expense[], right: Expense[], fields: (keyof Expense)[], reverse: boolean): Expense[] {
+function merge(left: Expense[], right: Expense[], fields: (keyof Expense)[], mode: string): Expense[] {
     let result: Expense[] = [];
     let leftIndex = 0;
     let rightIndex = 0;
 
-    for (let i = 0; i < fields.length; i++) {
-        while (leftIndex < left.length && rightIndex < right.length) {
+    const reverse = mode === "desc";
+
+    while (leftIndex < left.length && rightIndex < right.length) {
+        let comparison = 0;
+
+        for (let i = 0; i < fields.length; i++) {
             const leftValue = left[leftIndex][fields[i]];
             const rightValue = right[rightIndex][fields[i]];
 
-            if ((reverse && leftValue > rightValue) || (!reverse && leftValue < rightValue)) {
-                result.push(left[leftIndex]);
-                leftIndex++;
-            } else {
-                result.push(right[rightIndex]);
-                rightIndex++;
+            if (leftValue < rightValue) {
+                comparison = reverse ? 1 : -1;
+                break;
+            } else if (leftValue > rightValue) {
+                comparison = reverse ? -1 : 1;
+                break;
             }
+        }
+
+        if (comparison < 0) {
+            result.push(left[leftIndex]);
+            leftIndex++;
+        } else {
+            result.push(right[rightIndex]);
+            rightIndex++;
         }
     }
 

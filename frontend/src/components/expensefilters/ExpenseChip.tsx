@@ -21,6 +21,7 @@ const ExpenseChip: React.FC<Props> = ({ name, value }) => {
                 expenseFilters.set({
                     ...$expenseFilters, date: {
                         ...$expenseFilters.date,
+                        month: null,
                         checked: false
                     }
                 })
