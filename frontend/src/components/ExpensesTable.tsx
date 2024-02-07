@@ -55,19 +55,21 @@ interface Expense {
 
 interface Header {
     name: string,
-    key: keyof Expense,
+    keys: (keyof Expense)[],
     reverse: boolean
 }
+
+const defaultHeaders: Header[] = [
+    { name: "Expense", keys: ["name"], reverse: false },
+    { name: "Category", keys: ["categoryId"], reverse: false },
+    { name: "Date", keys: ["year", "month", "day"], reverse: false },
+    { name: "Amount", keys: ["amount"], reverse: false },
+]
 
 const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }) => {
     const $expenses = useStore(expenses)
     const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
-    const [headers, setHeaders] = useState<Header[]>([
-        { name: "Expense", key: "name", reverse: false },
-        { name: "Category", key: "categoryId", reverse: false },
-        { name: "Date", key: "day", reverse: false },
-        { name: "Amount", key: "amount", reverse: false },
-    ])
+    const [headers, setHeaders] = useState<Header[]>(defaultHeaders)
 
     useEffect(() => {
         getExpenses()
@@ -115,10 +117,10 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckbox, filteredExpenses }
                             key={header.name}
                             onClick={() => {
                                 if (filteredExpenses) {
-                                    setHeaders(prevHeaders => {
-                                        const newHeaderState = { ...prevHeaders[i], reverse: !prevHeaders[i].reverse }
-                                        filteredExpensesStore.set(mergeSort(filteredExpenses, header.key, newHeaderState.reverse))
-                                        return prevHeaders.slice(0, i).concat(newHeaderState).concat(prevHeaders.slice(i + 1))
+                                    setHeaders((prevHeaders) => {
+                                        const newHeaderState = { ...defaultHeaders[i], reverse: !prevHeaders[i].reverse }
+                                        filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.reverse))
+                                        return defaultHeaders.slice(0, i).concat(newHeaderState).concat(defaultHeaders.slice(i + 1))
                                     })
                                 }
                             }}

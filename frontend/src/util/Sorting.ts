@@ -9,7 +9,7 @@ interface Expense {
 }
 
 
-export function mergeSort(expenses: Expense[], field: keyof Expense, reverse: boolean = false): Expense[] {
+export function mergeSort(expenses: Expense[], fields: (keyof Expense)[], reverse: boolean = false): Expense[] {
     if (expenses.length <= 1) {
         return expenses;
     }
@@ -19,28 +19,30 @@ export function mergeSort(expenses: Expense[], field: keyof Expense, reverse: bo
     const right = expenses.slice(middle);
 
     return merge(
-        mergeSort(left, field, reverse),
-        mergeSort(right, field, reverse),
-        field,
+        mergeSort(left, fields, reverse),
+        mergeSort(right, fields, reverse),
+        fields,
         reverse
     );
 }
 
-function merge(left: Expense[], right: Expense[], field: keyof Expense, reverse: boolean): Expense[] {
+function merge(left: Expense[], right: Expense[], fields: (keyof Expense)[], reverse: boolean): Expense[] {
     let result: Expense[] = [];
     let leftIndex = 0;
     let rightIndex = 0;
 
-    while (leftIndex < left.length && rightIndex < right.length) {
-        const leftValue = left[leftIndex][field];
-        const rightValue = right[rightIndex][field];
+    for (let i = 0; i < fields.length; i++) {
+        while (leftIndex < left.length && rightIndex < right.length) {
+            const leftValue = left[leftIndex][fields[i]];
+            const rightValue = right[rightIndex][fields[i]];
 
-        if ((reverse && leftValue > rightValue) || (!reverse && leftValue < rightValue)) {
-            result.push(left[leftIndex]);
-            leftIndex++;
-        } else {
-            result.push(right[rightIndex]);
-            rightIndex++;
+            if ((reverse && leftValue > rightValue) || (!reverse && leftValue < rightValue)) {
+                result.push(left[leftIndex]);
+                leftIndex++;
+            } else {
+                result.push(right[rightIndex]);
+                rightIndex++;
+            }
         }
     }
 
