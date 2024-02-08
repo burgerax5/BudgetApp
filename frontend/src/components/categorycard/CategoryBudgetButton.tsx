@@ -163,7 +163,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                 </DialogHeader>
                 <div className="mx-auto flex flex-col items-center">
                     <span className="text-2xl font-bold">${remaining}</span>
-                    out of ${$budgetByDate?.amount}
+                    {$budgetByDate ? `out of ${$budgetByDate?.amount}` : ""}
                     {error && <span className="text-sm opacity-70 text-red-400">{error}</span>}
                 </div>
                 <div className="grid gap-4 py-4">

@@ -12,12 +12,12 @@ import {
 import { selectedDate } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
-import ProgressBar from "../ProgressBar"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
 
 interface Category {
     id: number,
-    name: string
+    name: string,
+    colour: string
 }
 
 interface Budget {
@@ -152,7 +152,12 @@ function CategoriesCard() {
                                     </span>}
                                 </div>
                             </div>
-                            <ProgressBar percentage={progress >= 0 && progress <= 100 ? progress : 100} />
+                            <div className="bg-accent rounded-full overflow-hidden">
+                                <div
+                                    className={`h-4 w-full flex-1 transition-all`}
+                                    style={{ transform: `translateX(-${100 - (progress || 0)}%)`, backgroundColor: category.colour }}
+                                ></div>
+                            </div>
                         </div>
                     })}
                 </div>
