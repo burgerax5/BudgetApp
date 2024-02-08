@@ -26,6 +26,7 @@ model User {
 model Category {
   id      Int       @id @default(autoincrement())
   name    String
+  colour  String
   Expense Expense[]
   Budget  Budget[]
 }

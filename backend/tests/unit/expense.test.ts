@@ -181,8 +181,6 @@ describe('Get expenses by month and year', () => {
     })
 
     it("should return alice's expenses by month", async () => {
-        const user = await userService.getUserById(1)
-
         await datedMockExpense(userService, categoryService, expenseService, new Date('August, 31, 2023')) // Aug 2023
         await datedMockExpense(userService, categoryService, expenseService, new Date('October, 10, 2023')) // Oct 2023
         await datedMockExpense(userService, categoryService, expenseService, new Date('December, 13, 2023')) // Dec 2023
@@ -195,17 +193,17 @@ describe('Get expenses by month and year', () => {
             userId: 1,
             month: 8,
             year: 2023
-        })
+        }, undefined)
         const october = await expenseService.getExpenseByParams({
             userId: 1,
             month: 10,
             year: 2023
-        })
+        }, undefined)
         const december = await expenseService.getExpenseByParams({
             userId: 1,
             month: 12,
             year: 2023
-        })
+        }, undefined)
 
         // Confirm correct number of expenses
         expect(august.length).toBe(1)
@@ -215,8 +213,8 @@ describe('Get expenses by month and year', () => {
         // Confirm the validity of entries
         expect(august[0]).toEqual(all_expenses[0])
         expect(october[0]).toEqual(all_expenses[1])
-        expect(december[0]).toEqual(all_expenses[2])
-        expect(december[1]).toEqual(all_expenses[3])
+        // expect(december).toContain(all_expenses[2])
+        expect(december).toEqual(all_expenses.slice(2).reverse())
     })
 
     it("should return all expenses from 2023", async () => {
@@ -232,21 +230,21 @@ describe('Get expenses by month and year', () => {
         const expenses_in_2021 = await expenseService.getExpenseByParams({
             userId: 1,
             year: 2021
-        })
+        }, undefined)
         expect(expenses_in_2021.length).toBe(1)
         expect(expenses_in_2021[0]).toEqual(all_expenses.find(exp => exp.year === 2021))
 
         const expenses_in_2022 = await expenseService.getExpenseByParams({
             userId: 1,
             year: 2022
-        })
+        }, undefined)
         expect(expenses_in_2022.length).toBe(1)
         expect(expenses_in_2022[0]).toEqual(all_expenses.find(exp => exp.year === 2022))
 
         const expenses_in_2023 = await expenseService.getExpenseByParams({
             userId: 1,
             year: 2023
-        })
+        }, undefined)
         expect(expenses_in_2023.length).toBe(2)
         expect(expenses_in_2023).toContainEqual(all_expenses[2])
         expect(expenses_in_2023).toContainEqual(all_expenses[3])
@@ -279,11 +277,11 @@ describe('Get expenses by category', () => {
         const entertainment_expenses = await expenseService.getExpenseByParams({
             userId: 1,
             categoryId: 2 // Entertainment
-        })
+        }, undefined)
         const foodndrink_expenses = await expenseService.getExpenseByParams({ // Created by different user
             userId: 2,
             categoryId: 1 // Food & Drink
-        })
+        }, undefined)
 
         expect(entertainment_expenses.length).toBe(2)
         expect(foodndrink_expenses.length).toBe(0)
