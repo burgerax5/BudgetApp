@@ -82,6 +82,6 @@ export const expenseFilters = atom<ExpenseFilters>({
         amount: "desc"
     }
 })
+export const categories = atom<Category[]>([])
 export const expensesByCategory = atom(defaultCategoryValue)
 export const isDarkMode = atom(false)
-export const categories = atom<Category[]>([])

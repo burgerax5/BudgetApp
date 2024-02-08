@@ -3,12 +3,19 @@ import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { expensesByCategory, isDarkMode } from '@/store/userStore'
 import { useStore } from '@nanostores/react'
+import axios from '@/api/axios'
 
 interface Budget {
     id: number,
     amount: number,
     month: number,
     year: number
+}
+
+interface Category {
+    id: number,
+    name: string,
+    colour: string
 }
 
 interface Props {
@@ -24,12 +31,30 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
     const $isDarkMode = useStore(isDarkMode)
     const [background, setBackground] = useState($isDarkMode ? "hsl(222.2, 84%, 4.9%)" : "hsl(0, 0%, 100%)")
     const [primary, setPrimary] = useState($isDarkMode ? "hsl(217.2, 91.2%, 59.8%)" : "hsl(221.2, 83.2%, 53.3%)")
-    const [accent, setAccent] = useState($isDarkMode ? "hsl(217.2, 32.6%, 17.5%)" : "hsl(210, 40%, 96.1%)")
+
+    const [categoryColours, setCategoryColours] = useState<Category[]>([])
+
+    useEffect(() => {
+        const getCategoryColours = async () => {
+            await axios.get('/category')
+                .then(res => {
+                    if (res.data.categories)
+                        setCategoryColours(() => {
+                            let colours = []
+                            for (let i = 0; i < res.data.categories.length; i++) {
+                                colours.push(res.data.categories[i].colour)
+                            }
+                            return colours
+                        })
+                })
+        }
+
+        getCategoryColours()
+    }, [])
 
     useEffect(() => {
         setBackground($isDarkMode ? "hsl(222.2, 84%, 4.9%)" : "hsl(0, 0%, 100%)")
         setPrimary($isDarkMode ? "hsl(217.2, 91.2%, 59.8%)" : "hsl(221.2, 83.2%, 53.3%)")
-        setAccent($isDarkMode ? "hsl(217.2, 32.6%, 17.5%)" : "hsl(210, 40%, 96.1%)")
     }, [$isDarkMode])
 
     const data = {
@@ -39,17 +64,7 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
             data: [remainingBudget, ...Object.values($expensesByCategory)],
             backgroundColor: [
                 primary, // Remaining budget
-                "#FF5733", // Food & Drink
-                "#FFA500", // Entertainment
-                "#FF8C00", // Transportation
-                "#FF6347", // Health
-                "#8A2BE2", // Education
-                "#2E8B57", // Housing
-                "#4169E1", // Utilities
-                "#800080", // Insurance
-                "#DC143C", // Debt Repayment
-                "#FF4500", // Clothing
-                "#A9A9A9", //Miscellaneous
+                ...categoryColours
             ],
             borderColor: [background]
         }],

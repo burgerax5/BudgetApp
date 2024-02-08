@@ -7,7 +7,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useStore } from '@nanostores/react'
-import { selectedDate } from '@/store/userStore'
+import { categories, selectedDate } from '@/store/userStore'
 import BarChart from './BarChart'
 import axios from '@/api/axios'
 
@@ -37,30 +37,41 @@ interface ExpenseData {
 const OverviewCard = () => {
     const $selectedDate = useStore(selectedDate)
     const [labels, setLabels] = useState<number[]>([])
-    const [data, setData] = useState<number[]>([])
+    const [data, setData] = useState<Dataset[]>([])
+    const $categories = useStore(categories)
     const [expenseData, setExpenseData] = useState<ExpenseData>({
         labels: labels,
-        datasets: [{
-            label: "Amount spent",
-            data: data,
-            backgroundColor: "hsl(221.2 83.2% 53.3%)"
-        }]
+        datasets: data
     })
+
+    useEffect(() => {
+        const getCategories = async () => {
+            if ($categories.length === 0) {
+                await axios.get('/category')
+                    .then(res => {
+                        if (res.data.categories)
+                            categories.set(res.data.categories)
+                    })
+            }
+        }
+
+        getCategories()
+    }, [])
 
     const daysInMonth = (year: number, month: number) => {
         const lastDayOfMonth = new Date(year, month, 0)
         return lastDayOfMonth.getDate()
     }
 
-    const aggregateExpenses = (expenses: Expense[], daysOrMonths: number) => {
+    const aggregateExpenses = (expenses: Expense[], daysOrMonths: number, categoryId: number) => {
         let spentInPeriod: number[] = []
         for (let i = 0; i < daysOrMonths; i++)
             spentInPeriod.push(0)
 
         expenses.map(exp => {
-            if (!$selectedDate.yearOnly) {
+            if (!$selectedDate.yearOnly && exp.categoryId === categoryId) {
                 spentInPeriod[exp.day - 1] += exp.amount
-            } else {
+            } else if ($selectedDate.yearOnly && exp.categoryId === categoryId) {
                 spentInPeriod[exp.month - 1] += exp.amount
             }
         })
@@ -68,44 +79,48 @@ const OverviewCard = () => {
         return spentInPeriod
     }
 
-    useEffect(() => {
-        const getExpenses = async () => {
-            const month = $selectedDate.date.getMonth() + 1
-            const year = $selectedDate.date.getFullYear()
-            const numberOfDays = $selectedDate.yearOnly ? 12 : daysInMonth(year, month)
-            let days: number[] = []
+    const getExpenses = async () => {
+        const month = $selectedDate.date.getMonth() + 1
+        const year = $selectedDate.date.getFullYear()
+        const numberOfDays = $selectedDate.yearOnly ? 12 : daysInMonth(year, month)
+        let days: number[] = []
 
-            for (let i = 1; i <= numberOfDays; i++)
-                days.push(i)
+        for (let i = 1; i <= numberOfDays; i++)
+            days.push(i)
 
-            const url = $selectedDate.yearOnly ? `/expense/?year=${year}` : `/expense/?month=${month}&year=${year}`
+        const url = $selectedDate.yearOnly ? `/expense/?year=${year}` : `/expense/?month=${month}&year=${year}`
 
-            await axios.get(url, { withCredentials: true })
-                .then(res => {
+        await axios.get(url, { withCredentials: true })
+            .then(res => {
+                if (res.data.expenses) {
                     const expenses: Expense[] = res.data.expenses
                     setLabels(days)
 
-                    const data = aggregateExpenses(expenses, numberOfDays)
-                    setData(data)
-                })
-                .catch(err => {
-                    console.error('Error occurred while getting expenses for the month:', err)
-                })
-        }
+                    let $data: Dataset[] = []
+                    $categories.map(cat => {
+                        $data.push({
+                            label: cat.name,
+                            data: aggregateExpenses(expenses, numberOfDays, cat.id),
+                            backgroundColor: cat.colour
+                        })
+                    })
+                    setData($data)
+                }
+            })
+            .catch(err => {
+                console.error('Error occurred while getting expenses for the month:', err)
+            })
+    }
 
+    useEffect(() => {
         getExpenses()
-    }, [$selectedDate])
+    }, [$selectedDate, $categories])
 
     useEffect(() => {
         setExpenseData(prevData => ({
             labels: labels,
-            datasets: [{
-                ...prevData.datasets[0],
-                label: "Amount spent",
-                data: data
-            }]
+            datasets: data
         }))
-
     }, [labels, data])
 
     return (

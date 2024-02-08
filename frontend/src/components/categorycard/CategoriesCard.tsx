@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { selectedDate, expensesByCategory, defaultCategoryValue } from "@/store/userStore"
+import { selectedDate, expensesByCategory, defaultCategoryValue, categories } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
@@ -45,12 +45,12 @@ function CategoriesCard() {
     }
     const $selectedDate = useStore(selectedDate)
     const $expensesByCategory = useStore(expensesByCategory)
-    const [categories, setCategories] = useState<Category[]>([])
+    const $categories = useStore(categories)
     const [expenses, setExpenses] = useState<Expense[]>([])
     const [budgetByCategory, setBudgetByCategory] = useState(defaultBudgetsByCategory)
 
     const getCategoryNameFromId = (id: number) => {
-        return categories.find(category => {
+        return $categories.find(category => {
             if (category.id === id) return category
         })
     }
@@ -59,7 +59,7 @@ function CategoriesCard() {
         const getCategories = async () => {
             const res = await axios.get('/category/')
             if (res.data)
-                setCategories(res.data.categories)
+                categories.set(res.data.categories)
         }
 
         const getExpenses = async () => {
@@ -119,7 +119,7 @@ function CategoriesCard() {
             </CardHeader>
             <CardContent>
                 <div className="grid items-center gap-3">
-                    {categories.map((category, i) => {
+                    {$categories.map((category, i) => {
                         let progress = budgetByCategory[i] ? ($expensesByCategory[category.name] / budgetByCategory[i]) * 100 :
                             $expensesByCategory[category.name] ? 100 : 0
 
@@ -144,7 +144,7 @@ function CategoriesCard() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <CategoryBudgetButton categories={categories} budgetByCategory={budgetByCategory} />
+                <CategoryBudgetButton categories={$categories} budgetByCategory={budgetByCategory} />
             </CardFooter>
         </Card>
     )

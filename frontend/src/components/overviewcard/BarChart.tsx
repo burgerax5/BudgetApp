@@ -19,9 +19,33 @@ interface Props {
 
 const BarChart: React.FC<Props> = ({ expenseData }) => {
     const chartRef = useRef<any>(null)
+    const options = {
+        // indexAxis: 'y' as const,
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            x: {
+                stacked: true,
+            },
+            y: {
+                stacked: true,
+                ticks: {
+                    callback: function (value: unknown, index: unknown, values: unknown) {
+                        return '$' + value
+                    }
+                },
+            }
+        },
+        plugins: {
+            legend: {
+                display: false, // Hide the legend
+                // position: 'right' as const,
+            },
+        },
+    }
 
     return (
-        <div className="flex flex-col gap-1 w-full relative h-36 sm:h-60">
+        <div className="flex flex-col p-3 gap-1 w-full relative h-60 sm:h-72">
             {expenseData.labels.length &&
                 <Bar data={expenseData}
                     ref={chartRef}
@@ -32,13 +56,8 @@ const BarChart: React.FC<Props> = ({ expenseData }) => {
                         top: "50%",
                         transform: "translate(-50%, -50%)"
                     }}
-                    options={{
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        onResize: (chartInstance, newSize) => {
-                            console.log("Chart resized")
-                        }
-                    }} />}
+                    options={options} />}
+
         </div>
     )
 }
