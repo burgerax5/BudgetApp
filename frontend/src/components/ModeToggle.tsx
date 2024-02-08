@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { isDarkMode } from "@/store/userStore"
 
 export function ModeToggle() {
   const [theme, setThemeState] = React.useState<
@@ -28,6 +29,7 @@ export function ModeToggle() {
 
     document.documentElement.classList[isDark ? "add" : "remove"]("dark")
     localStorage.setItem('theme', isDark ? "dark" : "light")
+    isDarkMode.set(isDark ? true : false)
   }, [theme])
 
   return (

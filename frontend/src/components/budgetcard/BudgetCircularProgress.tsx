@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { expensesByCategory } from '@/store/userStore'
+import { expensesByCategory, isDarkMode } from '@/store/userStore'
 import { useStore } from '@nanostores/react'
 
 interface Budget {
@@ -21,40 +21,38 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
     const remainingBudget = budget ? budget?.amount - spent : 0
     const [progress, setProgress] = useState<number>(0)
     const $expensesByCategory = useStore(expensesByCategory)
+    const $isDarkMode = useStore(isDarkMode)
+    const [background, setBackground] = useState($isDarkMode ? "hsl(222.2, 84%, 4.9%)" : "hsl(0, 0%, 100%)")
+    const [primary, setPrimary] = useState($isDarkMode ? "hsl(217.2, 91.2%, 59.8%)" : "hsl(221.2, 83.2%, 53.3%)")
+    const [accent, setAccent] = useState($isDarkMode ? "hsl(217.2, 32.6%, 17.5%)" : "hsl(210, 40%, 96.1%)")
 
-    // const data = {
-    //     labels: ['a', 'b'],
-    //     datasets: [{
-    //         label: "Expenses by Category",
-    //         data: Object.values($expensesByCategory),
-    //         backgroundColor: [
-    //             'rgb(255, 99, 132)',
-    //             'rgb(54, 162, 235)',
-    //             'rgb(255, 205, 86)'
-    //         ],
-    //     }]
-    // }
-
-    const isDarkMode = localStorage.getItem("theme") === "dark"
-    const background = isDarkMode ? "hsl(222.2, 84%, 4.9%)" : "hsl(0, 0%, 100%)"
-    const primary = isDarkMode ? "hsl(217.2, 91.2%, 59.8%)" : "hsl(221.2, 83.2%, 53.3%)"
-    const accent = isDarkMode ? "hsl(217.2, 32.6%, 17.5%)" : "hsl(210, 40%, 96.1%)"
+    useEffect(() => {
+        setBackground($isDarkMode ? "hsl(222.2, 84%, 4.9%)" : "hsl(0, 0%, 100%)")
+        setPrimary($isDarkMode ? "hsl(217.2, 91.2%, 59.8%)" : "hsl(221.2, 83.2%, 53.3%)")
+        setAccent($isDarkMode ? "hsl(217.2, 32.6%, 17.5%)" : "hsl(210, 40%, 96.1%)")
+    }, [$isDarkMode])
 
     const data = {
-        labels: ["Remaining", "Spent"],
+        labels: ["Remaining", ...Object.keys($expensesByCategory)],
         datasets: [{
             label: "Amount",
-            data: [remainingBudget, spent],
+            data: [remainingBudget, ...Object.values($expensesByCategory)],
             backgroundColor: [
-                primary,
-                accent,
+                primary, // Remaining budget
+                "#FF5733", // Food & Drink
+                "#FFA500", // Entertainment
+                "#FF8C00", // Transportation
+                "#FF6347", // Health
+                "#8A2BE2", // Education
+                "#2E8B57", // Housing
+                "#4169E1", // Utilities
+                "#800080", // Insurance
+                "#DC143C", // Debt Repayment
+                "#FF4500", // Clothing
+                "#A9A9A9", //Miscellaneous
             ],
             borderColor: [background]
-        },
-            // {
-            //     label: "Hi"
-            // }
-        ],
+        }],
     }
 
     useEffect(() => {
@@ -64,7 +62,7 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
 
     return (
         <>
-            <div className={`rounded-full w-full h-full absolute flex items-center justify-center mt-3.5`}>
+            <div className={`rounded-full w-full h-full absolute flex items-center justify-center`}>
                 <div className='flex flex-col items-center justify-center'>
                     <div className='font-bold text-2xl z-10'>$
                         {budget ? (remainingBudget).toLocaleString('default', { minimumFractionDigits: 2 }) : (spent).toLocaleString('default', { minimumFractionDigits: 2 })}
@@ -78,7 +76,14 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
             </div>
             <div className="flex items-center justify-center relative w-full h-full">
                 <Doughnut
-                    options={{ cutout: 80 }}
+                    options={{
+                        cutout: 80,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }}
                     style={{
                         position: "absolute",
                         height: "auto",

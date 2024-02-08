@@ -77,3 +77,4 @@ export const expenseFilters = atom<ExpenseFilters>({
     }
 })
 export const expensesByCategory = atom(defaultCategoryValue)
+export const isDarkMode = atom(false)
