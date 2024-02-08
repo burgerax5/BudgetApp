@@ -31,7 +31,7 @@ const SpendingCard = () => {
     }, [$expenses])
 
     return (
-        <Card>
+        <Card className="max-w-96 w-full sm:max-w-full sm:min-w-full mx-auto">
             <CardHeader>
                 <CardTitle>
                     Spendings

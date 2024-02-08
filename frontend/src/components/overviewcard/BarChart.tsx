@@ -9,15 +9,16 @@ interface Dataset {
 }
 
 interface ExpenseData {
-    labels: number[],
+    labels: string[],
     datasets: Dataset[]
 }
 
 interface Props {
-    expenseData: ExpenseData
+    expenseData: ExpenseData,
+    title: string
 }
 
-const BarChart: React.FC<Props> = ({ expenseData }) => {
+const BarChart: React.FC<Props> = ({ expenseData, title }) => {
     const chartRef = useRef<any>(null)
     const options = {
         // indexAxis: 'y' as const,
@@ -41,6 +42,13 @@ const BarChart: React.FC<Props> = ({ expenseData }) => {
                 display: false, // Hide the legend
                 // position: 'right' as const,
             },
+            title: {
+                display: true,
+                text: title,
+                font: {
+                    size: 16
+                }
+            }
         },
     }
 

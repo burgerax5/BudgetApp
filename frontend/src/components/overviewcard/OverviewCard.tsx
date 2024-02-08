@@ -30,13 +30,28 @@ interface Expense {
 }
 
 interface ExpenseData {
-    labels: number[],
+    labels: string[],
     datasets: Dataset[],
 }
 
+const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
+
 const OverviewCard = () => {
     const $selectedDate = useStore(selectedDate)
-    const [labels, setLabels] = useState<number[]>([])
+    const [labels, setLabels] = useState<string[]>([])
     const [data, setData] = useState<Dataset[]>([])
     const $categories = useStore(categories)
     const [expenseData, setExpenseData] = useState<ExpenseData>({
@@ -83,10 +98,16 @@ const OverviewCard = () => {
         const month = $selectedDate.date.getMonth() + 1
         const year = $selectedDate.date.getFullYear()
         const numberOfDays = $selectedDate.yearOnly ? 12 : daysInMonth(year, month)
-        let days: number[] = []
+        let days: string[] = []
 
-        for (let i = 1; i <= numberOfDays; i++)
-            days.push(i)
+        for (let i = 0; i <= numberOfDays; i++) {
+            // if ($selectedDate.yearOnly) {
+            //     days.push(months[i].slice(0, 3))
+            // } else {
+            //     days.push(`${i}`)
+            // }
+            days.push(`${$selectedDate.yearOnly && months[i] ? months[i].slice(0, 3) : i}`)
+        }
 
         const url = $selectedDate.yearOnly ? `/expense/?year=${year}` : `/expense/?month=${month}&year=${year}`
 
@@ -123,14 +144,18 @@ const OverviewCard = () => {
         }))
     }, [labels, data])
 
+    const title = $selectedDate.yearOnly ?
+        $selectedDate.date.getFullYear().toString() :
+        months[$selectedDate.date.getMonth()].slice(0, 3) + ' ' + $selectedDate.date.getFullYear()
+
     return (
-        <Card>
+        <Card className="max-w-96 w-full sm:max-w-full sm:min-w-full mx-auto">
             <CardHeader>
                 <CardTitle>Overview</CardTitle>
                 <CardDescription>Your spendings this {$selectedDate.yearOnly ? "year" : "month"}</CardDescription>
             </CardHeader>
             <CardContent className="relative">
-                <BarChart expenseData={expenseData} />
+                <BarChart expenseData={expenseData} title={title} />
             </CardContent>
         </Card>
     )
