@@ -120,7 +120,8 @@ function CategoriesCard() {
             <CardContent>
                 <div className="grid items-center gap-3">
                     {categories.map((category, i) => {
-                        const progress = budgetByCategory[i] ? ($expensesByCategory[category.name] / budgetByCategory[i]) * 100 : 0
+                        let progress = budgetByCategory[i] ? ($expensesByCategory[category.name] / budgetByCategory[i]) * 100 :
+                            $expensesByCategory[category.name] ? 100 : 0
 
                         return <div key={category.id} className='text-sm'>
                             <div className='flex justify-between items-center'>
@@ -134,7 +135,7 @@ function CategoriesCard() {
                             </div>
                             <div className="bg-accent rounded-full overflow-hidden">
                                 <div
-                                    className={`h-4 w-full flex-1 transition-all`}
+                                    className={`h-4 w-full flex-1 transition-all delay-200`}
                                     style={{ transform: `translateX(-${100 - (progress || 0)}%)`, backgroundColor: category.colour }}
                                 ></div>
                             </div>

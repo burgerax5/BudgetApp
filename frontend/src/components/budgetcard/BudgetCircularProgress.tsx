@@ -64,7 +64,8 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
         <>
             <div className={`rounded-full w-full h-full absolute flex items-center justify-center`}>
                 <div className='flex flex-col items-center justify-center'>
-                    <div className='font-bold text-2xl z-10'>$
+
+                    <div className='font-bold text-2xl'>$
                         {budget ? (remainingBudget).toLocaleString('default', { minimumFractionDigits: 2 }) : (spent).toLocaleString('default', { minimumFractionDigits: 2 })}
                     </div>
                     <div className='text-sm opacity-70'>

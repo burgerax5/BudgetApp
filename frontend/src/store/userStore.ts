@@ -9,6 +9,12 @@ interface Budget {
     year: number
 }
 
+interface Category {
+    id: number,
+    name: string,
+    colour: string
+}
+
 interface Expense {
     id: number,
     name: string,
@@ -78,3 +84,4 @@ export const expenseFilters = atom<ExpenseFilters>({
 })
 export const expensesByCategory = atom(defaultCategoryValue)
 export const isDarkMode = atom(false)
+export const categories = atom<Category[]>([])
