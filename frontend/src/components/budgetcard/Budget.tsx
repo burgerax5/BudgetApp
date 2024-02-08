@@ -100,7 +100,7 @@ function Budget() {
                     : `You do not have a budget set for this ${$selectedDate.yearOnly ? "year" : "month"}.`}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className='rounded-full w-40 h-40 mx-auto relative'>
+                <div className='rounded-full w-60 h-[240px] mx-auto relative'>
                     <BudgetCircularProgress budget={budget} spent={spent} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
                 </div>
             </CardContent>

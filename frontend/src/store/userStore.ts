@@ -37,6 +37,24 @@ interface ExpenseFilters {
     }
 }
 
+interface keyNumber {
+    [key: string]: number
+}
+
+export const defaultCategoryValue: keyNumber = {
+    'Food & Drink': 0,
+    'Entertainment': 0,
+    "Transportation": 0,
+    "Health": 0,
+    "Education": 0,
+    "Housing": 0,
+    "Utilities": 0,
+    "Insurance": 0,
+    "Debt Repayment": 0,
+    "Clothing": 0,
+    "Miscellaneous": 0,
+}
+
 export const isLoggedIn = atom(false)
 export const selectedDate = atom({ date: new Date(), yearOnly: false })
 export const budgetByDate = atom<Budget | null>(null)
@@ -58,3 +76,4 @@ export const expenseFilters = atom<ExpenseFilters>({
         amount: "desc"
     }
 })
+export const expensesByCategory = atom(defaultCategoryValue)

@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { selectedDate } from "@/store/userStore"
+import { selectedDate, expensesByCategory, defaultCategoryValue } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
@@ -38,33 +38,15 @@ interface Expense {
     amount: number
 }
 
-interface keyNumber {
-    [key: string]: number
-}
-
 function CategoriesCard() {
-    const defaultCategoryValue: keyNumber = {
-        'Food & Drink': 0,
-        'Entertainment': 0,
-        "Transportation": 0,
-        "Health": 0,
-        "Education": 0,
-        "Housing": 0,
-        "Utilities": 0,
-        "Insurance": 0,
-        "Debt Repayment": 0,
-        "Clothing": 0,
-        "Miscellaneous": 0,
-    }
-
     let defaultBudgetsByCategory: number[] = []
     for (let i = 0; i < 12; i++) {
         defaultBudgetsByCategory.push(0)
     }
     const $selectedDate = useStore(selectedDate)
+    const $expensesByCategory = useStore(expensesByCategory)
     const [categories, setCategories] = useState<Category[]>([])
     const [expenses, setExpenses] = useState<Expense[]>([])
-    const [expensesByCategory, setExpensesByCategory] = useState<keyNumber>(defaultCategoryValue)
     const [budgetByCategory, setBudgetByCategory] = useState(defaultBudgetsByCategory)
 
     const getCategoryNameFromId = (id: number) => {
@@ -120,15 +102,13 @@ function CategoriesCard() {
     }, [$selectedDate])
 
     useEffect(() => {
-        setExpensesByCategory(prevExpenseByCategory => {
-            let defaultExpenses = defaultCategoryValue
-            expenses.map(exp => {
-                const category = getCategoryNameFromId(exp.categoryId)
-                if (category)
-                    defaultExpenses[category.name] += exp.amount
-            })
-            return defaultExpenses
+        let newExpensesByCategory = { ...defaultCategoryValue }
+        expenses.map(exp => {
+            const category = getCategoryNameFromId(exp.categoryId)
+            if (category)
+                newExpensesByCategory[category.name] += exp.amount
         })
+        expensesByCategory.set(newExpensesByCategory)
     }, [expenses])
 
     return (
@@ -140,13 +120,13 @@ function CategoriesCard() {
             <CardContent>
                 <div className="grid items-center gap-3">
                     {categories.map((category, i) => {
-                        const progress = budgetByCategory[i] ? (expensesByCategory[category.name] / budgetByCategory[i]) * 100 : 0
+                        const progress = budgetByCategory[i] ? ($expensesByCategory[category.name] / budgetByCategory[i]) * 100 : 0
 
                         return <div key={category.id} className='text-sm'>
                             <div className='flex justify-between items-center'>
                                 <div>{category.name}</div>
                                 <div>
-                                    ${expensesByCategory[category.name].toFixed(2)}
+                                    ${$expensesByCategory[category.name].toFixed(2)}
                                     {budgetByCategory[i] && <span className="opacity-70">
                                         {` out of $${(budgetByCategory[i]).toFixed(2)}`}
                                     </span>}
