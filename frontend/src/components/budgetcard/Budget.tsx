@@ -50,17 +50,18 @@ function Budget() {
             await axios.get(url, { withCredentials: true })
                 .then(res => {
                     if (res.data.budgets.length) {
+                        let matched = false
                         res.data.budgets.map(b => {
-                            if ($selectedDate.yearOnly && !b.month && b.year === year && !b.categoryId) {
+                            if (($selectedDate.yearOnly && !b.month && b.year === year && !b.categoryId)
+                                || (!$selectedDate.yearOnly && b.month === month && b.year === year && !b.categoryId)) {
                                 setBudget(b)
                                 budgetByDate.set(b)
-                                return
-                            } else if (!$selectedDate.yearOnly && b.month === month && b.year === year && !b.categoryId) {
-                                setBudget(b)
-                                budgetByDate.set(b)
+                                matched = true
                                 return
                             }
                         })
+
+                        if (!matched) setBudget(null)
                     } else {
                         setBudget(null)
                         budgetByDate.set(null)
@@ -91,6 +92,7 @@ function Budget() {
         getBudget()
         spentThisPeriod()
     }, [$selectedDate])
+
 
     return (
         <Card>

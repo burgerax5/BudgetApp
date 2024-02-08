@@ -101,11 +101,6 @@ const OverviewCard = () => {
         let days: string[] = []
 
         for (let i = 0; i <= numberOfDays; i++) {
-            // if ($selectedDate.yearOnly) {
-            //     days.push(months[i].slice(0, 3))
-            // } else {
-            //     days.push(`${i}`)
-            // }
             days.push(`${$selectedDate.yearOnly && months[i] ? months[i].slice(0, 3) : i}`)
         }
 
