@@ -15,7 +15,7 @@ const Tool: React.FC<Props> = ({ text, children }) => {
     return (
         <TooltipProvider>
             <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger className="flex items-center justify-center">
                     {children}
                 </TooltipTrigger>
                 <TooltipContent>

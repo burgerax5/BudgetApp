@@ -60,6 +60,12 @@ interface Header {
     mode: "none" | "asc" | "desc"
 }
 
+interface CategoryInterface {
+    id: number,
+    name: string,
+    colour: string
+}
+
 const defaultHeaders: Header[] = [
     { name: "Expense", keys: ["name"], mode: "none" },
     { name: "Category", keys: ["categoryId"], mode: "none" },
@@ -70,16 +76,35 @@ const defaultHeaders: Header[] = [
 const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filteredExpenses }) => {
     const $expenses = useStore(expenses)
     const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
+    const [categories, setCategories] = useState<CategoryInterface[]>([])
     const [headers, setHeaders] = useState<Header[]>(defaultHeaders)
 
     useEffect(() => {
         getExpenses()
+        getCategories()
     }, [])
 
     const shiftMode = (currMode: string) => {
         const cycle = ["none", "asc", "desc"]
         const index = cycle.findIndex((el) => el === currMode)
         return cycle[(index + 1) % 3]
+    }
+
+    const getCategories = async () => {
+        await axios.get('/category')
+            .then(res => {
+                if (res.data.categories)
+                    setCategories(res.data.categories)
+            })
+    }
+
+    const getCategoryColour = (id: number) => {
+        for (let i = 0; i < categories.length; i++)
+            if (categories[i].id === id) {
+                console.log(categories[i].colour)
+                return categories[i].colour
+            }
+        return "text-primary"
     }
 
     const getExpenses = async () => {
@@ -151,12 +176,21 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                     checked={selectedExpenses.includes(expense)}
                                     onCheckedChange={() => handleCheckboxChange(expense)} />
                             </TableCell>}
-                            <TableCell className={`${headers[0].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{expense.name}</TableCell>
-                            <TableCell className={`${headers[1].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{Category[expense.categoryId]}</TableCell>
-                            <TableCell className={`${headers[2].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>{getDate(expense)}</TableCell>
-                            <TableCell className={`${headers[3].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>${expense.amount.toLocaleString('default', {
-                                minimumFractionDigits: 2
-                            })}</TableCell>
+                            <TableCell className={`${headers[0].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>
+                                {expense.name}
+                            </TableCell>
+                            <TableCell className={`${headers[1].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}
+                                style={{ color: getCategoryColour(expense.categoryId) }}>
+                                {Category[expense.categoryId]}
+                            </TableCell>
+                            <TableCell className={`${headers[2].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>
+                                {getDate(expense)}
+                            </TableCell>
+                            <TableCell className={`${headers[3].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>
+                                ${expense.amount.toLocaleString('default', {
+                                    minimumFractionDigits: 2
+                                })}
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
