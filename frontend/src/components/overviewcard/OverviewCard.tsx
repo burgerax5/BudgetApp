@@ -50,6 +50,7 @@ const months = [
 ];
 
 const OverviewCard = () => {
+
     const $selectedDate = useStore(selectedDate)
     const [labels, setLabels] = useState<string[]>([])
     const [data, setData] = useState<Dataset[]>([])
@@ -100,9 +101,14 @@ const OverviewCard = () => {
         const numberOfDays = $selectedDate.yearOnly ? 12 : daysInMonth(year, month)
         let days: string[] = []
 
-        for (let i = 0; i <= numberOfDays; i++) {
-            days.push(`${$selectedDate.yearOnly && months[i] ? months[i].slice(0, 3) : i}`)
+        for (let i = 1; i <= numberOfDays; i++) {
+            if ($selectedDate.yearOnly && months[i]) {
+                days.push(months[i - 1].slice(0, 3))
+            } else {
+                days.push(i + '')
+            }
         }
+        setLabels(days)
 
         const url = $selectedDate.yearOnly ? `/expense/?year=${year}` : `/expense/?month=${month}&year=${year}`
 
@@ -110,7 +116,6 @@ const OverviewCard = () => {
             .then(res => {
                 if (res.data.expenses) {
                     const expenses: Expense[] = res.data.expenses
-                    setLabels(days)
 
                     let $data: Dataset[] = []
                     $categories.map(cat => {
@@ -138,6 +143,10 @@ const OverviewCard = () => {
             datasets: data
         }))
     }, [labels, data])
+
+    useEffect(() => {
+        console.log(expenseData.labels)
+    }, [expenseData])
 
     const title = $selectedDate.yearOnly ?
         $selectedDate.date.getFullYear().toString() :

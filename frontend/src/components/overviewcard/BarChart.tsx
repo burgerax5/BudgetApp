@@ -1,6 +1,8 @@
 import { Bar } from "react-chartjs-2"
 import { Chart as ChartJS } from "chart.js/auto"
-import { useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useStore } from "@nanostores/react"
+import { selectedDate } from "@/store/userStore"
 
 interface Dataset {
     label: string,
@@ -18,21 +20,53 @@ interface Props {
     title: string
 }
 
+const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
+
 const BarChart: React.FC<Props> = ({ expenseData, title }) => {
+    const $selectedDate = useStore(selectedDate)
+    const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth)
     const chartRef = useRef<any>(null)
     const options = {
-        // indexAxis: 'y' as const,
+        indexAxis: screenWidth >= 640 ? 'x' : 'y',
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         scales: {
             x: {
                 stacked: true,
+                ticks: {
+                    callback: function (value: unknown, index: unknown, values: unknown) {
+                        if (screenWidth >= 640 && $selectedDate.yearOnly && months[value])
+                            return months[value].slice(0, 3)
+                        else if (screenWidth >= 640 && !$selectedDate.yearOnly)
+                            return value + 1
+                        else
+                            return '$' + value
+                    }
+                },
             },
             y: {
                 stacked: true,
                 ticks: {
                     callback: function (value: unknown, index: unknown, values: unknown) {
-                        return '$' + value
+                        if (screenWidth >= 640)
+                            return '$' + value
+                        else if ($selectedDate.yearOnly && months[value])
+                            return months[value].slice(0, 3)
+                        else
+                            return value + 1
                     }
                 },
             }
@@ -40,7 +74,6 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
         plugins: {
             legend: {
                 display: false, // Hide the legend
-                // position: 'right' as const,
             },
             title: {
                 display: true,
@@ -51,6 +84,18 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
             }
         },
     }
+
+    useEffect(() => {
+        const updateScreenWidth = () => {
+            setScreenWidth(window.innerWidth)
+        }
+
+        window.addEventListener('resize', updateScreenWidth)
+
+        return () => {
+            window.removeEventListener('resize', updateScreenWidth)
+        }
+    }, [])
 
     return (
         <div className="flex flex-col p-3 gap-1 w-full relative h-60 sm:h-72">

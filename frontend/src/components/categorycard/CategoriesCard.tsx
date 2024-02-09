@@ -135,7 +135,7 @@ function CategoriesCard() {
                             </div>
                             <div className="bg-accent rounded-full overflow-hidden">
                                 <div
-                                    className={`h-4 w-full flex-1 transition-all delay-200`}
+                                    className={`h-4 w-full flex-1 transition-all delay-200 rounded-full`}
                                     style={{ transform: `translateX(-${100 - (progress || 0)}%)`, backgroundColor: category.colour }}
                                 ></div>
                             </div>
