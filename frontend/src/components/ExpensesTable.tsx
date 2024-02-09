@@ -101,7 +101,6 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
     const getCategoryColour = (id: number) => {
         for (let i = 0; i < categories.length; i++)
             if (categories[i].id === id) {
-                console.log(categories[i].colour)
                 return categories[i].colour
             }
         return "text-primary"

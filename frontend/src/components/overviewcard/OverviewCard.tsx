@@ -144,10 +144,6 @@ const OverviewCard = () => {
         }))
     }, [labels, data])
 
-    useEffect(() => {
-        console.log(expenseData.labels)
-    }, [expenseData])
-
     const title = $selectedDate.yearOnly ?
         $selectedDate.date.getFullYear().toString() :
         months[$selectedDate.date.getMonth()].slice(0, 3) + ' ' + $selectedDate.date.getFullYear()
