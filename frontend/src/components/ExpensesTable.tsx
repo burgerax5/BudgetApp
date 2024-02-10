@@ -14,6 +14,12 @@ import { Checkbox } from './ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
 import { ChevronsUp, ChevronsDown } from 'lucide-react'
 import ExpenseToolbar from './expensefilters/ExpenseToolbar'
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 enum Category {
     "Food & Drink" = 1,
@@ -130,6 +136,8 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
             setSelectedExpenses($expenses)
     }
 
+    console.log($expenses)
+
     return (
         <>
             <ExpenseToolbar
@@ -151,7 +159,13 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                     if (filteredExpenses) {
                                         setHeaders((prevHeaders) => {
                                             const newHeaderState = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
-                                            filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))
+
+                                            if (newHeaderState.mode !== "none") {
+                                                filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))
+                                            } else {
+                                                filteredExpensesStore.set($expenses)
+                                            }
+
                                             return defaultHeaders.slice(0, i).concat(newHeaderState).concat(defaultHeaders.slice(i + 1))
                                         })
                                     }

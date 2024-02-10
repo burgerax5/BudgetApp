@@ -91,19 +91,6 @@ export class BudgetService {
         month: number | undefined,
         year: number
     }): Promise<Budget | null> {
-        // const { categoryId, userId, amount, month, year } = budget_details
-
-        // Make sure there isn't a budget for the user with the same date & category
-        // const budgetExists = await this.checkBudgetEmpty(userId, categoryId, month, year)
-        // Make sure that the sum of the budget categories of the month doesn't exceed the budget for the month
-        // const withinMonthBudget = await this.checkMonthBudgetSums(userId, amount, month, year)
-        // Make sure the sum of the categories and monthly budgets of the year doesn't exceed the budget for the month
-        // const withinYearBudget = await this.checkYearBudgetSums(userId, amount, month, year)
-
-        // If the budget doesn't already exist add IFF it is a total budget (month or year) or it is a child budget within the parent budget
-        // if (!budgetExists && !categoryId && (!month || (month && withinYearBudget) || (withinMonthBudget && withinYearBudget))) {
-
-        // } return null
         return await this.prisma.budget.create({
             data: budget_details
         })

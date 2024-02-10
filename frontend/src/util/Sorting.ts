@@ -31,7 +31,7 @@ function merge(left: Expense[], right: Expense[], fields: (keyof Expense)[], mod
     let leftIndex = 0;
     let rightIndex = 0;
 
-    const reverse = mode === "desc";
+    const reverse = mode === "asc";
 
     while (leftIndex < left.length && rightIndex < right.length) {
         let comparison = 0;
