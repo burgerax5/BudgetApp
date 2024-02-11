@@ -92,7 +92,7 @@ const EditButton: React.FC<Props> = ({ expense }) => {
 
     return (
         <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger asChild className="hover:opacity-70">
                 <div className="flex justify-between cursor-pointer">
                     Edit
                     <Pencil className="h-4 w-4" />
@@ -100,7 +100,7 @@ const EditButton: React.FC<Props> = ({ expense }) => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Add Expense</DialogTitle>
+                    <DialogTitle>Edit Expense</DialogTitle>
                     <DialogDescription>
                         Provide information about the expense.
                     </DialogDescription>

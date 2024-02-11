@@ -25,15 +25,19 @@ const ExpenseContextMenu: React.FC<Props> = ({ expense }) => {
     return (
         <Popover>
             <PopoverTrigger>...</PopoverTrigger>
-            <PopoverContent className="w-[160px]">
-                <div className="font-bold mb text truncate">
-                    {expense.name}
+            <PopoverContent className="w-[160px] h-[120px] relative">
+                <div className="absolute w-full left-0 top-0">
+                    <div className="font-bold text truncate px-2 my-2">
+                        {expense.name}
+                    </div>
+                    <hr></hr>
+                    <div className="flex flex-col justify-between p-2 gap-2">
+                        <EditButton expense={expense} />
+                        <DeleteButton expense={expense} />
+                    </div>
                 </div>
-                <hr></hr>
-                <EditButton expense={expense} />
-                <DeleteButton expense={expense} />
             </PopoverContent>
-        </Popover>
+        </Popover >
     )
 }
 

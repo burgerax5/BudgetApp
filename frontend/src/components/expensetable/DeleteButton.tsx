@@ -39,7 +39,7 @@ const DeleteButton: React.FC<Props> = ({ expense }) => {
 
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild>
+            <AlertDialogTrigger asChild className="hover:opacity-70">
                 <div className="flex justify-between cursor-pointer">
                     Delete
                     <Trash className="h-4 w-4" />

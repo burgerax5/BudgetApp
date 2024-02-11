@@ -209,9 +209,9 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                     minimumFractionDigits: 2
                                 })}
                             </TableCell>
-                            <TableCell>
+                            {showCheckboxAndToolbar && <TableCell>
                                 <ExpenseContextMenu expense={expense} />
-                            </TableCell>
+                            </TableCell>}
                         </TableRow>
                     ))}
                 </TableBody>
