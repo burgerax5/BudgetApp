@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button"
+import React, { useState, useEffect } from 'react'
+import { Calendar as CalendarIcon, Pencil } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -8,6 +9,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Button } from '../ui/button'
+import { Label } from '../ui/label'
+import { Input } from '../ui/input'
+import { useStore } from '@nanostores/react'
+import { categories, expenses } from '@/store/userStore'
 import {
     Select,
     SelectContent,
@@ -15,20 +21,27 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import React, { useState, useEffect } from "react"
-import axios from "@/api/axios"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { Calendar } from "./ui/calendar"
-import { useToast } from "./ui/use-toast"
-import { expenses } from "@/store/userStore"
-import { useStore } from "@nanostores/react"
+import axios from '@/api/axios'
+import { Calendar } from '../ui/calendar'
+
+interface Expense {
+    id: number,
+    name: string,
+    categoryId: number,
+    amount: number,
+    day: number,
+    month: number,
+    year: number
+}
+
+interface Props {
+    expense: Expense
+}
 
 interface Category {
     id: number,
@@ -36,31 +49,11 @@ interface Category {
     colour: string
 }
 
-interface Expense {
-    name: string,
-    categoryId: number,
-    amount: string,
-    day: number,
-    month: number,
-    year: number
-}
-
-const defaultFormState = {
-    name: '',
-    categoryId: 0,
-    amount: '0',
-    day: new Date().getDate(),
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear()
-}
-
-export function DialogButton() {
-    const [categories, setCategories] = useState<Category[]>([])
-    const [date, setDate] = useState<Date | undefined>(new Date())
-    const [formData, setFormData] = useState<Expense>(defaultFormState)
+const EditButton: React.FC<Props> = ({ expense }) => {
+    const $categories = useStore(categories)
+    const [date, setDate] = useState<Date | undefined>(new Date(expense.year, expense.month - 1, expense.day))
+    const [formData, setFormData] = useState<Expense>(expense)
     const [error, setError] = useState<string | null>(null)
-    const $expenses = useStore(expenses)
-    const { toast } = useToast()
 
     const verifyFormData = (): boolean => {
         const { name, categoryId, amount, day, month, year } = formData
@@ -77,40 +70,15 @@ export function DialogButton() {
 
     }
 
-    const addExpense = async () => {
-        console.log('Form Data: ', formData)
+    const editExpense = async () => {
         if (verifyFormData()) {
-            const res = await axios.post('/expense/add', { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
+            const res = await axios.put(`/expense/edit/${expense.id}`, { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
             if (res.data.expense) {
-                toast({
-                    title: "Successfully added expense",
-                    description: `${formData.name} $${formData.amount}`
-                })
-                setFormData({
-                    ...defaultFormState,
-                    day: new Date().getDate(),
-                    month: new Date().getMonth() + 1,
-                    year: new Date().getFullYear()
-                })
                 location.reload()
-            }
-            else {
-                toast({
-                    title: "Failed to add expense",
-                    description: `Bruh`
-                })
             }
         } else
             setError('Missing or invalid form data')
     }
-
-    useEffect(() => {
-        const getCategories = async () => {
-            const res = await axios.get('/category/')
-            setCategories(res.data.categories)
-        }
-        getCategories()
-    }, [])
 
     useEffect(() => {
         if (date)
@@ -125,7 +93,10 @@ export function DialogButton() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">Add Expense</Button>
+                <div className="flex justify-between cursor-pointer">
+                    Edit
+                    <Pencil className="h-4 w-4" />
+                </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -156,10 +127,10 @@ export function DialogButton() {
                             ))
                         }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Select Category" />
+                                <SelectValue placeholder={$categories[expense.categoryId - 1].name} />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories.map(category => {
+                                {$categories.map(category => {
                                     return <SelectItem key={category.id}
                                         value={`${category.id}`}
                                     >{category.name}</SelectItem>
@@ -206,9 +177,11 @@ export function DialogButton() {
                 </div>
                 <DialogFooter>
                     {error && <span className="text-sm opacity 0.7">{error}</span>}
-                    <Button type="submit" onClick={addExpense}>Submit</Button>
+                    <Button type="submit" onClick={editExpense}>Submit</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     )
 }
+
+export default EditButton

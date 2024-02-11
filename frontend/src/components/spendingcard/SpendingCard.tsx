@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card"
 import { expenses } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
-import ExpensesTable from '../ExpensesTable'
+import ExpensesTable from '../expensetable/ExpensesTable'
 import { Button } from "../ui/button"
 import { useEffect } from "react"
 

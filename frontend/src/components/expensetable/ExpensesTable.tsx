@@ -10,16 +10,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Checkbox } from './ui/checkbox'
+import { Checkbox } from '../ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
-import { ChevronsUp, ChevronsDown } from 'lucide-react'
-import ExpenseToolbar from './expensefilters/ExpenseToolbar'
-import {
-    ContextMenu,
-    ContextMenuContent,
-    ContextMenuItem,
-    ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+import { ChevronsUp, ChevronsDown, Pencil, Trash } from 'lucide-react'
+import ExpenseToolbar from '../expensefilters/ExpenseToolbar'
+import ExpenseContextMenu from './ExpenseContextMenu'
+
 
 enum Category {
     "Food & Drink" = 1,
@@ -136,7 +132,10 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
             setSelectedExpenses($expenses)
     }
 
-    console.log($expenses)
+    const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+        e.preventDefault()
+        console.log("BRUH")
+    }
 
     return (
         <>
@@ -179,11 +178,17 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                 </div>
                             </TableHead>
                         ))}
+                        {showCheckboxAndToolbar && <TableHead>
+                            <div></div>
+                        </TableHead>}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {filteredExpenses && filteredExpenses.map(expense => (
-                        <TableRow key={crypto.randomUUID()}>
+                        <TableRow
+                            key={crypto.randomUUID()}
+                            onContextMenu={handleContextMenu}
+                        >
                             {showCheckboxAndToolbar && <TableCell>
                                 <Checkbox
                                     checked={selectedExpenses.includes(expense)}
@@ -203,6 +208,9 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                 ${expense.amount.toLocaleString('default', {
                                     minimumFractionDigits: 2
                                 })}
+                            </TableCell>
+                            <TableCell>
+                                <ExpenseContextMenu expense={expense} />
                             </TableCell>
                         </TableRow>
                     ))}
