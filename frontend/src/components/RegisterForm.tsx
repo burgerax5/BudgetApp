@@ -3,6 +3,8 @@ import { Input } from './ui/input'
 import { PasswordInput } from './ui/password-input';
 import { Button } from './ui/button'
 import { UsernameInput } from './ui/username-input';
+import axios from '@/api/axios';
+
 
 interface RegistrationFormState {
     username: string;
@@ -26,7 +28,6 @@ const initialFormState: RegistrationFormState = {
     },
 };
 
-
 function RegisterForm() {
     const [formState, setFormState] = useState<RegistrationFormState>(initialFormState)
     const [data, setData] = useState<{ user_exists: boolean } | null>(null)
@@ -36,6 +37,10 @@ function RegisterForm() {
     useEffect(() => {
         checkUserExists(formState.username)
     }, [formState])
+
+    useEffect(() => {
+
+    }, [qrcode])
 
     const validateForm = () => {
         const errors = {
@@ -81,24 +86,14 @@ function RegisterForm() {
         password: string
     }) => {
         if (!data?.user_exists)
-            fetch(backendUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            })
+            await axios.post(backendUrl, userData)
                 .then(res => {
                     if (res.status === 400)
-                        throw new Error(`Username is already taken`)
-                    return res
-                })
-                .then(data => {
-                    console.log(data)
+                        throw new Error('Username is already taken')
                     location.replace('/login')
                 })
                 .catch(err => {
-                    console.log('There was a problem with the fetch operation:', err)
+                    console.error('An error occurred while registering user:', err)
                 })
     }
 

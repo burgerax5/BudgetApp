@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 import speakeasy from "speakeasy"
-import { v4 as uuid4 } from 'uuid'
 import qrcode from "qrcode"
 
 import { UserService } from '../services/userService';
@@ -43,12 +42,18 @@ export class AuthController {
         return this.userService.refreshTokens.includes(refreshToken)
     }
 
-    // Call when creating an account
+    // Used when the user wants to enable 2FA
     public async createOTPCode(req: Request, res: Response) {
-        const $secret = this.generate2FASecret()
+        const { user } = req.body
+
+        if (user.secret)
+            res.status(403).send('User already has 2FA set up.')
+
+        const $secret = this.generate2FASecret(user.username)
 
         if ($secret.otpauth_url) {
             const qrcode = await this.generateQRCode($secret.otpauth_url)
+
             res.json({
                 secret: $secret,
                 qrcode: qrcode
@@ -58,25 +63,36 @@ export class AuthController {
         }
     }
 
-    public async verifyOTP(req: Request, res: Response) {
-        // The secret will not be in the body if the user already exists (will get from DB instead)
-        const { token, secret, user } = req.body
+    public async checkHas2FA(req: Request, res: Response) {
+        const { user } = req.body
 
-        let existing_secret: string | null = null
         if (user) {
             const user_obj = await this.userService.getUserByUsername(user.username)
-            if (user_obj) existing_secret = user_obj.secret
+            res.json({
+                "2FA": user_obj?.secret ? true : false
+            })
+        } else {
+            res.status(401).send('User not found')
         }
+    }
 
+    public async verifyOTP(req: Request, res: Response) {
+        const { token, secret, user } = req.body
+
+        let existing_secret: string | null = await this.userService.getSecret(user.username)
         const valid = this.isValidOTP(existing_secret ? existing_secret : secret, token)
+
+        if (valid && !existing_secret)
+            await this.userService.addSecret(user.username, secret)
+
         res.json({
             valid
         })
     }
 
-    generate2FASecret() {
+    generate2FASecret(username: string) {
         return speakeasy.generateSecret({
-            name: uuid4()
+            name: `BudgetApp: ${username}`
         })
     }
 
@@ -91,9 +107,9 @@ export class AuthController {
 
     private isValidOTP(secret: string, token: string) {
         return speakeasy.totp.verify({
-            secret,
+            secret: secret,
             encoding: 'ascii',
-            token
+            token: token
         })
     }
 

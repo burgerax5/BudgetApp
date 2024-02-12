@@ -43,4 +43,28 @@ export class UserService {
     public async getAllUsers(): Promise<User[]> {
         return this.prisma.user.findMany()
     }
+
+    public async addSecret(username: string, secret: string): Promise<User> {
+        return this.prisma.user.update({
+            where: {
+                username: username
+            },
+            data: {
+                secret: secret
+            }
+        })
+    }
+
+    public async getSecret(username: string): Promise<string | null> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                username: username
+            },
+            select: {
+                secret: true
+            }
+        })
+
+        return user ? user.secret : null
+    }
 }

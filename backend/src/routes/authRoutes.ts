@@ -39,11 +39,15 @@ router.get('/users/:username', (req: Request, res: Response) => {
     authController.getUserByUsername(req, res)
 })
 
-router.get('/get-2fa-secret', (req: Request, res: Response) => {
+router.get('/get-2fa-secret', authenticateToken, (req: Request, res: Response) => {
     authController.createOTPCode(req, res)
 })
 
-router.get('/verify-otp', (req: Request, res: Response) => {
+router.get('/check-2fa', authenticateToken, (req: Request, res: Response) => {
+    authController.checkHas2FA(req, res)
+})
+
+router.get('/verify-otp', authenticateToken, (req: Request, res: Response) => {
     authController.verifyOTP(req, res)
 })
 

@@ -1,12 +1,43 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import DatePicker from "@/components/datepicker/DatePicker";
+import { useState, useEffect } from "react";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
 import OverviewCard from "./overviewcard/OverviewCard";
 import SpendingCard from "./spendingcard/SpendingCard";
+import axios from "@/api/axios";
+
+interface OTPSecret {
+    ascii: string,
+    hex: string,
+    base32: string,
+    otpauth_url: string
+}
+
 
 function Dashboard() {
+    const [user, setUser] = useState()
+    const [secret, setSecret] = useState<OTPSecret | null>(null)
+    const [qrcode, setQRCode] = useState<string>("")
+
+    useEffect(() => {
+        const getUser = async () => {
+            await axios.get('/')
+        }
+    }, [])
+
+    // For Google Authenticator
+    const generateQRCode = async () => {
+        const url = 'http://localhost:8080/auth/get-2fa-secret'
+        await axios.get(url).then(res => {
+            if (res.data.secret && res.data.qrcode) {
+                setSecret(res.data.secret)
+                setQRCode(res.data.qrcode)
+            }
+        })
+    }
+
     return (
         <>
             {/* <!-- Top --> */}
