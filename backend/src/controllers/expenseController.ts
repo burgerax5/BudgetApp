@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { ExpenseService } from '../services/expenseService';
 import { UserService } from '../services/userService';
 import { CategoryService } from '../services/categoryService';
@@ -7,7 +6,6 @@ import {
     PrismaClient, User as PrismaUser,
     Expense as PrismaExpense
 } from '@prisma/client';
-
 interface User extends PrismaUser { }
 interface Expense extends PrismaExpense { }
 

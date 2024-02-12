@@ -150,12 +150,6 @@ function RegisterForm() {
                     name="username"
                     value={formState.username}
                 />
-                {/* <Input
-                    type="text"
-                    name="username"
-                    value={formState.username}
-                    onChange={handleChange}
-                /> */}
                 {error && <span className="text-sm">{error}</span>}
                 {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
             </div>

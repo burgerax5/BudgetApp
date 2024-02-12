@@ -39,4 +39,8 @@ router.get('/users/:username', (req: Request, res: Response) => {
     authController.getUserByUsername(req, res)
 })
 
+router.get('/get-2fa-secret', (req: Request, res: Response) => {
+    authController.generate2FASecret(req, res)
+})
+
 export default router;

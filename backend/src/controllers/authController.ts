@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
+import speakeasy from "speakeasy"
+import { v4 as uuid4 } from 'uuid'
+import qrcode from "qrcode"
 
 import { UserService } from '../services/userService';
 
@@ -38,6 +41,31 @@ export class AuthController {
 
     private verifyRefreshToken(refreshToken: string) {
         return this.userService.refreshTokens.includes(refreshToken)
+    }
+
+    public async generate2FASecret(req: Request, res: Response) {
+        const secret = speakeasy.generateSecret({
+            name: uuid4()
+        })
+
+        if (secret.otpauth_url) {
+            const qrcode = await this.generateQRCode(secret.otpauth_url)
+            res.json({
+                secret,
+                qrcode: qrcode
+            })
+        } else {
+            res.status(400).send('An error occurred while creating QR code')
+        }
+    }
+
+    private async generateQRCode(otpauthUrl: string) {
+        return new Promise<string>((resolve, reject) => {
+            qrcode.toDataURL(otpauthUrl, (err, data) => {
+                if (err) reject(err)
+                else resolve(data)
+            })
+        })
     }
 
     public async login(req: Request, res: Response): Promise<void> {

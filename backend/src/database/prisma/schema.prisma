@@ -20,6 +20,8 @@ model User {
   updatedAt DateTime  @updatedAt
   expenses  Expense[]
   budgets   Budget[]
+  secret    String
+  encoding  String
 }
 
 // Define the Category model
