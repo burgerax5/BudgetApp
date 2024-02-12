@@ -43,4 +43,8 @@ router.get('/get-2fa-secret', (req: Request, res: Response) => {
     authController.generate2FASecret(req, res)
 })
 
+router.get('/verify-otp', (req: Request, res: Response) => {
+    authController.verifyOTP(req, res)
+})
+
 export default router;

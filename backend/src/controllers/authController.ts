@@ -44,19 +44,31 @@ export class AuthController {
     }
 
     public async generate2FASecret(req: Request, res: Response) {
-        const secret = speakeasy.generateSecret({
-            name: uuid4()
+        const { secret } = req.body
+        const random_secret = uuid4()
+
+        const $secret = speakeasy.generateSecret({
+            name: secret ? secret : random_secret
         })
 
-        if (secret.otpauth_url) {
-            const qrcode = await this.generateQRCode(secret.otpauth_url)
+        if ($secret.otpauth_url) {
+            const qrcode = await this.generateQRCode($secret.otpauth_url)
             res.json({
-                secret,
+                secret: $secret,
                 qrcode: qrcode
             })
         } else {
             res.status(400).send('An error occurred while creating QR code')
         }
+    }
+
+    public async verifyOTP(req: Request, res: Response) {
+        const { token, secret } = req.params
+
+        const valid = this.isValidOTP(secret, token)
+        res.json({
+            valid
+        })
     }
 
     private async generateQRCode(otpauthUrl: string) {
@@ -65,6 +77,14 @@ export class AuthController {
                 if (err) reject(err)
                 else resolve(data)
             })
+        })
+    }
+
+    private isValidOTP(secret: string, token: string) {
+        return speakeasy.totp.verify({
+            secret,
+            encoding: 'ascii',
+            token
         })
     }
 
