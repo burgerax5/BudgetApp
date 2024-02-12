@@ -25,7 +25,7 @@ export class ExpenseController {
     }
 
     private async getUserFromRequest(req: Request): Promise<User | null> {
-        const user = await this.userService.getUserByUsername(req.body.user.username);
+        const user = await this.userService.getUserByEmail(req.body.user.email);
         if (!user) {
             throw new Error(`No user with the details ${JSON.stringify(req.body.user)}`);
         }

@@ -12,10 +12,10 @@ export class UserService {
         this.refreshTokens = []
     }
 
-    public async getUserByUsername(username: string): Promise<User | null> {
+    public async getUserByEmail(email: string): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where: {
-                username: username,
+                email: email,
             }
         })
     }
@@ -28,13 +28,13 @@ export class UserService {
         })
     }
 
-    public async registerUser(username: string, password: string): Promise<User> {
+    public async registerUser(email: string, password: string): Promise<User> {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         return this.prisma.user.create({
             data: {
-                username,
+                email,
                 password: hashedPassword
             }
         })

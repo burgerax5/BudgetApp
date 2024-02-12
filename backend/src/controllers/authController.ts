@@ -15,17 +15,17 @@ export class AuthController {
     }
 
     public home(req: Request, res: Response) {
-        res.cookie('username', req.body.user.username)
+        res.cookie('email', req.body.user.email)
         res.cookie('user_id', req.body.user_id)
 
         res.status(200).json({
-            username: req.body.user.username,
+            email: req.body.user.email,
             user_id: req.body.user.user_id,
         })
     }
 
-    private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {
-        return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '10m' });
+    private generateAccessToken(secretKey: string, user: { user_id: number; email: string }) {
+        return jwt.sign({ user_id: user.user_id, email: user.email }, secretKey, { expiresIn: '10m' });
     }
 
     private addRefreshToken(refreshToken: string) {
@@ -42,14 +42,14 @@ export class AuthController {
 
     public async login(req: Request, res: Response): Promise<void> {
         try {
-            const { username, password } = req.body;
+            const { email, password } = req.body;
 
-            if (!username || !password) {
-                res.status(400).send('Missing fields. Please enter both username and password.');
+            if (!email || !password) {
+                res.status(400).send('Missing fields. Please enter both email and password.');
                 return;
             }
 
-            const user = await this.userService.getUserByUsername(username);
+            const user = await this.userService.getUserByEmail(email);
 
             if (!user) {
                 res.status(401).send('User not found');
@@ -68,7 +68,7 @@ export class AuthController {
                 if (!refreshSecretKey)
                     throw new Error('JWT refresh token secret is not defined')
 
-                const user_token_details = { user_id: user.id, username: user.username }
+                const user_token_details = { user_id: user.id, email: user.email }
 
                 const accessToken = this.generateAccessToken(secretKey, user_token_details)
                 const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
@@ -86,7 +86,7 @@ export class AuthController {
                 })
 
                 res.status(200).json({
-                    username
+                    email
                 });
             } else {
                 res.status(400).send('Invalid password');
@@ -99,22 +99,22 @@ export class AuthController {
 
     public async register(req: Request, res: Response): Promise<void> {
         try {
-            const { username, password } = req.body;
+            const { email, password } = req.body;
 
-            if (!username || !password) {
-                res.status(400).send('Missing fields. Please enter both username and password.');
+            if (!email || !password) {
+                res.status(400).send('Missing fields. Please enter both email and password.');
                 return;
             }
 
-            const userExists = await this.userService.getUserByUsername(username);
+            const userExists = await this.userService.getUserByEmail(email);
             if (userExists) {
-                res.status(400).send(`The user ${username} already exists.`);
+                res.status(400).send(`The ${email} is already taken.`);
                 return;
             }
 
-            const user = await this.userService.registerUser(username, password);
+            const user = await this.userService.registerUser(email, password);
             if (user)
-                res.send(`Registered the user ${username}`);
+                res.send(`Registered the user ${email}`);
             else
                 throw new Error('Failed to register')
         } catch (error) {
@@ -195,8 +195,8 @@ export class AuthController {
         res.status(200).send(await this.userService.getAllUsers())
     }
 
-    public async getUserByUsername(req: Request, res: Response): Promise<void> {
-        const user = await this.userService.getUserByUsername(req.params.username)
+    public async getUserByEmail(req: Request, res: Response): Promise<void> {
+        const user = await this.userService.getUserByEmail(req.params.email)
         res.status(200).send({
             user_exists: user ? true : false
         })

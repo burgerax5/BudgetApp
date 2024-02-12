@@ -47,32 +47,6 @@ export class ExpenseService {
         })
     }
 
-    // public async addExpense(expense_details: {
-    //     userId: number,
-    //     amount: number,
-    //     name: string,
-    //     day: number,
-    //     month: number,
-    //     year: number,
-    //     categoryId: number
-    // }): Promise<Expense | null> {
-    //     return await this.prisma.expense.create({
-    //         data: {
-    //             user: {
-    //                 connect: { id: expense_details.userId }
-    //             },
-    //             amount: expense_details.amount,
-    //             name: expense_details.name,
-    //             day: expense_details.day,
-    //             month: expense_details.month,
-    //             year: expense_details.year,
-    //             category: {
-    //                 connect: { id: expense_details.categoryId }
-    //             }
-    //         }
-    //     });
-    // }
-
     public async addExpense(expense_details: {
         userId: number,
         amount: number,
@@ -81,12 +55,9 @@ export class ExpenseService {
         month: number,
         year: number,
         categoryId: number
-    }, expense_id: number = 0): Promise<Expense | null> {
-        const result = await this.prisma.expense.upsert({
-            where: {
-                id: expense_id
-            },
-            create: {
+    }): Promise<Expense | null> {
+        return await this.prisma.expense.create({
+            data: {
                 user: {
                     connect: { id: expense_details.userId }
                 },
@@ -98,21 +69,50 @@ export class ExpenseService {
                 category: {
                     connect: { id: expense_details.categoryId }
                 }
-            },
-            update: {
-                amount: expense_details.amount,
-                name: expense_details.name,
-                day: expense_details.day,
-                month: expense_details.month,
-                year: expense_details.year,
-                category: {
-                    connect: { id: expense_details.categoryId }
-                }
             }
         });
-
-        return result;
     }
+
+    // public async addExpense(expense_details: {
+    //     userId: number,
+    //     amount: number,
+    //     name: string,
+    //     day: number,
+    //     month: number,
+    //     year: number,
+    //     categoryId: number
+    // }, expense_id: number = 0): Promise<Expense | null> {
+    //     const result = await this.prisma.expense.upsert({
+    //         where: {
+    //             id: expense_id
+    //         },
+    //         create: {
+    //             user: {
+    //                 connect: { id: expense_details.userId }
+    //             },
+    //             amount: expense_details.amount,
+    //             name: expense_details.name,
+    //             day: expense_details.day,
+    //             month: expense_details.month,
+    //             year: expense_details.year,
+    //             category: {
+    //                 connect: { id: expense_details.categoryId }
+    //             }
+    //         },
+    //         update: {
+    //             amount: expense_details.amount,
+    //             name: expense_details.name,
+    //             day: expense_details.day,
+    //             month: expense_details.month,
+    //             year: expense_details.year,
+    //             category: {
+    //                 connect: { id: expense_details.categoryId }
+    //             }
+    //         }
+    //     });
+
+    //     return result;
+    // }
 
     public async editExpense(expense_id: number,
         new_expense_details: {

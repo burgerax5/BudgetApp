@@ -5,22 +5,22 @@ import { Button } from './ui/button'
 import { UsernameInput } from './ui/username-input';
 
 interface RegistrationFormState {
-    username: string;
+    email: string;
     password: string;
     confirmPassword: string;
     errors: {
-        username: string;
+        email: string;
         password: string;
         confirmPassword: string;
     };
 }
 
 const initialFormState: RegistrationFormState = {
-    username: '',
+    email: '',
     password: '',
     confirmPassword: '',
     errors: {
-        username: '',
+        email: '',
         password: '',
         confirmPassword: '',
     },
@@ -34,12 +34,12 @@ function RegisterForm() {
     const [submitted, setSubmitted] = useState(false)
 
     useEffect(() => {
-        checkUserExists(formState.username)
+        checkUserExists(formState.email)
     }, [formState])
 
     const validateForm = () => {
         const errors = {
-            username: formState.username.trim() === '' ? 'Username is required' : '',
+            email: formState.email.trim() === '' ? 'Username is required' : '',
             password: formState.password.length < 6 ? 'Password must be at least 6 characters' : '',
             confirmPassword:
                 formState.password === formState.confirmPassword
@@ -51,21 +51,21 @@ function RegisterForm() {
         return Object.values(errors).every((error) => error === '');
     };
 
-    const checkUserExists = async (username: string) => {
+    const checkUserExists = async (email: string) => {
         const backendUrl = 'http://localhost:8080/auth/users/'
 
         try {
-            const res = await fetch(backendUrl + username)
+            const res = await fetch(backendUrl + email)
             if (!res.ok)
                 throw new Error(`Network response was not ok: ${res.status}`)
 
             const data = await res.json()
 
-            // Check if the username is taken
+            // Check if the email is taken
             if (data.user_exists)
                 setError('Username is already taken.')
             else {
-                // Username is available
+                // Email is available
                 setError(null)
                 setData(data)
             }
@@ -77,7 +77,7 @@ function RegisterForm() {
     }
 
     const registerUser = async (backendUrl: string, userData: {
-        username: string,
+        email: string,
         password: string
     }) => {
         if (!data?.user_exists)
@@ -109,11 +109,11 @@ function RegisterForm() {
             const backendUrl = 'http://localhost:8080/auth/register'
             const formData = new FormData(e.currentTarget)
             const userData = {
-                username: formData.get('username') as string,
+                email: formData.get('email') as string,
                 password: formData.get('password') as string
             }
 
-            await checkUserExists(userData.username)
+            await checkUserExists(userData.email)
             await registerUser(backendUrl, userData)
         } else {
             console.log('Form has errors. Cannot submit.');
@@ -135,29 +135,23 @@ function RegisterForm() {
 
     return (
         <form className="w-full flex flex-col gap-3" onSubmit={handleSubmit}>
-            {submitted && (!formState.username || !formState.password || !formState.confirmPassword) &&
+            {submitted && (!formState.email || !formState.password || !formState.confirmPassword) &&
                 <span>Please fill in all fields</span>}
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    htmlFor="username">
-                    Username:
+                    htmlFor="email">
+                    Email:
                 </label>
                 <UsernameInput
                     formState={formState}
                     setFormState={setFormState}
                     onChange={handleChange}
-                    type="text"
-                    name="username"
-                    value={formState.username}
+                    type="email"
+                    name="email"
+                    value={formState.email}
                 />
-                {/* <Input
-                    type="text"
-                    name="username"
-                    value={formState.username}
-                    onChange={handleChange}
-                /> */}
                 {error && <span className="text-sm">{error}</span>}
-                {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
+                {formState.errors.email && <span className="text-sm">{formState.errors.email}</span>}
             </div>
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

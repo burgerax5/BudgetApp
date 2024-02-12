@@ -35,8 +35,8 @@ router.get('/users', (req: Request, res: Response) => {
     authController.getUsers(req, res)
 })
 
-router.get('/users/:username', (req: Request, res: Response) => {
-    authController.getUserByUsername(req, res)
+router.get('/users/:email', (req: Request, res: Response) => {
+    authController.getUserByEmail(req, res)
 })
 
 export default router;

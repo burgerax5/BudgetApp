@@ -8,19 +8,19 @@ import { isLoggedIn } from '@/store/userStore';
 import { UsernameInput } from './ui/username-input';
 
 interface RegistrationFormState {
-    username: string;
+    email: string;
     password: string;
     errors: {
-        username: string;
+        email: string;
         password: string;
     };
 }
 
 const initialFormState: RegistrationFormState = {
-    username: '',
+    email: '',
     password: '',
     errors: {
-        username: '',
+        email: '',
         password: '',
     },
 };
@@ -33,12 +33,12 @@ function LoginForm() {
     const $isLoggedIn = useStore(isLoggedIn)
 
     useEffect(() => {
-        checkUserExists(formState.username)
+        checkUserExists(formState.email)
     }, [formState])
 
     const validateForm = () => {
         const errors = {
-            username: formState.username.trim() === '' ? 'Username is required' : '',
+            email: formState.email.trim() === '' ? 'Email is required' : '',
             password: formState.password.length < 6 ? 'Password is required' : ''
         };
 
@@ -46,9 +46,9 @@ function LoginForm() {
         return Object.values(errors).every((error) => error === '');
     };
 
-    const checkUserExists = async (username: string) => {
+    const checkUserExists = async (email: string) => {
         try {
-            const res = await axios.get(`/auth/users/${username}`)
+            const res = await axios.get(`/auth/users/${email}`)
             if (res.status !== 200)
                 throw new Error(`Network response was not ok: ${res.status}`)
 
@@ -69,24 +69,24 @@ function LoginForm() {
     }
 
     const loginUser = async (userData: {
-        username: string,
+        email: string,
         password: string
     }) => {
-        const { username, password } = userData
+        const { email, password } = userData
         if (userExists)
             try {
-                const res = await axios.post('/auth/login', { username, password }, { withCredentials: true })
+                const res = await axios.post('/auth/login', { email, password }, { withCredentials: true })
                 if (res.status === 400)
-                    setError('Username or password is incorrect')
-                if (res.data.username) {
+                    setError('Email or password is incorrect')
+                if (res.data.email) {
                     isLoggedIn.set(true)
                     location.replace('/')
                 }
             } catch (err) {
-                setError('Username or password is incorrect')
+                setError('Email or password is incorrect')
             }
         else
-            setError('Username or password is incorrect')
+            setError('Email or password is incorrect')
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -95,11 +95,11 @@ function LoginForm() {
         if (validateForm()) {
             const formData = new FormData(e.currentTarget)
             const userData = {
-                username: formData.get('username') as string,
+                email: formData.get('email') as string,
                 password: formData.get('password') as string
             }
 
-            await checkUserExists(userData.username)
+            await checkUserExists(userData.email)
             await loginUser(userData)
         }
     };
@@ -119,21 +119,21 @@ function LoginForm() {
 
     return (
         <form className="w-full flex flex-col gap-3 sm:min-w-64 !" onSubmit={handleSubmit}>
-            {submitted && (!formState.username || !formState.password) &&
+            {submitted && (!formState.email || !formState.password) &&
                 <span>Please fill in all fields</span>}
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    htmlFor="username">
-                    Username:
+                    htmlFor="email">
+                    Email:
                 </label>
                 <UsernameInput
                     formState={formState}
                     setFormState={setFormState}
                     onChange={handleChange}
-                    type="text"
-                    name="username"
-                    value={formState.username} />
-                {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
+                    type="email"
+                    name="email"
+                    value={formState.email} />
+                {formState.errors.email && <span className="text-sm">{formState.errors.email}</span>}
             </div>
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -151,7 +151,7 @@ function LoginForm() {
             </div>
             {submitted && error && <span className="text-sm">{error}</span>}
             <Button
-                disabled={!formState.password.length || !formState.username.length}
+                disabled={!formState.password.length || !formState.email.length}
                 type="submit"
             >Sign In</Button>
         </form>

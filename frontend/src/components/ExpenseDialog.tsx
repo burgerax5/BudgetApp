@@ -78,7 +78,6 @@ export function DialogButton() {
     }
 
     const addExpense = async () => {
-        console.log('Form Data: ', formData)
         if (verifyFormData()) {
             const res = await axios.post('/expense/add', { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
             if (res.data.expense) {

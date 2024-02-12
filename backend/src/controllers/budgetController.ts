@@ -126,8 +126,8 @@ export class BudgetController {
 
     async deleteBudget(req: Request, res: Response) {
         try {
-            const username = req.body.user.username
-            const user = await this.userService.getUserByUsername(username)
+            const email = req.body.user.email
+            const user = await this.userService.getUserByEmail(email)
 
             if (!user)
                 throw new Error('User does not exist')

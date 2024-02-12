@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils"
 import { XCircle } from "lucide-react"
 
 interface RegistrationFormState {
-    username: string,
+    email: string,
     password: string,
     errors: {
-        username: string,
+        email: string,
         password: string,
     },
 }
@@ -31,12 +31,12 @@ const UsernameInput = React.forwardRef<HTMLInputElement, InputProps>(
                     ref={ref}
                     {...props}
                 />
-                {formState.username && <Button
+                {formState.email && <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setFormState(prevState => ({ ...prevState, username: '' }))}
+                    onClick={() => setFormState(prevState => ({ ...prevState, email: '' }))}
                 >
                     <XCircle className="h-4 w-4 cursor-pointer text-muted-foreground  hover:text-foreground" />
                 </Button>}
