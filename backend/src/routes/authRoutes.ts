@@ -40,7 +40,7 @@ router.get('/users/:username', (req: Request, res: Response) => {
 })
 
 router.get('/get-2fa-secret', (req: Request, res: Response) => {
-    authController.generate2FASecret(req, res)
+    authController.createOTPCode(req, res)
 })
 
 router.get('/verify-otp', (req: Request, res: Response) => {

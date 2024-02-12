@@ -6,6 +6,7 @@ import { addMockExpense, datedMockExpense, categorizedMockExpense } from "../scr
 import { PrismaClient } from "@prisma/client";
 import { resetTables, cleanUp } from "../scripts/resetTables";
 import { prisma } from "../../src/services/service_init";
+import { categories } from "../../src/constants/categories";
 
 describe('Test initialization and adding of expenses', () => {
     let expenseService: ExpenseService
@@ -44,7 +45,6 @@ describe('Test initialization and adding of expenses', () => {
         expect(expenses2.length).toBe(1)
     })
 
-    // FLAKY
     it('should increment the expense_id after each expense added', async () => {
         const { success: s1, error: err1 } = await addMockExpense(userService, categoryService, expenseService)
         expect(err1).toBeNull()
@@ -78,6 +78,13 @@ describe('Test if there are ids provided for rows that do not exist', () => {
         // Ensure user is not initialized
         expect(await userService.getUserById(1)).toBeNull()
 
+        await prisma.category.createMany({
+            data: categories
+        })
+
+        // Ensure category is initialized
+        expect(await categoryService.getCategoryById(2)).not.toBeNull()
+
         const { success, error } = await addMockExpense(userService, categoryService, expenseService)
         expect(success).toBeFalsy()
 
@@ -99,7 +106,7 @@ describe('Test if there are ids provided for rows that do not exist', () => {
             expect(error.message).toBe('Category does not exist')
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('Test updating and deleting existing expenses', () => {
@@ -161,7 +168,7 @@ describe('Test updating and deleting existing expenses', () => {
         expect(editedExpense?.categoryId).toBe(2)
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('Get expenses by month and year', () => {
@@ -217,6 +224,7 @@ describe('Get expenses by month and year', () => {
         expect(december).toEqual(all_expenses.slice(2).reverse())
     })
 
+    // FLAKY
     it("should return all expenses from 2023", async () => {
         const user = userService.getUserById(1)
 
@@ -246,11 +254,10 @@ describe('Get expenses by month and year', () => {
             year: 2023
         }, undefined)
         expect(expenses_in_2023.length).toBe(2)
-        expect(expenses_in_2023).toContainEqual(all_expenses[2])
-        expect(expenses_in_2023).toContainEqual(all_expenses[3])
+        expect(expenses_in_2023).toEqual([all_expenses[3], all_expenses[2]])
     })
 
-    afterEach(async () => cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('Get expenses by category', () => {
@@ -325,7 +332,7 @@ describe('Get expense by id', () => {
         expect(expense?.name).toBe("Cyberpunk 2077: Phantom Liberty")
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })
 
 describe('Get all expenses by user', () => {
@@ -353,5 +360,5 @@ describe('Get all expenses by user', () => {
         expect(expenses.length).toBe(3)
     })
 
-    afterEach(async () => await cleanUp(prisma))
+    afterAll(async () => await cleanUp(prisma))
 })

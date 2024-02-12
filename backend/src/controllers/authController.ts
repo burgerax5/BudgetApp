@@ -43,13 +43,9 @@ export class AuthController {
         return this.userService.refreshTokens.includes(refreshToken)
     }
 
-    public async generate2FASecret(req: Request, res: Response) {
-        const { secret } = req.body
-        const random_secret = uuid4()
-
-        const $secret = speakeasy.generateSecret({
-            name: secret ? secret : random_secret
-        })
+    // Call when creating an account
+    public async createOTPCode(req: Request, res: Response) {
+        const $secret = this.generate2FASecret()
 
         if ($secret.otpauth_url) {
             const qrcode = await this.generateQRCode($secret.otpauth_url)
@@ -63,15 +59,28 @@ export class AuthController {
     }
 
     public async verifyOTP(req: Request, res: Response) {
-        const { token, secret } = req.params
+        // The secret will not be in the body if the user already exists (will get from DB instead)
+        const { token, secret, user } = req.body
 
-        const valid = this.isValidOTP(secret, token)
+        let existing_secret: string | null = null
+        if (user) {
+            const user_obj = await this.userService.getUserByUsername(user.username)
+            if (user_obj) existing_secret = user_obj.secret
+        }
+
+        const valid = this.isValidOTP(existing_secret ? existing_secret : secret, token)
         res.json({
             valid
         })
     }
 
-    private async generateQRCode(otpauthUrl: string) {
+    generate2FASecret() {
+        return speakeasy.generateSecret({
+            name: uuid4()
+        })
+    }
+
+    async generateQRCode(otpauthUrl: string) {
         return new Promise<string>((resolve, reject) => {
             qrcode.toDataURL(otpauthUrl, (err, data) => {
                 if (err) reject(err)
