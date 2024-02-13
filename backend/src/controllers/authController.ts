@@ -6,6 +6,7 @@ import speakeasy from "speakeasy"
 import qrcode from "qrcode"
 
 import { UserService } from '../services/userService';
+import { User } from '@prisma/client';
 
 const compareAsync = promisify(bcrypt.compare);
 
@@ -63,31 +64,19 @@ export class AuthController {
         }
     }
 
-    public async checkHas2FA(req: Request, res: Response) {
-        const { user } = req.body
-
-        if (user) {
-            const user_obj = await this.userService.getUserByUsername(user.username)
-            res.json({
-                "2FA": user_obj?.secret ? true : false
-            })
-        } else {
-            res.status(401).send('User not found')
-        }
-    }
-
     public async verifyOTP(req: Request, res: Response) {
-        const { token, secret, user } = req.body
+        const { token, secret, username } = req.body
 
-        let existing_secret: string | null = await this.userService.getSecret(user.username)
+        if (!username)
+            res.status(400).send('Could not find a user with the provided username.')
+
+        let existing_secret = await this.userService.getSecret(username)
         const valid = this.isValidOTP(existing_secret ? existing_secret : secret, token)
 
         if (valid && !existing_secret)
-            await this.userService.addSecret(user.username, secret)
+            await this.userService.addSecret(username, secret)
 
-        res.json({
-            valid
-        })
+        res.json({ valid })
     }
 
     generate2FASecret(username: string) {
@@ -113,7 +102,11 @@ export class AuthController {
         })
     }
 
-    public async login(req: Request, res: Response): Promise<void> {
+    private authenticateUser(res: Response, user: User) {
+
+    }
+
+    public async verifyCredentials(req: Request, res: Response) {
         try {
             const { username, password } = req.body;
 
@@ -130,8 +123,26 @@ export class AuthController {
             }
 
             const result = await compareAsync(password, user.password);
+            const results = {
+                success: result,
+                requires2FA: user.secret ? true : false,
+                username: user.username
+            }
 
-            if (result) {
+            res.json(results)
+            return results
+        } catch (error) {
+            console.error('Error during login:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    }
+
+    public async login(req: Request, res: Response): Promise<void> {
+        try {
+            const { username } = req.body
+            const user = await this.userService.getUserByUsername(username)
+
+            if (user) {
                 const secretKey = process.env.ACCESS_TOKEN_SECRET;
                 const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET
 
@@ -147,6 +158,9 @@ export class AuthController {
                 const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
                 this.addRefreshToken(refreshToken)
 
+                console.log(`Access Token: ${accessToken}`)
+                console.log(`Refresh Token: ${refreshToken}`)
+
                 res.cookie("access-token", accessToken, {
                     maxAge: 2.592e+9, // 1 month
                     httpOnly: true,
@@ -159,11 +173,14 @@ export class AuthController {
                 })
 
                 res.status(200).json({
-                    username
+                    username: user.username
                 });
-            } else {
-                res.status(400).send('Invalid password');
             }
+            // this.authenticateUser(res, user)
+
+            else
+                res.status(400).send('User does not exist.')
+
         } catch (error) {
             console.error('Error during login:', error);
             res.status(500).send('Internal Server Error');

@@ -39,15 +39,18 @@ router.get('/users/:username', (req: Request, res: Response) => {
     authController.getUserByUsername(req, res)
 })
 
+// When adding 2FA to a user
 router.get('/get-2fa-secret', authenticateToken, (req: Request, res: Response) => {
     authController.createOTPCode(req, res)
 })
 
-router.get('/check-2fa', authenticateToken, (req: Request, res: Response) => {
-    authController.checkHas2FA(req, res)
+// Check if credentials are correct
+router.post('/verify-credentials', (req: Request, res: Response) => {
+    authController.verifyCredentials(req, res)
 })
 
-router.get('/verify-otp', authenticateToken, (req: Request, res: Response) => {
+// Check if the OTP entered for 2FA is correct
+router.post('/verify-otp', (req: Request, res: Response) => {
     authController.verifyOTP(req, res)
 })
 

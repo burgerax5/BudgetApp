@@ -38,10 +38,6 @@ function RegisterForm() {
         checkUserExists(formState.username)
     }, [formState])
 
-    useEffect(() => {
-
-    }, [qrcode])
-
     const validateForm = () => {
         const errors = {
             username: formState.username.trim() === '' ? 'Username is required' : '',
