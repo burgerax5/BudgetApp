@@ -141,8 +141,8 @@ function RegisterForm() {
                     name="username"
                     value={formState.username}
                 />
-                {error && <span className="text-sm">{error}</span>}
-                {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
+                {error && <span className="text-sm text-destructive">{error}</span>}
+                {formState.errors.username && <span className="text-sm text-destructive">{formState.errors.username}</span>}
             </div>
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -156,7 +156,7 @@ function RegisterForm() {
                     value={formState.password}
                     onChange={handleChange}
                 />
-                {formState.errors.password && <span className="text-sm">{formState.errors.password}</span>}
+                {formState.errors.password && <span className="text-sm text-destructive">{formState.errors.password}</span>}
             </div>
             <div>
                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -172,7 +172,7 @@ function RegisterForm() {
                     onChange={handleChange}
                 />
                 {formState.errors.confirmPassword && (
-                    <span className="text-sm">{formState.errors.confirmPassword}</span>
+                    <span className="text-sm text-destructive">{formState.errors.confirmPassword}</span>
                 )}
             </div>
             <Button type="submit">Register</Button>

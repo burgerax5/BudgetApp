@@ -1,7 +1,8 @@
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "./ui/label"
 
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,25 +34,13 @@ export function ModeToggle() {
   }, [theme])
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="px-2" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setThemeState("theme-light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setThemeState("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setThemeState("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center p-3 gap-3">
+      <div onClick={() => {
+        setThemeState(prev => (prev === "dark" ? "theme-light" : "dark"))
+      }}>
+        <Switch id="theme" checked={theme === "dark"} />
+      </div>
+      <Label htmlFor="theme">Dark Mode</Label>
+    </div>
   )
 }

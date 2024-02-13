@@ -214,7 +214,7 @@ function LoginForm() {
                         type="text"
                         name="username"
                         value={formState.username} />
-                    {formState.errors.username && <span className="text-sm">{formState.errors.username}</span>}
+                    {formState.errors.username && <span className="text-sm text-destructive">{formState.errors.username}</span>}
                 </div>
                 <div>
                     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -230,7 +230,7 @@ function LoginForm() {
                     />
                     {formState.errors.password && <span className="text-sm">{formState.errors.password}</span>}
                 </div>
-                {submitted && error && <span className="text-sm">{error}</span>}
+                {submitted && error && <span className="text-sm text-destructive">{error}</span>}
                 <Button
                     disabled={!formState.password.length || !formState.username.length}
                     type="submit"
@@ -247,7 +247,7 @@ function LoginForm() {
                             <Input onChange={(e) => {
                                 setFormState(prev => ({ ...prev, otp: e.target.value }))
                             }} />
-                            {formState.errors.otp && <div>{formState.errors.otp}</div>}
+                            {formState.errors.otp && <div className="text-sm text-destructive absolute mt-2">{formState.errors.otp}</div>}
                         </CardContent>
                         <CardFooter>
                             <Button className="ml-auto" onClick={handle2FASubmit}>Submit</Button>

@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+
+// Redirect to home if user is logged in
+import Protect from "@/components/Protect";
+---
+
+<Layout title="Login">
+    <Protect client:load mustBeAuthenticated={true} />
+    <main class="flex flex-col items-center h-svh">
+        <div
+            class="mt-20 border w-auto p-8 rounded-md flex flex-col items-center"
+        >
+            <h1 class="text-2xl font-bold py-3">Profile</h1>
+        </div>
+    </main>
+</Layout>

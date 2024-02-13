@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
 import { Input } from "@/components/ui/input";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/store/userStore";
 import { readCookie, deleteCookie } from "@/util/cookies";
 import { checkAuth } from "@/util/CheckAuth";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 function Navbar() {
     const [toggled, setToggled] = useState<boolean>(false)
@@ -53,11 +58,26 @@ function Navbar() {
                     {toggled && <X />}
                 </div>
                 <div className="flex gap-3 ml-auto hidden sm:flex">
-                    <ModeToggle />
                     {$isLoggedIn ?
-                        <Button onClick={handleLogout}>
-                            <a href="/">Logout</a>
-                        </Button> :
+                        <>
+                            <Popover>
+                                <PopoverTrigger>
+                                    <div className="my-auto border-2 border hover:bg-accent p-2 rounded-full transition-all">
+                                        <User />
+                                    </div>
+                                </PopoverTrigger>
+                                <PopoverContent className="flex flex-col w-full w-[160px] mr-3 p-0">
+                                    <a className="p-3 w-full cursor-pointer hover:bg-accent" href="/profile">Profile</a>
+                                    <div className="p-3 w-full cursor-pointer hover:bg-accent flex items-center justify-between" onClick={handleLogout}>
+                                        Logout
+                                        <LogOut className="h-4 w-4" />
+                                    </div>
+                                    <hr></hr>
+                                    <ModeToggle />
+                                </PopoverContent>
+                            </Popover>
+                        </>
+                        :
                         <>
                             <Button variant="outline" asChild>
                                 <a href="/login">Login</a>
@@ -72,7 +92,10 @@ function Navbar() {
                 <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/">Dashboard</a>
                 {$isLoggedIn && <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/expenses">Expenses</a>}
                 {$isLoggedIn ?
-                    <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout} href="/">Logout</a>
+                    <>
+                        <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" onClick={handleLogout} href="/">Logout</a>
+                        <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/profile">Profile</a>
+                    </>
                     :
                     <>
                         <a className="hover:text-blue-800 mt-auto py-3.5 w-full h-full border-b background text-center cursor-pointer" href="/login">Login</a>
