@@ -1,18 +1,15 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import BasicInformation from "@/components/profile/BasicInformation";
 import ProfileNav from "@/components/profile/ProfileNav";
-
-// Redirect to home if user is logged in
-// import Protect from "@/components/Protect";
+import Stats from "@/components/profile/Stats";
 ---
 
 <Layout title="Login">
     <!-- <Protect client:load mustBeAuthenticated={true} /> -->
     <main class="flex items-center justify-center w-svw">
-        <ProfileNav page="profile" client:load />
+        <ProfileNav page="stats" client:load />
         <div class="w-[360px] p-8 rounded-md flex flex-col items-center">
-            <BasicInformation client:load />
+            <Stats client:load />
         </div>
     </main>
 </Layout>

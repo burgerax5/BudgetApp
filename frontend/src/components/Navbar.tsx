@@ -59,24 +59,22 @@ function Navbar() {
                 </div>
                 <div className="flex gap-3 ml-auto hidden sm:flex">
                     {$isLoggedIn ?
-                        <>
-                            <Popover>
-                                <PopoverTrigger>
-                                    <div className="my-auto border-2 border hover:bg-accent p-2 rounded-full transition-all">
-                                        <User />
-                                    </div>
-                                </PopoverTrigger>
-                                <PopoverContent className="flex flex-col w-full w-[160px] mr-3 p-0">
-                                    <a className="p-3 w-full cursor-pointer hover:bg-accent" href="/profile">Profile</a>
-                                    <div className="p-3 w-full cursor-pointer hover:bg-accent flex items-center justify-between" onClick={handleLogout}>
-                                        Logout
-                                        <LogOut className="h-4 w-4" />
-                                    </div>
-                                    <hr></hr>
-                                    <ModeToggle />
-                                </PopoverContent>
-                            </Popover>
-                        </>
+                        <Popover>
+                            <PopoverTrigger>
+                                <div className="my-auto border-2 border hover:bg-accent p-2 rounded-full transition-all">
+                                    <User />
+                                </div>
+                            </PopoverTrigger>
+                            <PopoverContent className="flex flex-col w-full w-[160px] mr-3 p-0">
+                                <a className="p-3 w-full cursor-pointer hover:bg-accent" href="/profile">Profile</a>
+                                <div className="p-3 w-full cursor-pointer hover:bg-accent flex items-center justify-between" onClick={handleLogout}>
+                                    Logout
+                                    <LogOut className="h-4 w-4" />
+                                </div>
+                                <hr></hr>
+                                <ModeToggle />
+                            </PopoverContent>
+                        </Popover>
                         :
                         <>
                             <Button variant="outline" asChild>

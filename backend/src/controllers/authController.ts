@@ -103,7 +103,38 @@ export class AuthController {
     }
 
     private authenticateUser(res: Response, user: User) {
+        const secretKey = process.env.ACCESS_TOKEN_SECRET;
+        const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET
 
+        if (!secretKey)
+            throw new Error('JWT access token secret is not defined')
+
+        if (!refreshSecretKey)
+            throw new Error('JWT refresh token secret is not defined')
+
+        const user_token_details = { user_id: user.id, username: user.username }
+
+        const accessToken = this.generateAccessToken(secretKey, user_token_details)
+        const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
+        this.addRefreshToken(refreshToken)
+
+        console.log(`Access Token: ${accessToken}`)
+        console.log(`Refresh Token: ${refreshToken}`)
+
+        res.cookie("access-token", accessToken, {
+            maxAge: 2.592e+9, // 1 month
+            httpOnly: true,
+            secure: true
+        })
+
+        res.cookie("refresh-token", refreshToken, {
+            httpOnly: true,
+            secure: true
+        })
+
+        res.status(200).json({
+            username: user.username
+        });
     }
 
     public async verifyCredentials(req: Request, res: Response) {
@@ -142,42 +173,8 @@ export class AuthController {
             const { username } = req.body
             const user = await this.userService.getUserByUsername(username)
 
-            if (user) {
-                const secretKey = process.env.ACCESS_TOKEN_SECRET;
-                const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET
-
-                if (!secretKey)
-                    throw new Error('JWT access token secret is not defined')
-
-                if (!refreshSecretKey)
-                    throw new Error('JWT refresh token secret is not defined')
-
-                const user_token_details = { user_id: user.id, username: user.username }
-
-                const accessToken = this.generateAccessToken(secretKey, user_token_details)
-                const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
-                this.addRefreshToken(refreshToken)
-
-                console.log(`Access Token: ${accessToken}`)
-                console.log(`Refresh Token: ${refreshToken}`)
-
-                res.cookie("access-token", accessToken, {
-                    maxAge: 2.592e+9, // 1 month
-                    httpOnly: true,
-                    secure: true
-                })
-
-                res.cookie("refresh-token", refreshToken, {
-                    httpOnly: true,
-                    secure: true
-                })
-
-                res.status(200).json({
-                    username: user.username
-                });
-            }
-            // this.authenticateUser(res, user)
-
+            if (user)
+                this.authenticateUser(res, user)
             else
                 res.status(400).send('User does not exist.')
 
