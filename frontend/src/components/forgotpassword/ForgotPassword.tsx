@@ -16,10 +16,11 @@ import { readCookie } from '@/util/cookies'
 import axios from '@/api/axios'
 import { PasswordInput } from '../ui/password-input'
 import { UsernameInput } from '../ui/username-input'
+import Cookies from 'js-cookie'
 
 const ForgotPassword = () => {
     const [formState, setFormState] = useState({
-        username: '',
+        username: Cookies.get('username') ? Cookies.get('username') : '',
         password: '',
         confirmPassword: '',
         otp: '',

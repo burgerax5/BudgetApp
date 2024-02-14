@@ -156,10 +156,15 @@ function LoginForm() {
             await checkUserExists(userData.username)
             const res = await verifyCredentials(userData)
 
+            console.log(res?.data.success)
+
             if (res && res.data.success && !res.data.requires2FA)
                 await loginUser(userData)
-            else if (res && res.data.requires2FA)
+            else if (res && res.data.success && res.data.requires2FA)
                 setShow2FA(true)
+            else {
+                setError('Username or password is incorrect.')
+            }
         }
     };
 
