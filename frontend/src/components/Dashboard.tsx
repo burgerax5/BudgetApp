@@ -1,14 +1,43 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import DatePicker from "@/components/datepicker/DatePicker";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
 import OverviewCard from "./overviewcard/OverviewCard";
 import SpendingCard from "./spendingcard/SpendingCard";
+import { selectedDate } from "@/store/userStore";
 import axios from "@/api/axios";
+import { useStore } from "@nanostores/react";
 
-function Dashboard() {
+interface Props {
+    month: string | null,
+    year: string | null
+}
+
+const Dashboard: React.FC<Props> = ({ month, year }) => {
+    const $selectedDate = useStore(selectedDate)
+
+    useEffect(() => {
+        const monthInt = month !== null ? parseInt(month) : null
+        const yearInt = year !== null ? parseInt(year) : null
+
+        const isValidMonth = monthInt !== null && monthInt >= 1 && monthInt <= 12;
+        const isValidYear = yearInt !== null && yearInt >= 1900 && yearInt <= 2100;
+
+        if (isValidMonth && isValidYear) {
+            selectedDate.set({
+                date: new Date(yearInt, monthInt - 1, 1),
+                yearOnly: false
+            })
+        } else if (!isValidMonth && isValidYear) {
+            selectedDate.set({
+                ...$selectedDate,
+                yearOnly: true
+            })
+        }
+    }, [month, year])
+
     return (
         <>
             {/* <!-- Top --> */}

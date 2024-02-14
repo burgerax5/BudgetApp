@@ -57,6 +57,8 @@ const DatePickerForm: React.FC<Props> = ({ prevSelected }) => {
             date: new Date(date.year, date.month ? date.month - 1 : $selectedDate?.date.getMonth() - 1, 1),
             yearOnly
         })
+        const queryParams = yearOnly ? `/?year=${date.year}` : `/?month=${date.month}&year=${date.year}`
+        location.replace(queryParams)
     }
 
     return (

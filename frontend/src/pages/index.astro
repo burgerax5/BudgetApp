@@ -1,8 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import RenderHome from "@/components/RenderHome";
+const month = Astro.url.searchParams.get("month")! || "";
+const year = Astro.url.searchParams.get("year")! || "";
 ---
 
 <Layout title="Budget App">
-	<RenderHome client:load />
+	<RenderHome month={month} year={year} client:load />
 </Layout>
