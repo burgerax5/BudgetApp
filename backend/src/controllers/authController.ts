@@ -17,13 +17,16 @@ export class AuthController {
         this.userService = userService
     }
 
-    public home(req: Request, res: Response) {
+    public async home(req: Request, res: Response) {
         res.cookie('username', req.body.user.username)
         res.cookie('user_id', req.body.user_id)
+
+        const user = await this.userService.getUserByUsername(req.body.user.username)
 
         res.status(200).json({
             username: req.body.user.username,
             user_id: req.body.user.user_id,
+            enabled2FA: (user && user.secret) ? true : false
         })
     }
 
@@ -65,10 +68,9 @@ export class AuthController {
     }
 
     public async verifyOTP(req: Request, res: Response) {
-        const { token, secret, username } = req.body
+        const { token, secret, user } = req.body
 
-        if (!username)
-            res.status(400).send('Could not find a user with the provided username.')
+        const username = user.username
 
         let existing_secret = await this.userService.getSecret(username)
         const valid = this.isValidOTP(existing_secret ? existing_secret : secret, token)

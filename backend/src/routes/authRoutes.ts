@@ -7,8 +7,8 @@ import { userService } from '../services/service_init';
 const router: Router = express.Router();
 const authController: AuthController = new AuthController(userService)
 
-router.get('/', authenticateToken, (req: Request, res: Response) => {
-    authController.home(req, res)
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
+    await authController.home(req, res)
 });
 
 router.get('/clear-cookies', (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ router.post('/verify-credentials', (req: Request, res: Response) => {
 })
 
 // Check if the OTP entered for 2FA is correct
-router.post('/verify-otp', (req: Request, res: Response) => {
+router.post('/verify-otp', authenticateToken, (req: Request, res: Response) => {
     authController.verifyOTP(req, res)
 })
 

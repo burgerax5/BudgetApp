@@ -7,7 +7,7 @@ interface Props {
 const ProfileNav: React.FC<Props> = ({ page }) => {
 
     return (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 mt-[100px]">
             <a href="/profile/" className={`p-2 px-4 cursor-pointer hover:bg-accent rounded-md ${page === "profile" ? "bg-accent" : ""}`}>
                 Profile
             </a>
