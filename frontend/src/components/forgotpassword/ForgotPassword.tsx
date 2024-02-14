@@ -14,11 +14,22 @@ import { useStore } from '@nanostores/react'
 import { isLoggedIn } from '@/store/userStore'
 import { readCookie } from '@/util/cookies'
 import axios from '@/api/axios'
+import { PasswordInput } from '../ui/password-input'
+import { UsernameInput } from '../ui/username-input'
 
 const ForgotPassword = () => {
-    const [username, setUsername] = useState<string>("")
-    const [password, setPassword] = useState<string>("")
-    const [confirmPassword, setConfirmPassword] = useState<string>("")
+    const [formState, setFormState] = useState({
+        username: '',
+        password: '',
+        confirmPassword: '',
+        otp: '',
+        errors: {
+            username: '',
+            password: '',
+            confirmPassword: '',
+            otp: ''
+        },
+    })
     const [show2FA, setShow2FA] = useState(false)
     const [otp, setOTP] = useState("")
     const [errors, setErrors] = useState({
@@ -35,34 +46,30 @@ const ForgotPassword = () => {
                 .then(res => {
                     console.log(res.data.username)
                     if (res.data.username)
-                        setUsername(res.data.username)
+                        setFormState({ ...formState, })
                 })
         }
 
         getUsername()
     }, [])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>,
-        input: "username" | "confirmPassword" | "password") => {
-        switch (input) {
-            case "username":
-                setUsername(e.target.value)
-                break
-            case "password":
-                setPassword(e.target.value)
-                break
-            case "confirmPassword":
-                setConfirmPassword(e.target.value)
-                break
-            default:
-                console.error('Handle input change')
-        }
-    }
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        setFormState((prev) => ({
+            ...prev,
+            [name]: value,
+            errors: {
+                ...prev.errors,
+                [name]: '',
+            },
+        }));
+    };
 
     const resetPassword = async () => {
         await axios.post('/auth/resetPassword', {
-            username,
-            password
+            username: formState.username,
+            password: formState.password
         })
             .then(res => {
                 if (res.data.success) {
@@ -75,10 +82,11 @@ const ForgotPassword = () => {
 
     const getUser = async () => {
         console.log({
-            username,
-            password,
-            confirmPassword
+            username: formState.username,
+            password: formState.password,
+            confirmPassword: formState.confirmPassword
         })
+        const username = formState.username
         if (username.length !== 0) {
             await axios.get(`/auth/users/${username}`)
                 .then(res => {
@@ -93,7 +101,7 @@ const ForgotPassword = () => {
     }
 
     const verifyPassword = () => {
-        return password === confirmPassword && password.length >= 6
+        return formState.password === formState.confirmPassword && formState.password.length >= 6
     }
 
     const handleSubmit = () => {
@@ -125,12 +133,28 @@ const ForgotPassword = () => {
                 <CardContent className="flex flex-col gap-2">
                     {!$isLoggedIn && <>
                         <Label>Username</Label>
-                        <Input value={username} onChange={(e) => handleInputChange(e, "username")} />
+                        <UsernameInput
+                            formState={formState}
+                            setFormState={setFormState}
+                            onChange={handleInputChange}
+                            type="text"
+                            name="username"
+                            value={formState.username} />
                     </>}
                     <Label>New Password</Label>
-                    <Input value={password} onChange={(e) => handleInputChange(e, "password")} />
+                    <PasswordInput
+                        formState={formState}
+                        setFormState={setFormState}
+                        name="password"
+                        value={formState.password}
+                        onChange={handleInputChange} />
                     <Label>Confirm Password</Label>
-                    <Input value={confirmPassword} onChange={(e) => handleInputChange(e, "confirmPassword")} />
+                    <PasswordInput
+                        formState={formState}
+                        setFormState={setFormState}
+                        name="confirmPassword"
+                        value={formState.confirmPassword}
+                        onChange={handleInputChange} />
                 </CardContent>
                 <CardFooter>
                     <Button className="ml-auto" onClick={handleSubmit}>Submit</Button>
