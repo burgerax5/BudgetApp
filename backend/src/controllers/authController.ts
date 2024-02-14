@@ -297,7 +297,8 @@ export class AuthController {
     public async getUserByUsername(req: Request, res: Response): Promise<void> {
         const user = await this.userService.getUserByUsername(req.params.username)
         res.status(200).send({
-            user_exists: user ? true : false
+            user_exists: user ? true : false,
+            requires2FA: user?.secret ? true : false
         })
     }
 }

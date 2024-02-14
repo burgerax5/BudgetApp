@@ -8,14 +8,6 @@ import OverviewCard from "./overviewcard/OverviewCard";
 import SpendingCard from "./spendingcard/SpendingCard";
 import axios from "@/api/axios";
 
-interface OTPSecret {
-    ascii: string,
-    hex: string,
-    base32: string,
-    otpauth_url: string
-}
-
-
 function Dashboard() {
     return (
         <>
