@@ -54,4 +54,12 @@ router.post('/verify-otp', authenticateToken, (req: Request, res: Response) => {
     authController.verifyOTP(req, res)
 })
 
+router.post('/verify-otp-guest', (req: Request, res: Response) => {
+    authController.verifyOTP(req, res)
+})
+
+router.post('/resetPassword', async (req: Request, res: Response) => {
+    await authController.resetPassword(req, res)
+})
+
 export default router;

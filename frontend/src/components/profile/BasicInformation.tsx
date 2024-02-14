@@ -17,7 +17,6 @@ import { show2FAForm } from '@/store/userStore'
 const BasicInformation = () => {
     const [username, setUsername] = useState<string>("")
     const [enabled2FA, setEnabled2FA] = useState<boolean>(false)
-    const $show2FAForm = useStore(show2FAForm)
 
     const getUser = async () => {
         await axios.get('/auth/', { withCredentials: true }).then(res => {
@@ -50,7 +49,7 @@ const BasicInformation = () => {
                         <TableRow>
                             <TableCell className="font-medium">Password</TableCell>
                             <TableCell>
-                                <a className="text-primary">Change Password</a>
+                                <a className="text-primary" href="/forgotPassword">Change Password</a>
                             </TableCell>
                         </TableRow>
                         <TableRow>

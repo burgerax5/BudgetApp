@@ -17,27 +17,6 @@ interface OTPSecret {
 
 
 function Dashboard() {
-    const [user, setUser] = useState()
-    const [secret, setSecret] = useState<OTPSecret | null>(null)
-    const [qrcode, setQRCode] = useState<string>("")
-
-    useEffect(() => {
-        const getUser = async () => {
-            await axios.get('/')
-        }
-    }, [])
-
-    // For Google Authenticator
-    const generateQRCode = async () => {
-        const url = 'http://localhost:8080/auth/get-2fa-secret'
-        await axios.get(url).then(res => {
-            if (res.data.secret && res.data.qrcode) {
-                setSecret(res.data.secret)
-                setQRCode(res.data.qrcode)
-            }
-        })
-    }
-
     return (
         <>
             {/* <!-- Top --> */}

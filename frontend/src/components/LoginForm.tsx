@@ -139,7 +139,7 @@ function LoginForm() {
     }
 
     const verifyOTP = async (token: string, username: string) => {
-        const res = await axios.post('/auth/verify-otp', { token, username })
+        const res = await axios.post('/auth/verify-otp-guest', { token, username })
         return res.data.valid
     }
 

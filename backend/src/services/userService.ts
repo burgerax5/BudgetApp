@@ -40,6 +40,20 @@ export class UserService {
         })
     }
 
+    public async resetPassword(username: string, newPassword: string): Promise<User | null> {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        return this.prisma.user.update({
+            where: {
+                username: username
+            },
+            data: {
+                password: hashedPassword
+            }
+        })
+    }
+
     public async getAllUsers(): Promise<User[]> {
         return this.prisma.user.findMany()
     }

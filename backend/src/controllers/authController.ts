@@ -68,15 +68,15 @@ export class AuthController {
     }
 
     public async verifyOTP(req: Request, res: Response) {
-        const { token, secret, user } = req.body
+        const { token, secret, user, username } = req.body
 
-        const username = user.username
+        const $username = user ? user.username : username
 
-        let existing_secret = await this.userService.getSecret(username)
+        let existing_secret = await this.userService.getSecret($username)
         const valid = this.isValidOTP(existing_secret ? existing_secret : secret, token)
 
         if (valid && !existing_secret)
-            await this.userService.addSecret(username, secret)
+            await this.userService.addSecret($username, secret)
 
         res.json({ valid })
     }
@@ -225,6 +225,16 @@ export class AuthController {
 
         this.removeRefreshToken(token)
         res.status(200).send('Successful logout.')
+    }
+
+    public async resetPassword(req: Request, res: Response) {
+        const { username, password } = req.body
+
+        const user = await this.userService.resetPassword(username, password)
+
+        return res.json({
+            success: user ? true : false
+        })
     }
 
     public token(req: Request, res: Response) {
