@@ -18,11 +18,13 @@ import {
 interface RegistrationFormState {
     username: string
     password: string
-    otp: string
+    confirmPassword?: string
+    otp?: string
     errors: {
         username: string
         password: string,
-        otp: string
+        confirmPassword?: string,
+        otp?: string
     }
 }
 
@@ -170,6 +172,9 @@ function LoginForm() {
 
     const handle2FASubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+
+        if (!formState?.otp) return
+
         const valid = await verifyOTP(formState.otp, formState.username)
 
         if (valid) {

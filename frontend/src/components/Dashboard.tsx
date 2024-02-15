@@ -1,13 +1,12 @@
 import { DialogButton } from "@/components/ExpenseDialog";
 import DatePicker from "@/components/datepicker/DatePicker";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import Budget from "@/components/budgetcard/Budget";
 import CategoriesCard from "@/components/categorycard/CategoriesCard";
 import OverviewCard from "./overviewcard/OverviewCard";
 import SpendingCard from "./spendingcard/SpendingCard";
 import { selectedDate } from "@/store/userStore";
-import axios from "@/api/axios";
 import { useStore } from "@nanostores/react";
 
 interface Props {

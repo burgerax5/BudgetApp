@@ -7,15 +7,18 @@ import axios from '@/api/axios';
 
 
 interface RegistrationFormState {
-    username: string;
-    password: string;
-    confirmPassword: string;
+    username: string
+    password: string
+    confirmPassword?: string
+    otp?: string
     errors: {
-        username: string;
-        password: string;
-        confirmPassword: string;
-    };
+        username: string
+        password: string,
+        confirmPassword?: string,
+        otp?: string
+    }
 }
+
 
 const initialFormState: RegistrationFormState = {
     username: '',

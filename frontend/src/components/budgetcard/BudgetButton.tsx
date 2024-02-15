@@ -20,7 +20,8 @@ interface Budget {
     id: number,
     amount: number,
     month: number,
-    year: number
+    year: number,
+    categoryId: number
 }
 
 interface EditBudgetProps {

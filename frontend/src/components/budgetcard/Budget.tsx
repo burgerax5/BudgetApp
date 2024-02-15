@@ -15,6 +15,8 @@ import BudgetCircularProgress from './BudgetCircularProgress'
 
 interface Budget {
     id: number,
+    userId: number,
+    categoryId: number,
     amount: number,
     month: number,
     year: number
@@ -51,7 +53,7 @@ function Budget() {
                 .then(res => {
                     if (res.data.budgets.length) {
                         let matched = false
-                        res.data.budgets.map(b => {
+                        res.data.budgets.map((b: Budget) => {
                             if (($selectedDate.yearOnly && !b.month && b.year === year && !b.categoryId)
                                 || (!$selectedDate.yearOnly && b.month === month && b.year === year && !b.categoryId)) {
                                 setBudget(b)

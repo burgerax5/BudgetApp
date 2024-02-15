@@ -4,13 +4,17 @@ import { cn } from "@/lib/utils"
 import { XCircle } from "lucide-react"
 
 interface RegistrationFormState {
-    username: string,
-    password: string,
+    username: string
+    password: string
+    confirmPassword?: string
+    otp?: string
     errors: {
-        username: string,
+        username: string
         password: string,
-    },
+        otp?: string
+    }
 }
+
 
 interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
