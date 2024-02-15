@@ -1,14 +1,6 @@
 import * as React from "react"
-import { Moon, Sun } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "./ui/label"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { isDarkMode } from "@/store/userStore"
 
 export function ModeToggle() {

@@ -72,7 +72,7 @@ const EditButton: React.FC<Props> = ({ expense }) => {
 
     const editExpense = async () => {
         if (verifyFormData()) {
-            const res = await axios.put(`/expense/edit/${expense.id}`, { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
+            const res = await axios.put(`/expense/edit/${expense.id}`, { expense: { ...formData, amount: formData.amount } }, { withCredentials: true })
             if (res.data.expense) {
                 location.reload()
             }

@@ -26,11 +26,10 @@ interface Budget {
 
 interface EditBudgetProps {
     budget: Budget | null,
-    setBudget: React.Dispatch<React.SetStateAction<Budget | null>>,
     period: string
 }
 
-const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget, period }) => {
+const BudgetButton: React.FC<EditBudgetProps> = ({ budget, period }) => {
     const $selectedDate = useStore(selectedDate)
     const [newBudget, setNewBudget] = useState<number>(0)
 
@@ -65,17 +64,6 @@ const BudgetButton: React.FC<EditBudgetProps> = ({ budget, setBudget, period }) 
                 location.replace('/')
         }).catch(err => {
             console.error('Failed to edit budget:', err)
-        })
-    }
-
-    const deleteBudget = async () => {
-        await axios.delete(
-            `/budget/delete/${budget?.id}`, { withCredentials: true }
-        ).then(res => {
-            if (res.data.message === 'Successfully deleted a budget.')
-                location.replace('/')
-        }).catch(err => {
-            console.error('Failed to delete budget:', err)
         })
     }
 

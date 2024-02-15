@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Card,
     CardContent,
@@ -138,7 +138,7 @@ const OverviewCard = () => {
     }, [$selectedDate, $categories])
 
     useEffect(() => {
-        setExpenseData(prevData => ({
+        setExpenseData(() => ({
             labels: labels,
             datasets: data
         }))

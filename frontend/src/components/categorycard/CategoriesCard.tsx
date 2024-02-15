@@ -14,12 +14,6 @@ import { useStore } from "@nanostores/react"
 import { useState, useEffect } from "react"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
 
-interface Category {
-    id: number,
-    name: string,
-    colour: string
-}
-
 interface Budget {
     id: number,
     userId: number,
@@ -87,9 +81,9 @@ function CategoriesCard() {
                 else if (!yearOnly && b.year === year && b.month === month) return b
             })
 
-            setBudgetByCategory(b => {
+            setBudgetByCategory((b: number[]) => {
                 return b.map((value, i) =>
-                    (i === categoryId - 1) ? budget?.amount : value
+                    (i === categoryId - 1) ? budget?.amount as number : value
                 )
             })
         }

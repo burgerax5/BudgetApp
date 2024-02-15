@@ -3,15 +3,11 @@ import { useState, useEffect } from 'react'
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableHead,
-    TableHeader,
     TableRow,
 } from "@/components/ui/table"
 import { Lock } from 'lucide-react'
 import { Button } from '../ui/button'
-import { useStore } from '@nanostores/react'
 import { show2FAForm } from '@/store/userStore'
 
 const BasicInformation = () => {

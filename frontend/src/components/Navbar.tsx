@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ModeToggle } from "./ModeToggle";
-import { Input } from "@/components/ui/input";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import axios from "@/api/axios";
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from "@/store/userStore";
-import { readCookie, deleteCookie } from "@/util/cookies";
+import { deleteCookie } from "@/util/cookies";
 import { checkAuth } from "@/util/CheckAuth";
 import {
     Popover,

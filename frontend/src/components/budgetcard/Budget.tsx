@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Card,
     CardContent,
@@ -109,7 +109,7 @@ function Budget() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <BudgetButton budget={budget} setBudget={setBudget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
+                <BudgetButton budget={budget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
             </CardFooter>
         </Card>
     )

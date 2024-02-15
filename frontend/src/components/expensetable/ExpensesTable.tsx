@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from '../ui/checkbox'
 import { mergeSort } from '@/util/Sorting'
-import { ChevronsUp, ChevronsDown, Pencil, Trash } from 'lucide-react'
+import { ChevronsUp, ChevronsDown } from 'lucide-react'
 import ExpenseToolbar from '../expensefilters/ExpenseToolbar'
 import ExpenseContextMenu from './ExpenseContextMenu'
 
@@ -86,10 +86,10 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
         getCategories()
     }, [])
 
-    const shiftMode = (currMode: string) => {
+    const shiftMode = (currMode: string): "none" | "asc" | "desc" => {
         const cycle = ["none", "asc", "desc"]
         const index = cycle.findIndex((el) => el === currMode)
-        return cycle[(index + 1) % 3]
+        return cycle[(index + 1) % 3] as "none" | "asc" | "desc"
     }
 
     const getCategories = async () => {
@@ -157,7 +157,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                 onClick={() => {
                                     if (filteredExpenses) {
                                         setHeaders((prevHeaders) => {
-                                            const newHeaderState = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
+                                            const newHeaderState: Header = { ...defaultHeaders[i], mode: shiftMode(prevHeaders[i].mode) }
 
                                             if (newHeaderState.mode !== "none") {
                                                 filteredExpensesStore.set(mergeSort(filteredExpenses, header.keys, newHeaderState.mode))

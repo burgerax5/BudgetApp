@@ -6,7 +6,7 @@ import { expenseFilters } from '@/store/userStore'
 
 interface Props {
     name: string,
-    value: unknown,
+    value: React.ReactNode,
 }
 
 const ExpenseChip: React.FC<Props> = ({ name, value }) => {

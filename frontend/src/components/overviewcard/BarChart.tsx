@@ -1,5 +1,6 @@
 import { Bar } from "react-chartjs-2"
-import { Chart as ChartJS } from "chart.js/auto"
+import { Chart as ChartJS } from "chart.js"
+import type { ChartOptions } from "chart.js"
 import { useState, useEffect, useRef } from "react"
 import { useStore } from "@nanostores/react"
 import { selectedDate } from "@/store/userStore"
@@ -47,7 +48,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
             x: {
                 stacked: true,
                 ticks: {
-                    callback: function (value: unknown, index: unknown, values: unknown) {
+                    callback: function (value: number, index: number, values: unknown) {
                         if (screenWidth >= 640 && $selectedDate.yearOnly && months[value])
                             return months[value].slice(0, 3)
                         else if (screenWidth >= 640 && !$selectedDate.yearOnly)
@@ -60,7 +61,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
             y: {
                 stacked: true,
                 ticks: {
-                    callback: function (value: unknown, index: unknown, values: unknown) {
+                    callback: function (value: number, index: number, values: unknown) {
                         if (screenWidth >= 640)
                             return '$' + value
                         else if ($selectedDate.yearOnly && months[value])
@@ -109,7 +110,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
                         top: "50%",
                         transform: "translate(-50%, -50%)"
                     }}
-                    options={options} />}
+                    options={options as ChartOptions<'bar'>} />}
 
         </div>
     )

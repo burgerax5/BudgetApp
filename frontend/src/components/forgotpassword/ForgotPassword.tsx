@@ -12,15 +12,27 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { useStore } from '@nanostores/react'
 import { isLoggedIn } from '@/store/userStore'
-import { readCookie } from '@/util/cookies'
 import axios from '@/api/axios'
 import { PasswordInput } from '../ui/password-input'
 import { UsernameInput } from '../ui/username-input'
 import Cookies from 'js-cookie'
 
-const ForgotPassword = () => {
-    const [formState, setFormState] = useState({
-        username: Cookies.get('username') ? Cookies.get('username') : '',
+interface RegistrationFormState {
+    username: string
+    password: string
+    confirmPassword?: string
+    otp?: string
+    errors: {
+        username: string
+        password: string,
+        confirmPassword?: string,
+        otp?: string
+    }
+}
+
+const ForgotPasswordPage = () => {
+    const [formState, setFormState] = useState<RegistrationFormState>({
+        username: Cookies.get('username') ? Cookies.get('username') as string : '',
         password: '',
         confirmPassword: '',
         otp: '',
@@ -88,7 +100,7 @@ const ForgotPassword = () => {
             confirmPassword: formState.confirmPassword
         })
         const username = formState.username
-        if (username.length !== 0) {
+        if (username && username.length !== 0) {
             await axios.get(`/auth/users/${username}`)
                 .then(res => {
                     console.log(res.data)
@@ -187,4 +199,4 @@ const ForgotPassword = () => {
     )
 }
 
-export default ForgotPassword
+export default ForgotPasswordPage

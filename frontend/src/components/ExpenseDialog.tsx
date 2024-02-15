@@ -59,7 +59,6 @@ export function DialogButton() {
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [formData, setFormData] = useState<Expense>(defaultFormState)
     const [error, setError] = useState<string | null>(null)
-    const $expenses = useStore(expenses)
     const { toast } = useToast()
 
     const verifyFormData = (): boolean => {

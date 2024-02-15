@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import type { ChartData } from 'chart.js'
 import { expensesByCategory, isDarkMode } from '@/store/userStore'
 import { useStore } from '@nanostores/react'
 import axios from '@/api/axios'
@@ -107,7 +108,7 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
                         top: "50%",
                         transform: "translate(-50%, -50%)"
                     }}
-                    data={data}
+                    data={data as ChartData<'doughnut'>}
                 />
             </div>
         </>
