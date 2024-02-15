@@ -1,24 +1,24 @@
 import { atom } from "nanostores";
 
 interface Budget {
-    id: number,
-    userId: number,
-    categoryId: number,
+    id: string,
+    userId: string,
+    categoryId: string,
     amount: number,
     month: number,
     year: number
 }
 
 interface Category {
-    id: number,
+    id: string,
     name: string,
     colour: string
 }
 
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,

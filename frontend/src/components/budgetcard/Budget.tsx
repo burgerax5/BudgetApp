@@ -14,9 +14,9 @@ import { selectedDate, budgetByDate } from '@/store/userStore'
 import BudgetCircularProgress from './BudgetCircularProgress'
 
 interface Budget {
-    id: number,
-    userId: number,
-    categoryId: number,
+    id: string,
+    userId: string,
+    categoryId: string,
     amount: number,
     month: number,
     year: number
@@ -27,8 +27,8 @@ interface ExpenseResponse {
 }
 
 interface Expense {
-    id: number,
-    categoryId: number,
+    id: string,
+    categoryId: string,
     amount: number,
     name: string,
     day: number,
@@ -109,7 +109,7 @@ function Budget() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                <BudgetButton budget={budget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
+                {/* <BudgetButton budget={budget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} /> */}
             </CardFooter>
         </Card>
     )

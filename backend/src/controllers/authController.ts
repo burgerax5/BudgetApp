@@ -120,9 +120,6 @@ export class AuthController {
         const refreshToken = jwt.sign(user_token_details, refreshSecretKey)
         this.addRefreshToken(refreshToken)
 
-        console.log(`Access Token: ${accessToken}`)
-        console.log(`Refresh Token: ${refreshToken}`)
-
         res.cookie("access-token", accessToken, {
             maxAge: 2.592e+9, // 1 month
             httpOnly: true,

@@ -6,15 +6,19 @@ import { expensesByCategory, isDarkMode } from '@/store/userStore'
 import { useStore } from '@nanostores/react'
 import axios from '@/api/axios'
 
+ChartJS.register(ArcElement)
+ChartJS.register(Tooltip)
+ChartJS.register(Legend)
+
 interface Budget {
-    id: number,
+    id: string,
     amount: number,
     month: number,
     year: number
 }
 
 interface Category {
-    id: number,
+    id: string,
     name: string,
     colour: string
 }
@@ -75,6 +79,8 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
         const percentage = budget ? ((budget.amount - spent) / budget.amount) * 100 : 0
         setProgress(percentage)
     }, [budget, spent, progress])
+
+    console.log(data)
 
     return (
         <>

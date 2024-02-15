@@ -31,14 +31,14 @@ import { expenses } from "@/store/userStore"
 import { useStore } from "@nanostores/react"
 
 interface Category {
-    id: number,
+    id: string,
     name: string,
     colour: string
 }
 
 interface Expense {
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: string,
     day: number,
     month: number,
@@ -47,7 +47,7 @@ interface Expense {
 
 const defaultFormState = {
     name: '',
-    categoryId: 0,
+    categoryId: '',
     amount: '0',
     day: new Date().getDate(),
     month: new Date().getMonth() + 1,
@@ -151,7 +151,7 @@ export function DialogButton() {
                         </Label>
                         <Select onValueChange={(value) => {
                             setFormData(prevFormData => (
-                                { ...prevFormData, categoryId: parseInt(value) }
+                                { ...prevFormData, categoryId: value }
                             ))
                         }}>
                             <SelectTrigger className="w-[180px]">

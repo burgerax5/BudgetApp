@@ -12,10 +12,17 @@ export class CategoryService {
     }
 
     async populate_categories() {
-        if (await this.prisma.category.count() === 0)
-            await this.prisma.category.createMany({
-                data: categories,
-            })
+        for (const category of categories) {
+            try {
+                await this.prisma.category.upsert({
+                    where: { name: category.name },
+                    update: {},
+                    create: category
+                })
+            } catch (err) {
+                console.error(`Error while upserting category ${category.name}`)
+            }
+        }
     }
 
     public async getAllCategories(): Promise<Category[]> {

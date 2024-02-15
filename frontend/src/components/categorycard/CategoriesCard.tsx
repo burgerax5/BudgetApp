@@ -15,19 +15,18 @@ import { useState, useEffect } from "react"
 import { CategoryBudgetButton } from "./CategoryBudgetButton"
 
 interface Budget {
-    id: number,
-    userId: number,
-    categoryId: number | null,
+    id: string,
+    userId: string,
+    categoryId: string | null,
     month: number | null,
     year: number,
     amount: number
 }
 
 interface Expense {
-    id: number,
-    userId: number,
-    categoryId: number,
-    currencyId: number,
+    id: string,
+    userId: string,
+    categoryId: string,
     name: string,
     amount: number
 }
@@ -43,7 +42,7 @@ function CategoriesCard() {
     const [expenses, setExpenses] = useState<Expense[]>([])
     const [budgetByCategory, setBudgetByCategory] = useState(defaultBudgetsByCategory)
 
-    const getCategoryNameFromId = (id: number) => {
+    const getCategoryNameFromId = (id: string) => {
         return $categories.find(category => {
             if (category.id === id) return category
         })
@@ -52,6 +51,7 @@ function CategoriesCard() {
     useEffect(() => {
         const getCategories = async () => {
             const res = await axios.get('/category/')
+            console.log(res)
             if (res.data)
                 categories.set(res.data.categories)
         }

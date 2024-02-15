@@ -59,8 +59,8 @@ const Dashboard: React.FC<Props> = ({ month, year }) => {
 
                 {/* <!-- Right side --> */}
                 <div className="flex flex-col gap-3.5 w-full">
-                    <OverviewCard />
-                    <SpendingCard />
+                    {/* <OverviewCard />
+                    <SpendingCard /> */}
                 </div>
             </div>
         </>
