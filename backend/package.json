@@ -30,6 +30,7 @@
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.3.0",
     "qrcode": "^1.5.3",
     "speakeasy": "^2.0.0",
     "typescript": "^5.3.3",

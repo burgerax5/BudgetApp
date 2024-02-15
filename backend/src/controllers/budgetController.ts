@@ -15,15 +15,15 @@ export class BudgetController {
     async getBudgets(req: Request, res: Response) {
         try {
             const { month, year, categoryId } = req.query
-            const userId = parseInt(req.body.user.user_id as string, 10)
+            const userId = req.body.user.user_id
             const user = await this.userService.getUserById(userId)
 
             if (!user)
                 throw new Error('User does not exist.')
 
             let budget_details: {
-                userId: number,
-                categoryId?: number,
+                userId: string,
+                categoryId?: string,
                 month?: number,
                 year?: number
             } = { userId }
@@ -35,7 +35,7 @@ export class BudgetController {
                 budget_details.year = parseInt(year as string, 10)
 
             if (!isNaN(parseInt(categoryId as string, 10)))
-                budget_details.categoryId = parseInt(categoryId as string, 10)
+                budget_details.categoryId = categoryId as string
 
             const budgets = await this.budgetService.getBudgets(budget_details)
             res.status(200).json({
@@ -95,7 +95,7 @@ export class BudgetController {
             if (!user)
                 throw new Error('User does not exist.')
 
-            const budget_id = parseInt(req.params.budgetId)
+            const budget_id = req.params.budgetId
             const budget = await this.budgetService.getBudgetById(budget_id)
 
             if (!budget)
@@ -132,7 +132,7 @@ export class BudgetController {
             if (!user)
                 throw new Error('User does not exist')
 
-            const budget_id = parseInt(req.params.budgetId as string, 10)
+            const budget_id = req.params.budgetId as string
             const budget = await this.budgetService.getBudgetById(budget_id)
 
             if (!budget)

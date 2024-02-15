@@ -31,7 +31,7 @@ export class ExpenseController {
     }
 
     private async getUserFromParam(req: Request): Promise<User | null> {
-        const userId = parseInt(req.params.userId)
+        const userId = req.params.userId
         const user = await this.userService.getUserById(userId)
         return user
     }
@@ -42,7 +42,7 @@ export class ExpenseController {
         day: number,
         month: number,
         year: number,
-        categoryId: number,
+        categoryId: string,
     }): Promise<void> {
 
         // Ensure required fields are present in the expense object
@@ -65,7 +65,7 @@ export class ExpenseController {
     }
 
     async getExpenseById(req: Request, res: Response) {
-        const expense_id = parseInt(req.params.expenseId)
+        const expense_id = req.params.expenseId
         const expense = await this.expenseService.getExpenseById(expense_id)
         res.json({ expense })
     }
@@ -103,7 +103,7 @@ export class ExpenseController {
     async editExpense(req: Request, res: Response) {
         try {
             const { expense: expense_details } = req.body
-            const expense_id = parseInt(req.params.expenseId)
+            const expense_id = req.params.expenseId
 
             // Validate expense id
             let expense = await this.expenseService.getExpenseById(expense_id)
@@ -134,7 +134,7 @@ export class ExpenseController {
 
     async deleteExpense(req: Request, res: Response) {
         try {
-            const expense_id = parseInt(req.params.expenseId)
+            const expense_id = req.params.expenseId
             const expense = await this.expenseService.getExpenseById(expense_id)
 
             const user = await this.getUserFromRequest(req)

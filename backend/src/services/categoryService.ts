@@ -15,7 +15,6 @@ export class CategoryService {
         if (await this.prisma.category.count() === 0)
             await this.prisma.category.createMany({
                 data: categories,
-                skipDuplicates: true
             })
     }
 
@@ -31,7 +30,7 @@ export class CategoryService {
         })
     }
 
-    public async getCategoryById(category_id: number): Promise<Category | null> {
+    public async getCategoryById(category_id: string): Promise<Category | null> {
         return await this.prisma.category.findUnique({
             where: {
                 id: category_id

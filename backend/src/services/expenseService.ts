@@ -20,7 +20,7 @@ export class ExpenseService {
         return await this.prisma.expense.findMany()
     }
 
-    async getExpenseById(expense_id: number): Promise<Expense | null> {
+    async getExpenseById(expense_id: string): Promise<Expense | null> {
         return this.prisma.expense.findUnique({
             where: {
                 id: expense_id
@@ -29,11 +29,11 @@ export class ExpenseService {
     }
 
     async getExpenseByParams(where: {
-        userId: number,
+        userId: string,
         name?: string,
         month?: number,
         year?: number,
-        categoryId?: number,
+        categoryId?: string,
     }, take: number | undefined): Promise<Expense[]> {
         return this.prisma.expense.findMany({
             where,
@@ -47,46 +47,17 @@ export class ExpenseService {
         })
     }
 
-    // public async addExpense(expense_details: {
-    //     userId: number,
-    //     amount: number,
-    //     name: string,
-    //     day: number,
-    //     month: number,
-    //     year: number,
-    //     categoryId: number
-    // }): Promise<Expense | null> {
-    //     return await this.prisma.expense.create({
-    //         data: {
-    //             user: {
-    //                 connect: { id: expense_details.userId }
-    //             },
-    //             amount: expense_details.amount,
-    //             name: expense_details.name,
-    //             day: expense_details.day,
-    //             month: expense_details.month,
-    //             year: expense_details.year,
-    //             category: {
-    //                 connect: { id: expense_details.categoryId }
-    //             }
-    //         }
-    //     });
-    // }
-
     public async addExpense(expense_details: {
-        userId: number,
+        userId: string,
         amount: number,
         name: string,
         day: number,
         month: number,
         year: number,
-        categoryId: number
-    }, expense_id: number = 0): Promise<Expense | null> {
-        const result = await this.prisma.expense.upsert({
-            where: {
-                id: expense_id
-            },
-            create: {
+        categoryId: string
+    }): Promise<Expense | null> {
+        return await this.prisma.expense.create({
+            data: {
                 user: {
                     connect: { id: expense_details.userId }
                 },
@@ -98,30 +69,18 @@ export class ExpenseService {
                 category: {
                     connect: { id: expense_details.categoryId }
                 }
-            },
-            update: {
-                amount: expense_details.amount,
-                name: expense_details.name,
-                day: expense_details.day,
-                month: expense_details.month,
-                year: expense_details.year,
-                category: {
-                    connect: { id: expense_details.categoryId }
-                }
             }
         });
-
-        return result;
     }
 
-    public async editExpense(expense_id: number,
+    public async editExpense(expense_id: string,
         new_expense_details: {
             amount: number,
             day: number,
             month: number,
             year: number,
             name: string,
-            categoryId: number
+            categoryId: string
         }): Promise<void> {
 
         const { amount, day, month, year, name, categoryId } = new_expense_details
@@ -141,13 +100,13 @@ export class ExpenseService {
         })
     }
 
-    public async deleteExpense(expense_id: number): Promise<void> {
+    public async deleteExpense(expense_id: string): Promise<void> {
         await this.prisma.expense.delete({
             where: { id: expense_id }
         })
     }
 
-    async getExpensesByUser(user_id: number): Promise<Expense[]> {
+    async getExpensesByUser(user_id: string): Promise<Expense[]> {
         return await this.prisma.expense.findMany({
             where: { userId: user_id }
         })

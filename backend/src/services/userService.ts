@@ -20,7 +20,7 @@ export class UserService {
         })
     }
 
-    public async getUserById(user_id: number): Promise<User | null> {
+    public async getUserById(user_id: string): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where: {
                 id: user_id,

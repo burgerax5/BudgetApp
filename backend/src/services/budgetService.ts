@@ -9,7 +9,7 @@ export class BudgetService {
         this.prisma = prisma
     }
 
-    async checkMonthBudgetSums(user_id: number, amount: number, month: number | undefined, year: number): Promise<boolean> {
+    async checkMonthBudgetSums(user_id: string, amount: number, month: number | undefined, year: number): Promise<boolean> {
         const budgets = await this.prisma.budget.findMany({
             where: { userId: user_id, month, year }
         })
@@ -27,7 +27,7 @@ export class BudgetService {
         return monthsBudgetSums.categories + amount <= monthsBudgetSums.total
     }
 
-    async checkYearBudgetSums(user_id: number, amount: number, month: number | undefined, year: number | undefined) {
+    async checkYearBudgetSums(user_id: string, amount: number, month: number | undefined, year: number | undefined) {
         if (!year) return true
 
         const budgets = await this.prisma.budget.findMany({
@@ -58,19 +58,19 @@ export class BudgetService {
         return await this.prisma.budget.findMany()
     }
 
-    async getBudgetsByUser(user_id: number): Promise<Budget[]> {
+    async getBudgetsByUser(user_id: string): Promise<Budget[]> {
         return await this.prisma.budget.findMany({
             where: { userId: user_id }
         })
     }
 
-    async getBudgetById(budget_id: number): Promise<Budget | null> {
+    async getBudgetById(budget_id: string): Promise<Budget | null> {
         return await this.prisma.budget.findUnique({
             where: { id: budget_id }
         })
     }
 
-    async checkBudgetEmpty(user_id: number, category_id: number | undefined, month: number | undefined, year: number): Promise<boolean> {
+    async checkBudgetEmpty(user_id: string, category_id: string | undefined, month: number | undefined, year: number): Promise<boolean> {
         // If there isn't already a budget set for the specified the category & date for the user
         const budget = await this.prisma.budget.findFirst({
             where: {
@@ -85,8 +85,8 @@ export class BudgetService {
     }
 
     async addBudget(budget_details: {
-        userId: number,
-        categoryId: number | undefined,
+        userId: string,
+        categoryId: string | undefined,
         amount: number,
         month: number | undefined,
         year: number
@@ -96,9 +96,9 @@ export class BudgetService {
         })
     }
 
-    async editBudget(budget_id: number, budget_details: {
-        userId: number,
-        categoryId: number | undefined,
+    async editBudget(budget_id: string, budget_details: {
+        userId: string,
+        categoryId: string | undefined,
         amount: number,
         month: number | undefined,
         year: number
@@ -115,7 +115,7 @@ export class BudgetService {
         } return false
     }
 
-    async deleteBudget(budget_id: number): Promise<boolean> {
+    async deleteBudget(budget_id: string): Promise<boolean> {
         const budget = await this.getBudgetById(budget_id)
         if (!budget) return false
 
@@ -124,8 +124,8 @@ export class BudgetService {
     }
 
     async getBudgets(budget_details: {
-        userId: number,
-        categoryId?: number,
+        userId: string,
+        categoryId?: string,
         month?: number,
         year?: number
     }): Promise<Budget[]> {

@@ -30,7 +30,7 @@ export class AuthController {
         })
     }
 
-    private generateAccessToken(secretKey: string, user: { user_id: number; username: string }) {
+    private generateAccessToken(secretKey: string, user: { user_id: string; username: string }) {
         return jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '10m' });
     }
 
@@ -240,8 +240,6 @@ export class AuthController {
     public token(req: Request, res: Response) {
         try {
             const refreshToken = req.cookies['refresh-token']
-            console.log(refreshToken)
-            console.log(this.userService.refreshTokens)
             if (!refreshToken) return res.status(401).send('Missing refresh token')
 
             if (!this.verifyRefreshToken(refreshToken))
