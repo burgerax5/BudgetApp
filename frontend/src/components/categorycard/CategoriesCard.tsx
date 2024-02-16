@@ -65,7 +65,7 @@ function CategoriesCard() {
                 setExpenses(res.data.expenses)
         }
 
-        const getCategoryBudgets = async (categoryId: number) => {
+        const getCategoryBudgets = async (categoryId: string) => {
             const month = $selectedDate.date.getMonth() + 1
             const year = $selectedDate.date.getFullYear()
             const yearOnly = $selectedDate.yearOnly
@@ -83,16 +83,13 @@ function CategoriesCard() {
 
             setBudgetByCategory((b: number[]) => {
                 return b.map((value, i) =>
-                    (i === categoryId - 1) ? budget?.amount as number : value
+                    (budget?.categoryId === categoryId) ? budget?.amount as number : value
                 )
             })
         }
 
         getCategories()
         getExpenses()
-
-        for (let i = 1; i < 13; i++)
-            getCategoryBudgets(i)
     }, [$selectedDate])
 
     useEffect(() => {

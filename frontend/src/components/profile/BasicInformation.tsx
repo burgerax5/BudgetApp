@@ -28,10 +28,6 @@ const BasicInformation = () => {
         getUser()
     }, [])
 
-    useEffect(() => {
-        console.log(username)
-    }, [username])
-
     return (
         <div className="w-full h-full relative">
             <div className="max-w-[300px]">

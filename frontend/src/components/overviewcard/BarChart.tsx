@@ -56,7 +56,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
                         else
                             return '$' + value
                     }
-                },
+                }
             },
             y: {
                 stacked: true,
@@ -100,8 +100,9 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
 
     return (
         <div className="flex flex-col p-3 gap-1 w-full relative h-60 sm:h-72">
-            {expenseData.labels.length &&
-                <Bar data={expenseData}
+            {/* {expenseData.datasets.length > 0 &&
+                <Bar
+                    data={expenseData}
                     ref={chartRef}
                     style={{
                         position: "absolute",
@@ -110,7 +111,8 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
                         top: "50%",
                         transform: "translate(-50%, -50%)"
                     }}
-                    options={options as ChartOptions<'bar'>} />}
+                    options={options as ChartOptions<'bar'>}
+                />} */}
 
         </div>
     )

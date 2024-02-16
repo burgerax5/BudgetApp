@@ -80,8 +80,6 @@ const BudgetCircularProgress: React.FC<Props> = ({ budget, spent, period }) => {
         setProgress(percentage)
     }, [budget, spent, progress])
 
-    console.log(data)
-
     return (
         <>
             <div className={`rounded-full w-full h-full absolute flex items-center justify-center`}>

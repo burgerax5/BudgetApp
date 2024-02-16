@@ -23,12 +23,12 @@ import {
 } from "@/components/ui/select"
 
 interface Category {
-    id: number,
+    id: string,
     name: string
 }
 
 interface Budget {
-    id: number,
+    id: string,
     userId: number,
     categoryId: number,
     amount: number,

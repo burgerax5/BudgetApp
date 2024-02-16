@@ -32,9 +32,9 @@ enum Category {
 }
 
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,
@@ -49,7 +49,7 @@ interface Props {
 
 interface Expense {
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,

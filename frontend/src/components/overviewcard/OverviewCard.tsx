@@ -18,10 +18,9 @@ interface Dataset {
 }
 
 interface Expense {
-    id: number,
-    userId: number,
-    categoryId: number,
-    currencyId: number,
+    id: string,
+    userId: string,
+    categoryId: string,
     name: string,
     amount: number,
     day: number,
@@ -79,7 +78,7 @@ const OverviewCard = () => {
         return lastDayOfMonth.getDate()
     }
 
-    const aggregateExpenses = (expenses: Expense[], daysOrMonths: number, categoryId: number) => {
+    const aggregateExpenses = (expenses: Expense[], daysOrMonths: number, categoryId: string) => {
         let spentInPeriod: number[] = []
         for (let i = 0; i < daysOrMonths; i++)
             spentInPeriod.push(0)

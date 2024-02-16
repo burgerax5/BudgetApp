@@ -58,6 +58,15 @@ const ExpenseFilters = () => {
 
     const [maxPrice, setMaxPrice] = useState<number>(0)
 
+    const getCategoryName = async (id: string) => {
+        const res = await axios.get('/category')
+        if (res.data.categories)
+            for (let i = 0; i < res.data.categories.length; i++)
+                if (res.data.categories[i].id === id)
+                    return res.data.categories[i].name
+        return null
+    }
+
     useEffect(() => {
         const getExpenses = async () => {
             await axios.get('/expense', { withCredentials: true })
@@ -98,7 +107,7 @@ const ExpenseFilters = () => {
 
             // Apply category filter
             if (category)
-                newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.categoryId === Categories[category as keyof CategoryIndex]))
+                newFilteredExpenses = newFilteredExpenses.filter(exp => (getCategoryName(exp.id) !== null))
 
             // Apply year filter
             if (date.year && !date.month && date.checked)

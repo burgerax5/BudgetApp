@@ -30,9 +30,9 @@ import axios from '@/api/axios'
 import { Calendar } from '../ui/calendar'
 
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,
@@ -44,7 +44,7 @@ interface Props {
 }
 
 interface Category {
-    id: number,
+    id: string,
     name: string,
     colour: string
 }
@@ -68,6 +68,10 @@ const EditButton: React.FC<Props> = ({ expense }) => {
             [id]: value
         }))
 
+    }
+
+    const getCategoryName = (id: string) => {
+        return $categories.find(cat => cat.id === id)?.name
     }
 
     const editExpense = async () => {
@@ -123,11 +127,11 @@ const EditButton: React.FC<Props> = ({ expense }) => {
                         </Label>
                         <Select onValueChange={(value) => {
                             setFormData(prevFormData => (
-                                { ...prevFormData, categoryId: parseInt(value) }
+                                { ...prevFormData, categoryId: value }
                             ))
                         }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={$categories[expense.categoryId - 1].name} />
+                                <SelectValue placeholder={getCategoryName(expense.id)} />
                             </SelectTrigger>
                             <SelectContent>
                                 {$categories.map(category => {

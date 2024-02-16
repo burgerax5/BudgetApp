@@ -14,9 +14,9 @@ import { Trash } from 'lucide-react'
 import axios from '@/api/axios'
 
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,
