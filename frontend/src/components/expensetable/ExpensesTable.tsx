@@ -1,7 +1,7 @@
 import axios from '@/api/axios'
 import { useState, useEffect } from 'react'
 import { useStore } from '@nanostores/react'
-import { expenses, filteredExpenses as filteredExpensesStore } from '@/store/userStore'
+import { categories, expenses, filteredExpenses as filteredExpensesStore } from '@/store/userStore'
 import {
     Table,
     TableBody,
@@ -78,7 +78,7 @@ const defaultHeaders: Header[] = [
 const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filteredExpenses }) => {
     const $expenses = useStore(expenses)
     const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
-    const [categories, setCategories] = useState<CategoryInterface[]>([])
+    const $categories = useStore(categories)
     const [headers, setHeaders] = useState<Header[]>(defaultHeaders)
 
     useEffect(() => {
@@ -96,16 +96,16 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
         await axios.get('/category')
             .then(res => {
                 if (res.data.categories)
-                    setCategories(res.data.categories)
+                    categories.set(res.data.categories)
             })
     }
 
-    const getCategoryColour = (id: number) => {
-        for (let i = 0; i < categories.length; i++)
-            if (categories[i].id === id) {
-                return categories[i].colour
-            }
-        return "text-primary"
+    const getCategoryById = (id: string) => {
+        for (let i = 0; i < $categories.length; i++) {
+            if ($categories[i].id === id)
+                return $categories[i]
+        }
+        return null
     }
 
     const getExpenses = async () => {
@@ -198,8 +198,8 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                                 {expense.name}
                             </TableCell>
                             <TableCell className={`${headers[1].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}
-                                style={{ color: getCategoryColour(expense.categoryId) }}>
-                                {Category[expense.categoryId]}
+                                style={{ color: getCategoryById(expense.categoryId)?.colour }}>
+                                {getCategoryById(expense.categoryId)?.name}
                             </TableCell>
                             <TableCell className={`${headers[2].mode !== "none" ? "bg-slate-100/50 dark:bg-slate-800/50" : ""}`}>
                                 {getDate(expense)}

@@ -14,9 +14,9 @@ import axios from '@/api/axios'
 import Tool from './toolbar/Tool'
 
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,

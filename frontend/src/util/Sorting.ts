@@ -1,13 +1,12 @@
 interface Expense {
-    id: number,
+    id: string,
     name: string,
-    categoryId: number,
+    categoryId: string,
     amount: number,
     day: number,
     month: number,
     year: number
 }
-
 
 export function mergeSort(expenses: Expense[], fields: (keyof Expense)[], mode: string): Expense[] {
     if (expenses.length <= 1) {
