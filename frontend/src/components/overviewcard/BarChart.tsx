@@ -1,9 +1,13 @@
 import { Bar } from "react-chartjs-2"
-import { Chart as ChartJS } from "chart.js"
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement } from "chart.js"
 import type { ChartOptions } from "chart.js"
 import { useState, useEffect, useRef } from "react"
 import { useStore } from "@nanostores/react"
 import { selectedDate } from "@/store/userStore"
+
+ChartJS.register(CategoryScale)
+ChartJS.register(LinearScale)
+ChartJS.register(BarElement)
 
 interface Dataset {
     label: string,
@@ -100,7 +104,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
 
     return (
         <div className="flex flex-col p-3 gap-1 w-full relative h-60 sm:h-72">
-            {/* {expenseData.datasets.length > 0 &&
+            {expenseData.datasets.length > 0 &&
                 <Bar
                     data={expenseData}
                     ref={chartRef}
@@ -112,7 +116,7 @@ const BarChart: React.FC<Props> = ({ expenseData, title }) => {
                         transform: "translate(-50%, -50%)"
                     }}
                     options={options as ChartOptions<'bar'>}
-                />} */}
+                />}
 
         </div>
     )
