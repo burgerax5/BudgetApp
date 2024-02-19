@@ -17,11 +17,11 @@ import { Label } from "@/components/ui/label"
 import axios from '@/api/axios'
 
 interface Budget {
-    id: number,
+    id: string,
     amount: number,
     month: number,
     year: number,
-    categoryId: number
+    categoryId: string
 }
 
 interface EditBudgetProps {
