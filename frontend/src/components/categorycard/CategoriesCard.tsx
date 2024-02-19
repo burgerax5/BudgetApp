@@ -57,61 +57,68 @@ function CategoriesCard() {
         })
     }
 
-    useEffect(() => {
-        const getCategories = async () => {
-            const data: Category[] = await (await axios.get('/category/')).data.categories
-            if (data) {
-                categories.set(data)
+    const getCategories = async () => {
+        const data: Category[] = await (await axios.get('/category/')).data.categories
+        if (data) {
+            categories.set(data)
 
-                let budgetByCategories: CategoryBudget[] = []
-                data.map(cat => {
-                    budgetByCategories.push({
-                        id: cat.id,
-                        name: cat.name,
-                        colour: cat.colour,
-                        amount: 0
-                    })
+            let budgetByCategories: CategoryBudget[] = []
+            data.map(cat => {
+                budgetByCategories.push({
+                    id: cat.id,
+                    name: cat.name,
+                    colour: cat.colour,
+                    amount: 0
                 })
-
-                setBudgetByCategory(budgetByCategories)
-            }
-        }
-
-        const getExpenses = async () => {
-            const url = $selectedDate.yearOnly ? `/expense/?year=${$selectedDate.date.getFullYear()}` :
-                `/expense/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}`
-
-            const res = await axios.get(url, { withCredentials: true })
-            if (res.data.expenses)
-                setExpenses(res.data.expenses)
-        }
-
-        const getCategoryBudgets = async (categoryId: string) => {
-            const month = $selectedDate.date.getMonth() + 1
-            const year = $selectedDate.date.getFullYear()
-            const yearOnly = $selectedDate.yearOnly
-            const url = $selectedDate.yearOnly ? `/budget/?year=${year}&categoryId=${categoryId}` :
-                `/budget/?month=${month}&year=${year}&categoryId=${categoryId}`
-
-            const res = await axios.get(url, { withCredentials: true })
-            const budgets: Budget[] = res.data.budgets
-
-            if (!budgets.length) return
-            const budget = budgets.find(b => {
-                if (yearOnly && b.year === year && !b.month) return b
-                else if (!yearOnly && b.year === year && b.month === month) return b
             })
 
-            // setBudgetByCategory((b: number[]) => {
-            //     return b.map((value, i) =>
-            //         (budget?.categoryId === categoryId) ? budget?.amount as number : value
-            //     )
-            // })
+            setBudgetByCategory(budgetByCategories)
         }
+    }
 
+    const getExpenses = async () => {
+        const url = $selectedDate.yearOnly ? `/expense/?year=${$selectedDate.date.getFullYear()}` :
+            `/expense/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}`
+
+        const res = await axios.get(url, { withCredentials: true })
+        if (res.data.expenses)
+            setExpenses(res.data.expenses)
+    }
+
+    const getCategoryBudgets = async (categoryId: string) => {
+        const month = $selectedDate.date.getMonth() + 1
+        const year = $selectedDate.date.getFullYear()
+        const yearOnly = $selectedDate.yearOnly
+        const url = $selectedDate.yearOnly ? `/budget/?year=${year}&categoryId=${categoryId}` :
+            `/budget/?month=${month}&year=${year}&categoryId=${categoryId}`
+
+        const res = await axios.get(url, { withCredentials: true })
+        const budgets: Budget[] = res.data.budgets
+
+        if (!budgets.length) return
+        const budget = budgets.find(b => {
+            if (yearOnly && b.year === year && !b.month) return b
+            else if (!yearOnly && b.year === year && b.month === month) return b
+        })
+
+        setBudgetByCategory((prevBudgetByCat: CategoryBudget[]) => {
+            const index = prevBudgetByCat.findIndex(cat => cat.id === categoryId)
+            return prevBudgetByCat.slice(0, index).
+                concat({ ...prevBudgetByCat[index], amount: budget?.amount ? budget?.amount : 0 })
+                .concat(prevBudgetByCat.slice(index + 1))
+        })
+    }
+
+
+    useEffect(() => {
         getCategories()
         getExpenses()
+        $categories.map(cat => { getCategoryBudgets(cat.id) })
     }, [$selectedDate])
+
+    useEffect(() => {
+        $categories.map(cat => { getCategoryBudgets(cat.id) })
+    }, [$categories])
 
     useEffect(() => {
         let newExpensesByCategory = { ...defaultCategoryValue }

@@ -79,7 +79,11 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const getCategoryBudgetByName = (name: string) => {
         const entries = Object.entries(newBudgetByCategory)
         const cat = entries.find(catBudget => catBudget[0] === name)
-        return cat ? cat[1] : 0
+        return cat ? cat[1] : '0'
+    }
+
+    const checkCategoryHasBudget = () => {
+
     }
 
     const $selectedDate = useStore(selectedDate)
@@ -91,7 +95,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
-        console.log({ ...newBudgetByCategory, [id]: value })
         setNewBudgetByCategory(prevBudgetByCategory => {
             return { ...prevBudgetByCategory, [id]: parseFloat(value) }
         })
@@ -105,10 +108,6 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     useEffect(() => {
         setNewBudgetByCategory(getBudgetAmount())
     }, [budgetByCategory])
-
-    useEffect(() => {
-        console.log(newBudgetByCategory)
-    }, [newBudgetByCategory])
 
     useEffect(() => {
         setRemaining(() => {
@@ -149,21 +148,21 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
             const index = categories.findIndex(cat => cat.id === categoryId)
             const entries = Object.entries(newBudgetByCategory)
 
-            await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: category ? entries[index][1] : null }, { withCredentials: true })
+            await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: category ? entries[index][1] : 0 }, { withCredentials: true })
                 .catch(err => {
                     console.error('Failed to edit category budget:', err)
                 })
         }
     }
 
-    const addCategoryBudget = async (index: number) => {
+    const addCategoryBudget = async () => {
         if (!selectedCategory) return
 
         const budgetData = {
             month: $selectedDate.yearOnly ? null : $selectedDate.date.getMonth() + 1,
             year: $selectedDate.date.getFullYear(),
             categoryId: getCategoryIdByName(selectedCategory),
-            amount: getCategoryBudgetByName(selectedCategory)
+            amount: parseFloat(getCategoryBudgetByName(selectedCategory))
         }
 
         await axios.post('/budget/add/', budgetData, { withCredentials: true })
@@ -180,10 +179,10 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
 
                 if (!id) return
 
-                if (budgetByCategory[i] && id)
+                if (budgetByCategory[i].amount > 0 && id)
                     editCategoryBudget(id)
-                else if (!budgetByCategory[i] && id)
-                    addCategoryBudget(i)
+                else if (budgetByCategory[i].amount === 0 && id)
+                    addCategoryBudget()
             }
             location.replace('/')
         }
