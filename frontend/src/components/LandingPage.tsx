@@ -27,7 +27,7 @@ function LandingPage() {
                 <div className="px-6 py-[0.25rem] border rounded-full flex items-center justify-center gap-3">
                     <Trash className="w-4 h-4" /> Budget App
                 </div>
-                <h1 className="text-[3.75rem] font-bold flex flex-col leading-none">
+                <h1 className="text-[2rem] sm:text-[3.75rem] font-bold flex flex-col leading-none">
                     <span>The world's worst budget app</span>
                     <span>ever created.</span>
                 </h1>
@@ -36,11 +36,9 @@ function LandingPage() {
                         Get started <ChevronRight className="ml-3 w-4 h-4" />
                     </a>
                 </Button>
-                <div className="">
-                    <img src={$isDarkMode ? Hero.src : HeroLight.src} />
-                </div>
+                <img src={$isDarkMode ? Hero.src : HeroLight.src} />
             </section>
-            <section className="flex gap-12 items-center w-full overflow-hidden mt-12 py-6 relative">
+            <section className="flex gap-12 items-center w-full overflow-hidden mt-12 py-6 relative mb-32">
                 <div className="flex gap-12 absolute scroller1">
                     {icons.map(icon => (
                         <img key={icon} src={icon} className="max-h-[3.5rem]" />
@@ -51,6 +49,25 @@ function LandingPage() {
                         <img key={icon} src={icon} className="max-h-[3.5rem]" />
                     ))}
                 </div>
+            </section>
+            <section role="article flex flex-col">
+                <div className="px-6 py-[0.25rem] text-center border rounded-full gap-3 max-w-[130px]">
+                    Features
+                </div>
+                <article className="flex flex-col gap-20">
+                    <h2 className="text-[2rem] sm:text-[3.5rem] font-bold flex flex-col leading-none mt-6">
+                        Simple way of keeping track of your expenses.
+                    </h2>
+                    <div className="flex flex-col sm:flex-row">
+                        <div className="sm:w-[40%] flex flex-col gap-2">
+                            <h3 className="text-[1.5rem] font-bold">Set budgets</h3>
+                            <p className="opacity-70">
+                                You can set a budget for a specific month, or year as well as budgets for specific categories for the month and the year. The budgets can be modified at any time.
+                            </p>
+                        </div>
+                        <img className="sm:w-[60%] w-full" src={Hero.src} />
+                    </div>
+                </article>
             </section>
         </>
     )

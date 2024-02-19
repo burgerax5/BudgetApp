@@ -36,28 +36,64 @@ interface Budget {
     year: number
 }
 
+interface CategoryBudget {
+    id: string,
+    name: string,
+    colour: string,
+    amount: number
+}
+
 interface Props {
     categories: Category[],
-    budgetByCategory: number[],
+    budgetByCategory: CategoryBudget[],
 }
 
 export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCategory }) => {
+    const getBudgetAmount = () => {
+        return {
+            'Food & Drink': budgetByCategory[0] ? budgetByCategory[0].amount.toString() : '0',
+            'Entertainment': budgetByCategory[1] ? budgetByCategory[1].amount.toString() : '0',
+            "Transportation": budgetByCategory[2] ? budgetByCategory[2].amount.toString() : '0',
+            "Health": budgetByCategory[3] ? budgetByCategory[3].amount.toString() : '0',
+            "Education": budgetByCategory[4] ? budgetByCategory[4].amount.toString() : '0',
+            "Housing": budgetByCategory[5] ? budgetByCategory[5].amount.toString() : '0',
+            "Utilities": budgetByCategory[6] ? budgetByCategory[6].amount.toString() : '0',
+            "Insurance": budgetByCategory[7] ? budgetByCategory[7].amount.toString() : '0',
+            "Debt Repayment": budgetByCategory[8] ? budgetByCategory[8].amount.toString() : '0',
+            "Clothing": budgetByCategory[9] ? budgetByCategory[9].amount.toString() : '0',
+            "Miscellaneous": budgetByCategory[10] ? budgetByCategory[10].amount.toString() : '0',
+        }
+    }
+
+    const sumCategoryBudgets = () => {
+        const entries = Object.entries(newBudgetByCategory)
+        let sum = 0
+        entries.map(category => { sum += parseFloat(category[1]) })
+        return sum
+    }
+
+    const getCategoryIdByName = (name: string) => {
+        return categories.find(cat => cat.name === name)?.id
+    }
+
+    const getCategoryBudgetByName = (name: string) => {
+        const entries = Object.entries(newBudgetByCategory)
+        const cat = entries.find(catBudget => catBudget[0] === name)
+        return cat ? cat[1] : 0
+    }
+
     const $selectedDate = useStore(selectedDate)
     const $budgetByDate = useStore(budgetByDate)
-    const [newBudgetByCategory, setNewBudgetByCategory] = useState<number[]>(budgetByCategory)
+    const [newBudgetByCategory, setNewBudgetByCategory] = useState(getBudgetAmount())
     const [error, setError] = useState<string | null>(null)
-    const [remaining, setRemaining] = useState<number>($budgetByDate ?
-        $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr) : 0
-    )
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+    const [remaining, setRemaining] = useState<number>(sumCategoryBudgets())
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
-
+        console.log({ ...newBudgetByCategory, [id]: value })
         setNewBudgetByCategory(prevBudgetByCategory => {
-            const index = parseInt(id)
-            const amount = parseFloat(value) || 0
-            return prevBudgetByCategory.slice(0, index).concat(amount).concat(prevBudgetByCategory.slice(index + 1))
+            return { ...prevBudgetByCategory, [id]: parseFloat(value) }
         })
     }
 
@@ -67,27 +103,29 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     }, [remaining])
 
     useEffect(() => {
-        setNewBudgetByCategory(budgetByCategory)
+        setNewBudgetByCategory(getBudgetAmount())
     }, [budgetByCategory])
 
     useEffect(() => {
-        console.log()
-        setRemaining(prev => {
-            if ($budgetByDate && newBudgetByCategory.reduce((prev, curr) => prev + curr)) {
-                return $budgetByDate.amount - newBudgetByCategory.reduce((prev, curr) => prev + curr)
-            } else if ($budgetByDate) {
+        console.log(newBudgetByCategory)
+    }, [newBudgetByCategory])
+
+    useEffect(() => {
+        setRemaining(() => {
+            if ($budgetByDate && sumCategoryBudgets())
+                return $budgetByDate.amount - sumCategoryBudgets()
+            else if ($budgetByDate)
                 return $budgetByDate.amount
-            } else {
+            else
                 return 0
-            }
         })
     }, [newBudgetByCategory, $budgetByDate])
 
-    const getCategoryBudget = async (index: number): Promise<Budget | null> => {
+    const getCategoryBudget = async (categoryId: string): Promise<Budget | null> => {
 
         const url = $selectedDate.yearOnly ?
-            `/budget/?year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}` :
-            `/budget/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}&categoryId=${index + 1}`
+            `/budget/?year=${$selectedDate.date.getFullYear()}&categoryId=${categoryId}` :
+            `/budget/?month=${$selectedDate.date.getMonth() + 1}&year=${$selectedDate.date.getFullYear()}&categoryId=${categoryId}`
 
         const res = await axios.get(url, { withCredentials: true })
 
@@ -104,10 +142,14 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
         } return null
     }
 
-    const editCategoryBudget = async (index: number) => {
-        const budget = await getCategoryBudget(index)
+    const editCategoryBudget = async (categoryId: string) => {
+        const budget = await getCategoryBudget(categoryId)
         if (budget) {
-            await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: newBudgetByCategory[index] }, { withCredentials: true })
+            const category = categories.find(cat => cat.id === categoryId)
+            const index = categories.findIndex(cat => cat.id === categoryId)
+            const entries = Object.entries(newBudgetByCategory)
+
+            await axios.put(`/budget/edit/${budget.id}`, { ...budget, amount: category ? entries[index][1] : null }, { withCredentials: true })
                 .catch(err => {
                     console.error('Failed to edit category budget:', err)
                 })
@@ -115,20 +157,14 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     }
 
     const addCategoryBudget = async (index: number) => {
+        if (!selectedCategory) return
 
-        const budgetData = $selectedDate.yearOnly ?
-            {
-                month: null,
-                year: $selectedDate.date.getFullYear(),
-                categoryId: index + 1,
-                amount: newBudgetByCategory[index]
-            }
-            : {
-                month: $selectedDate.date.getMonth() + 1,
-                year: $selectedDate.date.getFullYear(),
-                categoryId: index + 1,
-                amount: newBudgetByCategory[index]
-            }
+        const budgetData = {
+            month: $selectedDate.yearOnly ? null : $selectedDate.date.getMonth() + 1,
+            year: $selectedDate.date.getFullYear(),
+            categoryId: getCategoryIdByName(selectedCategory),
+            amount: getCategoryBudgetByName(selectedCategory)
+        }
 
         await axios.post('/budget/add/', budgetData, { withCredentials: true })
             .catch(err => {
@@ -139,10 +175,14 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
     const handleOnSubmit = () => {
         if (!error) {
             if (selectedCategory !== null) {
-                const i = selectedCategory
-                if (budgetByCategory[i] && budgetByCategory[i] !== newBudgetByCategory[i])
-                    editCategoryBudget(i)
-                else if (!budgetByCategory[i] && newBudgetByCategory[i])
+                const id = getCategoryIdByName(selectedCategory)
+                const i = Object.keys(newBudgetByCategory).findIndex(catName => catName === selectedCategory)
+
+                if (!id) return
+
+                if (budgetByCategory[i] && id)
+                    editCategoryBudget(id)
+                else if (!budgetByCategory[i] && id)
                     addCategoryBudget(i)
             }
             location.replace('/')
@@ -172,14 +212,14 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                             Category
                         </Label>
                         <Select onValueChange={(value) => {
-                            setSelectedCategory(parseInt(value))
+                            setSelectedCategory(value)
                         }}>
                             <SelectTrigger className="w-[180px] col-span-3">
-                                <SelectValue placeholder={selectedCategory ? categories[selectedCategory].name : "Select Category"} />
+                                <SelectValue placeholder={selectedCategory ? selectedCategory : "Select Category"} />
                             </SelectTrigger>
                             <SelectContent>
                                 {categories.map((category, i) => (
-                                    <SelectItem key={`select-item-${i}`} value={i.toString()}>{category.name}</SelectItem>
+                                    <SelectItem key={`select-item-${i}`} value={category.name}>{category.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -192,10 +232,7 @@ export const CategoryBudgetButton: React.FC<Props> = ({ categories, budgetByCate
                                     id={selectedCategory.toString()}
                                     type="number"
                                     className="col-span-3"
-                                    value={
-                                        newBudgetByCategory[selectedCategory] ?
-                                            newBudgetByCategory[selectedCategory].toString() : 0
-                                    }
+                                    value={getCategoryBudgetByName(selectedCategory) ? getCategoryBudgetByName(selectedCategory)?.toString() : 0}
                                     placeholder="0"
                                     onChange={handleInputChange}
                                 />

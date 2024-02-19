@@ -109,7 +109,7 @@ function Budget() {
                 </div>
             </CardContent>
             <CardFooter className='justify-end'>
-                {/* <BudgetButton budget={budget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} /> */}
+                <BudgetButton budget={budget} period={`${$selectedDate.yearOnly ? "year" : "month"}`} />
             </CardFooter>
         </Card>
     )

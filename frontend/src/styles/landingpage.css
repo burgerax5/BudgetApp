@@ -4,7 +4,7 @@
 }
 
 .scroller2 {
-    transform: translateX(100%);
+    transform: translateX(110%);
     animation-delay: 0;
     animation: scroller2 20s infinite linear;
 }
