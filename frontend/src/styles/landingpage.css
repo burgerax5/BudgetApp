@@ -1,22 +1,10 @@
-.scroller1 {
-    animation-delay: 0;
-    animation: scroller1 20s infinite linear;
+.scroller {
+    animation: scroller 10s infinite linear;
+    width: max-content;
 }
 
-.scroller2 {
-    transform: translateX(110%);
-    animation-delay: 0;
-    animation: scroller2 20s infinite linear;
-}
-
-@keyframes scroller1 {
+@keyframes scroller {
     100% {
-        transform: translateX(-100%);
-    }
-}
-
-@keyframes scroller2 {
-    100% {
-        transform: translateX(0%);
+        transform: translateX(calc(-50% - 1.5rem));
     }
 }
