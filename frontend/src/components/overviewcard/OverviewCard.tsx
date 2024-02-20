@@ -7,7 +7,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useStore } from '@nanostores/react'
-import { categories, selectedDate } from '@/store/userStore'
+import { categories, selectedDate, expenses, budgetByDate } from '@/store/userStore'
 import BarChart from './BarChart'
 import axios from '@/api/axios'
 
@@ -49,7 +49,7 @@ const months = [
 ];
 
 const OverviewCard = () => {
-
+    const $expenses = useStore(expenses)
     const $selectedDate = useStore(selectedDate)
     const [labels, setLabels] = useState<string[]>([])
     const [data, setData] = useState<Dataset[]>([])
@@ -58,6 +58,20 @@ const OverviewCard = () => {
         labels: labels,
         datasets: data
     })
+    const [spent, setSpent] = useState(0)
+    const $budgetByDate = useStore(budgetByDate)
+
+    useEffect(() => {
+        const month = $selectedDate.date.getMonth() + 1
+        const year = $selectedDate.date.getFullYear()
+        let sum = 0
+        $expenses.map(exp => {
+            if (exp.month === month && exp.year === year)
+                sum += exp.amount
+        })
+        setSpent(sum)
+    }, [$expenses])
+
 
     useEffect(() => {
         const getCategories = async () => {
@@ -154,6 +168,10 @@ const OverviewCard = () => {
                 <CardDescription>Your spendings this {$selectedDate.yearOnly ? "year" : "month"}</CardDescription>
             </CardHeader>
             <CardContent className="relative">
+                <div className="p-1 text-2xl font-bold flex items-center justify-center gap-2">Spent:
+                    <span className={`${$budgetByDate && $budgetByDate?.amount >= spent ? "text-primary" : "text-destructive"}`}>
+                        ${spent}
+                    </span></div>
                 <BarChart expenseData={expenseData} title={title} />
             </CardContent>
         </Card>

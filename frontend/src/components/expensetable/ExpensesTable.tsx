@@ -62,12 +62,6 @@ interface Header {
     mode: "none" | "asc" | "desc"
 }
 
-interface CategoryInterface {
-    id: number,
-    name: string,
-    colour: string
-}
-
 const defaultHeaders: Header[] = [
     { name: "Expense", keys: ["name"], mode: "none" },
     { name: "Category", keys: ["categoryId"], mode: "none" },
@@ -76,6 +70,7 @@ const defaultHeaders: Header[] = [
 ]
 
 const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filteredExpenses }) => {
+    const $filteredExpenses = useStore(filteredExpensesStore)
     const $expenses = useStore(expenses)
     const [selectedExpenses, setSelectedExpenses] = useState<Expense[]>([])
     const $categories = useStore(categories)
@@ -110,7 +105,8 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
 
     const getExpenses = async () => {
         const res = await axios.get(`/expense/${take ? `?take=${take}` : ``}`, { withCredentials: true })
-        if (res.data) expenses.set(res.data.expenses)
+        console.log(res.data.expenses)
+        if (res.data) filteredExpensesStore.set(res.data.expenses)
     }
 
     const getDate = (expense: Expense) => {
@@ -184,7 +180,7 @@ const ExpensesTable: React.FC<Props> = ({ take, showCheckboxAndToolbar, filtered
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {filteredExpenses && filteredExpenses.map(expense => (
+                    {$filteredExpenses && $filteredExpenses.map(expense => (
                         <TableRow
                             key={crypto.randomUUID()}
                             onContextMenu={handleContextMenu}
