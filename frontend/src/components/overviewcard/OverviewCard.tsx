@@ -170,7 +170,7 @@ const OverviewCard = () => {
             <CardContent className="relative">
                 <div className="p-1 text-2xl font-bold flex items-center justify-center gap-2">Spent:
                     <span className={`${$budgetByDate && $budgetByDate?.amount >= spent ? "text-primary" : "text-destructive"}`}>
-                        ${spent}
+                        ${spent.toFixed(2)}
                     </span></div>
                 <BarChart expenseData={expenseData} title={title} />
             </CardContent>

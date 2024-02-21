@@ -43,12 +43,6 @@ interface Props {
     expense: Expense
 }
 
-interface Category {
-    id: string,
-    name: string,
-    colour: string
-}
-
 const EditButton: React.FC<Props> = ({ expense }) => {
     const $categories = useStore(categories)
     const [date, setDate] = useState<Date | undefined>(new Date(expense.year, expense.month - 1, expense.day))
@@ -76,7 +70,7 @@ const EditButton: React.FC<Props> = ({ expense }) => {
 
     const editExpense = async () => {
         if (verifyFormData()) {
-            const res = await axios.put(`/expense/edit/${expense.id}`, { expense: { ...formData, amount: formData.amount } }, { withCredentials: true })
+            const res = await axios.put(`/expense/edit/${expense.id}`, { expense: { ...formData, amount: parseFloat(formData.amount) } }, { withCredentials: true })
             if (res.data.expense) {
                 location.reload()
             }
@@ -131,7 +125,7 @@ const EditButton: React.FC<Props> = ({ expense }) => {
                             ))
                         }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={getCategoryName(expense.id)} />
+                                <SelectValue placeholder={getCategoryName(formData.categoryId) ? getCategoryName(formData.categoryId) : "Select Category"} />
                             </SelectTrigger>
                             <SelectContent>
                                 {$categories.map(category => {
