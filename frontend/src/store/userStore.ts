@@ -27,7 +27,8 @@ interface Expense {
 
 interface ExpenseFilters {
     search: string,
-    category: string | null,
+    categoryName: string | null,
+    categoryId: string | null,
     date: {
         month: number | null,
         year: number,

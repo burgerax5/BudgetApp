@@ -15,14 +15,14 @@ import { expenseFilters } from '@/store/userStore'
 
 interface Category {
     name: string,
-    id: number,
+    id: string,
 }
 
 const ExpenseCategorySelect = () => {
     const [categories, setCategories] = useState<Category[]>([])
     const $expenseFilters = useStore(expenseFilters)
     const [selectedCategory, setSelectedCategory] = useState<string>
-        ($expenseFilters.category ? $expenseFilters.category : "Any category")
+        ($expenseFilters.categoryName ? $expenseFilters.categoryName : "Any category")
 
     useEffect(() => {
         const getCategories = async () => {
@@ -37,13 +37,13 @@ const ExpenseCategorySelect = () => {
     const getCategory = (name: string) => {
         categories.map(cat => {
             if (cat.name === name)
-                expenseFilters.set({ ...$expenseFilters, category: cat.name })
+                expenseFilters.set({ ...$expenseFilters, categoryName: cat.name, categoryId: cat.id })
         })
     }
 
     useEffect(() => {
-        setSelectedCategory($expenseFilters.category ? $expenseFilters.category : "Any category")
-    }, [$expenseFilters.category])
+        setSelectedCategory($expenseFilters.categoryName ? $expenseFilters.categoryName : "Any category")
+    }, [$expenseFilters])
 
     return (
         <div>

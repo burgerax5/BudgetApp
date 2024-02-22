@@ -16,6 +16,16 @@ import axios from '@/api/axios';
 import ExpenseChip from './ExpenseChip'
 import { DialogButton } from '../ExpenseDialog'
 
+interface Expense {
+    id: string,
+    name: string,
+    categoryId: string,
+    amount: number,
+    day: number,
+    month: number,
+    year: number
+}
+
 interface CategoryIndex {
     'Food & Drink': number;
     Entertainment: number;
@@ -58,7 +68,7 @@ const ExpenseFilters = () => {
 
     const [maxPrice, setMaxPrice] = useState<number>(0)
 
-    const getCategoryName = async (id: string) => {
+    const getCategoryName = async (id: string): Promise<string | null> => {
         const res = await axios.get('/category')
         if (res.data.categories)
             for (let i = 0; i < res.data.categories.length; i++)
@@ -97,17 +107,18 @@ const ExpenseFilters = () => {
         expenseFilters.set({ ...$expenseFilters, search })
     }, [search])
 
-    const applyFilters = () => {
+    const applyFilters = async () => {
         let newFilteredExpenses = $expenses.slice()
-        const { search, category, date, maxPrice } = $expenseFilters
+        const { search, categoryName, categoryId, date, maxPrice } = $expenseFilters
 
-        $expenses.map(exp => {
+        $expenses.map(async () => {
             // Apply search filter
             newFilteredExpenses = newFilteredExpenses.filter(exp => exp.name.toLowerCase().includes(search.toLowerCase()))
 
             // Apply category filter
-            if (category)
-                newFilteredExpenses = newFilteredExpenses.filter(exp => (getCategoryName(exp.id) !== null))
+            if (categoryName && categoryId) {
+                newFilteredExpenses = newFilteredExpenses.filter(exp => exp.categoryId === categoryId)
+            }
 
             // Apply year filter
             if (date.year && !date.month && date.checked)
@@ -120,6 +131,8 @@ const ExpenseFilters = () => {
             if (maxPrice)
                 newFilteredExpenses = newFilteredExpenses.filter(exp => (exp.amount <= maxPrice))
         })
+
+        newFilteredExpenses = newFilteredExpenses.flat()
 
         filteredExpenses.set(newFilteredExpenses)
     }
@@ -149,8 +162,8 @@ const ExpenseFilters = () => {
                                 <ExpenseDatePicker />
                                 <ExpensePriceRange maxPrice={maxPrice} />
                                 <div className="flex gap-3">
-                                    {$expenseFilters.category &&
-                                        <ExpenseChip name={"category"} value={$expenseFilters.category} />}
+                                    {($expenseFilters.categoryName !== null && $expenseFilters.categoryId) &&
+                                        <ExpenseChip name={"category"} value={$expenseFilters.categoryName} />}
                                     {($expenseFilters.date.checked) &&
                                         <ExpenseChip
                                             name={"date"}
