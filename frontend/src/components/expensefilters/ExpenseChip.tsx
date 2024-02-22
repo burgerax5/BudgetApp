@@ -15,7 +15,7 @@ const ExpenseChip: React.FC<Props> = ({ name, value }) => {
     const removeFilter = () => {
         switch (name) {
             case "category":
-                expenseFilters.set({ ...$expenseFilters, category: null })
+                expenseFilters.set({ ...$expenseFilters, categoryName: null, categoryId: null })
                 break
             case "date":
                 expenseFilters.set({
